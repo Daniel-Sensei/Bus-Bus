@@ -1,0 +1,8 @@
+{
+  "name": "BusBus",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "ddda416d"
+}
