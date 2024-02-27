@@ -1,0 +1,32 @@
+.custom-badge {
+    background-color: transparent;
+    padding-right: 4px;
+    position: relative;
+    margin-right: 8px;
+    color: white; /* Imposta il colore del testo a bianco */
+    border: 2px solid #ccc; /* Aggiunge un bordo grigio */
+
+    display: flex;
+    align-items: center;
+
+    font-size: 14px; /* Imposta la dimensione del badge desiderata (13px DEFAULT) */
+
+  }
+  
+  .custom-badge::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: blue;
+  }
+
+  .icon-center {
+    margin-right: 4px; /* Aggiunge un po' di spazio tra l'icona e il testo */
+  }
+  
+  .label-small {
+    font-size: 15px; /* Imposta la dimensione del testo desiderata */
+  }
