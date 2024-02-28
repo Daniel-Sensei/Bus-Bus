@@ -3,14 +3,13 @@
     padding-right: 4px;
     position: relative;
     margin-right: 8px;
-    color: white; /* Imposta il colore del testo a bianco */
     border: 2px solid #ccc; /* Aggiunge un bordo grigio */
 
     display: flex;
     align-items: center;
 
     font-size: 14px; /* Imposta la dimensione del badge desiderata (13px DEFAULT) */
-
+    color: var(--ion-color-contrast); /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
   }
   
   .custom-badge::after {
