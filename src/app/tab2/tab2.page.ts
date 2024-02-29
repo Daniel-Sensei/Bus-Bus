@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
+import { Geolocation, Position } from '@capacitor/geolocation'
 
 @Component({
   selector: 'app-tab2',
@@ -8,25 +9,57 @@ import * as L from 'leaflet';
 })
 export class Tab2Page implements OnInit{
   map!: L.Map;
+  currentPosition!: Position;
 
   selectedSegment: string = 'default'; // Segmento attualmente selezionato
-  fermate: string[] = ['Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7', 'Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7']; // Lista delle fermate
+  fermate: string[] = ['Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7', 'Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7']; // Lista delle fermate
   autobus: string[] = ['Bus A', 'Bus B', 'Bus C']; // Lista dei bus
 
   constructor() {}
 
+  async getCurrentPosition() {
+    try {
+      const permissionStatus = await Geolocation.checkPermissions();
+      console.log("Permission status: ", permissionStatus.location);
+
+      if (permissionStatus.location != 'granted') {
+        const requestStatus = await Geolocation.requestPermissions();
+        console.log("Permission request: ", requestStatus.location);
+        if (requestStatus.location != 'granted') {
+          // Non è stato concesso il permesso
+          // Vai alla pagina delle impostazioni per abilitare il permesso
+          // Bisogna garantire posizione esatta per il funzionamento dell'app
+          return;
+        }
+      }
+
+      let options: PositionOptions = {
+        maximumAge: 3000,
+        timeout: 10000,
+        enableHighAccuracy: true
+      };
+      this.currentPosition = await Geolocation.getCurrentPosition(options);
+    } catch (error) {
+      console.error('Error getting current position', error);
+      throw(error);
+    }
+  }
+
   ngOnInit() {
-    this.initializeMap();
+    this.getCurrentPosition().then(() => {
+      this.initializeMap();
+    });
   }
 
   initializeMap() {
     this.map = L.map('map', {
-      center: [ 45.877, 8.695 ],
+      center: [ this.currentPosition.coords.latitude, this.currentPosition.coords.longitude ],
       zoom: 15,
       renderer: L.canvas()
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c --> trasporti
+    L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', {
       attribution: 'Open Street Map'
     }).addTo(this.map);
 
@@ -39,7 +72,7 @@ export class Tab2Page implements OnInit{
     });
 
     // Aggiungi il marker con l'icona personalizzata
-    const marker = L.marker([45.877, 8.695], { icon: customIcon }).addTo(this.map);
+    const marker = L.marker([this.currentPosition.coords.latitude, this.currentPosition.coords.longitude], { icon: customIcon }).addTo(this.map);
 
     this.map.whenReady(() => {
       setTimeout(() => {

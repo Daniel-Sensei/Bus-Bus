@@ -4,5 +4,20 @@
 }
 
 #map {
-    min-height: 50%;
+    min-height: 65%;
+}
+
+/* Stile per il segmento */
+.top-segment {
+    //margin-top: -56px; /* Altezza dell'header per compensare lo spazio bianco */
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Assicura che il segmento sia sopra all'header */
+    --background: var(--ion-item-background);
+}
+
+ion-list {
+    padding-top: 0;
 }

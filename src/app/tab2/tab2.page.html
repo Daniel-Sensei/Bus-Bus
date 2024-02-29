@@ -1,19 +1,11 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>
-      Fermate
-    </ion-title>
-    <ion-searchbar slot="start" (ionChange)="search($event)" placeholder="Cerca nelle vicinanze"></ion-searchbar>
-  </ion-toolbar>
-</ion-header>
+
 
 <ion-content [fullscreen]="true">
   <div id="map"></div>
 
-    <ion-segment value="default" (ionChange)="segmentChanged($event)">
+  <ion-list *ngIf="selectedSegment === 'default'">
+    <!-- Segmento ancorato sopra la lista delle fermate -->
+    <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
       <ion-segment-button value="default">
         <ion-label>Fermate</ion-label>
       </ion-segment-button>
@@ -22,21 +14,27 @@
       </ion-segment-button>
     </ion-segment>
 
-    
-
     <!-- Lista delle fermate -->
-    <ion-list *ngIf="selectedSegment === 'default'">
-      <ion-item *ngFor="let fermata of fermate">
-        {{ fermata }}
-      </ion-item>
-    </ion-list>
+    <ion-item *ngFor="let fermata of fermate">
+      {{ fermata }}
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="selectedSegment === 'segment'">
+    <!-- Segmento ancorato sopra la lista dei bus -->
+    <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
+      <ion-segment-button value="default">
+        <ion-label>Fermate</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="segment">
+        <ion-label>Bus</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
     <!-- Lista dei bus -->
-    <ion-list *ngIf="selectedSegment === 'segment'">
-      <ion-item *ngFor="let bus of autobus">
-        {{ bus }}
-      </ion-item>
-    </ion-list>
-    
+    <ion-item *ngFor="let bus of autobus">
+      {{ bus }}
+    </ion-item>
+  </ion-list>
 
 </ion-content>
