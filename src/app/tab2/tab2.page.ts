@@ -9,6 +9,10 @@ import * as L from 'leaflet';
 export class Tab2Page implements OnInit{
   map!: L.Map;
 
+  selectedSegment: string = 'default'; // Segmento attualmente selezionato
+  fermate: string[] = ['Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7', 'Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7']; // Lista delle fermate
+  autobus: string[] = ['Bus A', 'Bus B', 'Bus C']; // Lista dei bus
+
   constructor() {}
 
   ngOnInit() {
@@ -42,6 +46,15 @@ export class Tab2Page implements OnInit{
         this.map.invalidateSize();
       }, 1000);
     });
+  }
+
+  segmentChanged(event: any) {
+    this.selectedSegment = event.detail.value;
+  }
+
+  search(event: CustomEvent) {
+    const query = event.detail.value;
+    console.log(query);
   }
 
 }
