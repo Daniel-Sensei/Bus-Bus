@@ -16,6 +16,12 @@
     z-index: 1000;
     /* Assicura che il segmento sia sopra all'header */
     --background: var(--ion-item-background);
+
+    //imposta il colore di sfondo bianco per il tema chiaro
+    @media (prefers-color-scheme: light) {
+        --background: #fff;
+    }
+    
 }
 
 ion-list {
