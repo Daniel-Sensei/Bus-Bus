@@ -15,8 +15,8 @@
     </ion-segment>
 
     <!-- Lista delle fermate -->
-    <ion-item *ngFor="let fermata of fermate">
-      {{ fermata }}
+    <ion-item *ngFor="let fermata of filteredStops">
+      {{ fermata.name }}
     </ion-item>
   </ion-list>
 

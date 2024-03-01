@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet-routing-machine';
+
 import { Geolocation, Position } from '@capacitor/geolocation';
 import { stops } from '../model/MOCKS/stops_mock';
+import { Stop } from '../model/Stop';
 
 @Component({
   selector: 'app-tab2',
@@ -13,6 +16,8 @@ export class Tab2Page implements OnInit {
   currentPosition!: Position;
   selectedRadius: number = 1000;
   selectedSegment: string = 'default';
+
+  filteredStops: Stop[] = [];
 
   fermate: string[] = ['Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7', 'Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7']; // Lista delle fermate
   autobus: string[] = ['Bus A', 'Bus B', 'Bus C']; // Lista dei bus
@@ -133,25 +138,33 @@ export class Tab2Page implements OnInit {
 
     // Function to recenter the map on current position with a specified radius
     (window as any).recenterMap = (radius: number) => {
-      // Update the selected radius
       this.selectedRadius = radius;
-
       this.updateRadiusStyle(radius);
-
+    
       const currentPosition = this.currentPosition.coords;
       const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
       this.map.flyTo(currentLatLng, this.calculateZoomLevel(radius), {
         duration: 1,
         easeLinearity: 0.5
       });
-
-      // Remove existing circle and add new circle with specified radius
+    
+      // Rimuovi i marker delle fermate attualmente presenti sulla mappa
+      this.map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          this.map.removeLayer(layer);
+        }
+      });
+    
+      // Aggiorna e aggiungi i marker delle fermate filtrate con il nuovo raggio
+      this.addStopsMarkers();
+    
+      // Rimuovi il cerchio esistente e aggiungi un nuovo cerchio con il raggio specificato
       this.map.eachLayer((layer) => {
         if (layer instanceof L.Circle) {
           this.map.removeLayer(layer);
         }
       });
-
+    
       L.circle(currentLatLng, {
         radius: radius,
         color: 'red',
@@ -159,19 +172,63 @@ export class Tab2Page implements OnInit {
         fillOpacity: 0.2
       }).addTo(this.map);
     };
+    
   }
 
   addStopsMarkers() {
-    const filteredStops = stops.filter(stop =>
+    this.filteredStops = stops.filter(stop =>
       this.isInsideRadius([stop.lat, stop.lon], this.currentPosition.coords, this.selectedRadius)
     );
 
-    filteredStops.forEach(stop => {
-      L.marker([stop.lat, stop.lon])
+    this.addRoute();
+  
+    this.filteredStops.forEach(stop => {
+      const customIcon = L.icon({
+        iconUrl: 'assets/bus-stop.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+        iconSize: [32, 32], // Dimensioni del marker
+        iconAnchor: [16, 32], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+        popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+      });
+  
+      L.marker([stop.lat, stop.lon], { icon: customIcon }) // Usa il marker personalizzato
         .bindPopup(stop.name)
         .addTo(this.map);
     });
   }
+
+  // Test function to add a route between two stops (fixed stops for testing purposes)
+  addRoute() {
+    // Coordinate della fermata 1 e della fermata 3
+    const fermata1Coords = L.latLng(38.97635, 16.32999);
+    const fermata3Coords = L.latLng(38.97726, 16.33392);
+  
+    // Aggiungi il controllo di routing alla mappa
+    var control = L.Routing.control({
+      waypoints: [
+        fermata1Coords,
+        fermata3Coords
+      ],
+      routeWhileDragging: true,
+      show: false,
+      
+    }).addTo(this.map);
+
+    // Remove waypoints (of the route) from the map
+    this.map.eachLayer((layer: any) => {
+      if (layer.options.waypoints && layer.options.waypoints.length) {
+        this.map.removeLayer(layer);
+       }
+    });
+
+    // effettua una query nel DOM per trovare il div  che contiene il controllo di routing
+    // nascondi tutti i div che contengono il controllo di routing
+    const routingControlDivs = document.querySelectorAll('.leaflet-routing-container');
+    routingControlDivs.forEach((div: Element) => {
+      (div as HTMLElement).style.display = 'none';
+    });
+  }
+  
+  
 
   isInsideRadius(stopCoords: [number, number], currentCoords: { latitude: number, longitude: number }, radius: number): boolean {
     const stopLatLng = L.latLng(stopCoords[0], stopCoords[1]);
