@@ -30,7 +30,7 @@ export class Tab2Page implements OnInit {
 
   constructor() {}
 
-  isModalOpen = false;
+  isModalOpen = true;
 
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
@@ -283,6 +283,14 @@ export class Tab2Page implements OnInit {
 
   calculateZoomLevel(radius: number): number {
     return Math.round(15 - Math.log(radius / 500) / Math.LN2);
+  }
+
+  ionViewWillEnter() {
+    this.modal.present();
+  }
+
+  ionViewWillLeave() {
+    this.modal.dismiss();
   }
   
 }
