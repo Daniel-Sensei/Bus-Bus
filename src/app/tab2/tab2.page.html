@@ -50,8 +50,8 @@
             </ion-segment>
         
             <!-- Lista dei bus -->
-            <ion-item *ngFor="let bus of autobus">
-              {{ bus }}
+            <ion-item *ngFor="let bus of filteredBuses">
+              {{ bus.name }}
             </ion-item>
           </ion-list>
           </div>
