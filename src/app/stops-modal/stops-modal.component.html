@@ -1,18 +1,11 @@
-
-
-<ion-content>
-  <div #map id="map"></div>
-
-  <ion-button *ngIf="isModalOpen == false" (click)="setOpen(true)" slot="fixed">Visualizza nei dintorni</ion-button>
-
-  <ion-modal
+<ion-modal
       #modal
       trigger="open-modal"
-      [isOpen]="isModalOpen"
+      [isOpen]="true"
       [initialBreakpoint]="0.25"
       [breakpoints]="[0.00, 0.25, 0.35, 0.5, 0.65, 0.75, 0.85, 0.95]"
       [backdropDismiss]="false"
-      [backdropBreakpoint]="0.95"
+      [backdropBreakpoint]="0.5"
       [handle]="false"
       [cssClass]="'modal-above-tabs'"
     >
@@ -56,5 +49,3 @@
         </ion-content>
       </ng-template>
     </ion-modal>
-
-</ion-content>

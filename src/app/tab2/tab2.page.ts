@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 
 import { Geolocation, Position } from '@capacitor/geolocation';
 import { stops } from '../model/MOCKS/stops_mock';
 import { Stop } from '../model/Stop';
+
+import { IonModal } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab2',
@@ -22,11 +24,30 @@ export class Tab2Page implements OnInit {
   fermate: string[] = ['Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7', 'Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7']; // Lista delle fermate
   autobus: string[] = ['Bus A', 'Bus B', 'Bus C']; // Lista dei bus
 
-  constructor() { }
+  @ViewChild('modal', { static: true }) modal!: IonModal; // Ottieni il riferimento al modal
+  @ViewChild('map', { static: true }) mapContainer!: ElementRef; // Ottieni il riferimento al contenitore della mappa
+
+
+  constructor() {}
+
+  isModalOpen = false;
+
+  setOpen(isOpen: boolean) {
+    this.isModalOpen = isOpen;
+  }
 
   async ngOnInit() {
     await this.initializeDefaultMap();
+
+    this.addModalListeners();
   }
+
+  addModalListeners() {
+  this.modal.ionModalDidDismiss.subscribe(() => {
+    this.isModalOpen = false;
+  });
+  }
+
 
   async initializeDefaultMap() {
     try {
@@ -249,9 +270,11 @@ export class Tab2Page implements OnInit {
     });
   }
 
+  
   segmentChanged(event: any) {
     this.selectedSegment = event.detail.value;
   }
+  
 
   search(event: CustomEvent) {
     const query = event.detail.value;
@@ -261,4 +284,5 @@ export class Tab2Page implements OnInit {
   calculateZoomLevel(radius: number): number {
     return Math.round(15 - Math.log(radius / 500) / Math.LN2);
   }
+  
 }

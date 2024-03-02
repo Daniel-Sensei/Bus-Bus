@@ -1,19 +1,18 @@
-.half-screen {
-    height: 50%;
-    width: 100%;
+ion-list {
+    padding-top: 0;
 }
 
 #map {
-    min-height: 65%;
+    height: 100%;
 }
 
 /* Stile per il segmento */
 .top-segment {
     //margin-top: -56px; /* Altezza dell'header per compensare lo spazio bianco */
 
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    //position: sticky;
+    //top: 0;
+    //z-index: 1000;
     /* Assicura che il segmento sia sopra all'header */
     --background: var(--ion-item-background);
 
@@ -24,7 +23,19 @@
     
 }
 
-ion-list {
-    padding-top: 0;
-}
+.modal-above-tabs {
+    position: absolute; /* Remove default positioning */
+    //top: 0; /* Position to top of the screen */
+    //left: 0; /* Position to left of the screen */
+    //right: 0; /* Stretch to full width */
+    bottom: 50px; /* Don't cover the bottom */
+    /* Adjust height as needed */
+  }
 
+  ion-button[slot='fixed'] {
+    position: fixed;
+    bottom: 16px; // Regola l'altezza dal basso della pagina
+    left: 50%; // Posiziona il bottone a metà della larghezza della pagina
+    transform: translateX(-50%); // Sposta il bottone a sinistra del 50% della propria larghezza
+  }
+  
