@@ -201,7 +201,7 @@ export class Tab2Page implements OnInit {
       this.isInsideRadius([stop.lat, stop.lon], this.currentPosition.coords, this.selectedRadius)
     );
 
-    this.addRoute();
+    //this.addRoute();
   
     this.filteredStops.forEach(stop => {
       const customIcon = L.icon({

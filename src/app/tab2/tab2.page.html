@@ -11,11 +11,15 @@
       [breakpoints]="[0.00, 0.25, 0.35, 0.5, 0.65, 0.75, 0.85, 0.95]"
       [backdropDismiss]="false"
       [backdropBreakpoint]="0.95"
-      [handle]="false"
+      [handle]="true"
       [cssClass]="'modal-above-tabs'"
     >
       <ng-template>
-        <ion-content class="ion-padding">
+        <ion-content class="ion-padding modal-content">
+
+           <!-- Contenuto del modal -->
+      <!-- Assicurati che il contenuto abbia un'altezza fissa -->
+      <div class="modal-scroll-content">
 
           <ion-list *ngIf="selectedSegment === 'default'">
             <!-- Segmento ancorato sopra la lista delle fermate -->
@@ -50,6 +54,7 @@
               {{ bus }}
             </ion-item>
           </ion-list>
+          </div>
 
         </ion-content>
       </ng-template>
