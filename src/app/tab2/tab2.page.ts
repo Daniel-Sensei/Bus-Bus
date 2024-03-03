@@ -98,8 +98,11 @@ export class Tab2Page implements OnInit {
       const map = L.map('map', {
         center: [42.049, 13.348],
         zoom: 5,
-        renderer: L.canvas()
+        renderer: L.canvas(),
+        zoomControl: false // Rimuovi il controllo di zoom predefinito
       });
+
+      
 
       L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', {
         attribution: 'Open Street Map'
@@ -127,7 +130,7 @@ export class Tab2Page implements OnInit {
       this.addMarkerAndCircle(currentLatLng);
     });
 
-
+    this.addCustomControls();
     this.addRadiusControl();
     this.addStopsMarkers();
     this.addBusesMarkers();
@@ -147,6 +150,42 @@ export class Tab2Page implements OnInit {
       fillColor: '#f03',
       fillOpacity: 0.2
     }).addTo(this.map);
+  }
+
+  addCustomControls() {
+    // Rimuovi il controllo dello zoom
+    //this.map.removeControl(this.map.zoomControl);
+  
+    // Aggiungi un nuovo controllo personalizzato per il ricentramento sulla propria posizione
+    const recenterButton = L.Control.extend({
+      options: {
+        position: 'topleft'
+      },
+  
+      onAdd: () => {
+        const buttonDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        buttonDiv.style.backgroundColor = 'white';
+        buttonDiv.style.padding = '5px';
+        buttonDiv.innerHTML = '<ion-icon name="locate" style="font-size: 20px;"></ion-icon>';
+        buttonDiv.title = 'Ricentra sulla tua posizione';
+        buttonDiv.onclick = () => {
+          this.recenterMap();
+        };
+        return buttonDiv;
+      }
+    });
+  
+    const recenterControl = new recenterButton();
+    this.map.addControl(recenterControl);
+  }
+  
+  recenterMap() {
+    const currentPosition = this.currentPosition.coords;
+    const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
+    this.map.flyTo(currentLatLng, 15, {
+      duration: 1.5,
+      easeLinearity: 0.5
+    });
   }
 
   addRadiusControl() {
@@ -175,10 +214,12 @@ export class Tab2Page implements OnInit {
 
       const currentPosition = this.currentPosition.coords;
       const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
+      /*
       this.map.flyTo(currentLatLng, this.calculateZoomLevel(radius), {
         duration: 1,
         easeLinearity: 0.5
       });
+      */
 
       // Rimuovi i marker delle fermate attualmente presenti sulla mappa
       this.map.eachLayer((layer) => {
