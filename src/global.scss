@@ -27,3 +27,38 @@
 
 /* Importa i fogli di stile Leaflet */
 @import "~leaflet/dist/leaflet.css";
+
+/* SHEET MODAL */
+/* Stile per il segmento */
+.top-segment {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+
+    /* Assicura che il segmento sia sopra all'header */
+    --background: var(--ion-item-background);
+
+    //imposta il colore di sfondo bianco per il tema chiaro
+    @media (prefers-color-scheme: light) {
+        --background: #fff;
+    }
+
+    margin-top: -30px;
+    /* Sposta il segmento sopra lo spazio bianco */
+    padding-top: 10px;
+}
+
+.blank-space {
+    position: sticky;
+    top: -20px;
+    z-index: 1000;
+    height: 20px;
+
+
+    background: var(--ion-item-background);
+
+    //imposta il colore di sfondo bianco per il tema chiaro
+    @media (prefers-color-scheme: light) {
+        background: #fff;
+    }
+}

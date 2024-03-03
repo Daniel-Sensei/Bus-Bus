@@ -1,31 +1,9 @@
-ion-list {
-    padding-top: 0;
-    padding-bottom: 25px;
-}
-
 #map {
     height: 100%;
 }
 
-/* Stile per il segmento */
-.top-segment {
-    //margin-top: -56px; /* Altezza dell'header per compensare lo spazio bianco */
-
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    /* Assicura che il segmento sia sopra all'header */
-    --background: var(--ion-item-background);
-
-    //imposta il colore di sfondo bianco per il tema chiaro
-    @media (prefers-color-scheme: light) {
-        --background: #fff;
-    }
-
-}
-
 .modal-above-tabs {
-    position: absolute;
+    //position: absolute;
     /* Remove default positioning */
     //top: 0; /* Position to top of the screen */
     //left: 0; /* Position to left of the screen */
@@ -33,6 +11,17 @@ ion-list {
     bottom: 50px;
     /* Don't cover the bottom */
     /* Adjust height as needed */
+    
+}
+
+.modal-above-tabs::part(handle) {
+    background-color: var(--ion-color-primary);
+    /* Cambia il colore di sfondo della barra di handle */
+    height: 4px;
+    /* Imposta l'altezza della barra di handle */
+    width: 72px;
+    margin-top: 6px;
+    /* Imposta il margine superiore della barra di handle */
 }
 
 ion-button[slot='fixed'] {
@@ -40,27 +29,4 @@ ion-button[slot='fixed'] {
     bottom: 16px; // Regola l'altezza dal basso della pagina
     left: 50%; // Posiziona il bottone a metà della larghezza della pagina
     transform: translateX(-50%); // Sposta il bottone a sinistra del 50% della propria larghezza
-}
-
-.modal-content {
-    height: 100%;
-    /* Imposta l'altezza del contenuto del modal al 100% del modal */
-}
-
-.modal-scroll-content {
-    height: 100%;
-    /* Altezza fissa per il contenuto del modal */
-    overflow-y: auto;
-    /* Abilita lo scroll verticale quando il contenuto supera l'altezza del modal */
-}
-
-.modal-above-tabs::part(handle) {
-    background-color: var(--ion-color-primary); /* Cambia il colore di sfondo della barra di handle */
-    height: 4px; /* Imposta l'altezza della barra di handle */
-    width: 72px;
-    margin-top: 6px; /* Imposta il margine superiore della barra di handle */
-  }
-
-.padding-top-modal {
-    padding-top: 10px;
 }

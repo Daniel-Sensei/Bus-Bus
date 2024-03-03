@@ -7,19 +7,21 @@
       #modal
       trigger="open-modal"
       [isOpen]="isModalOpen"
-      [initialBreakpoint]="0.25"
-      [breakpoints]="[0.00, 0.25, 0.35, 0.5, 0.65, 0.75, 0.85, 0.95]"
+      [initialBreakpoint]="0.30"
+      [breakpoints]="[0.00, 0.30, 0.50, 1]"
       [backdropDismiss]="false"
       [backdropBreakpoint]="0.95"
       [handle]="true"
       [cssClass]="'modal-above-tabs'"
     >
       <ng-template>
-        <ion-content class="ion-padding modal-content">
+        <ion-content class="ion-padding">
 
            <!-- Contenuto del modal -->
       <!-- Assicurati che il contenuto abbia un'altezza fissa -->
-      <div class="modal-scroll-content padding-top-modal" *ngIf="showStops">
+      <div *ngIf="showStops">
+
+        <div class="blank-space"></div>
 
         <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
           <ion-segment-button value="default">

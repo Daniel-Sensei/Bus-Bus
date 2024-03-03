@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
+import { Stop } from '../model/Stop';
 
 @Component({
   selector: 'app-stop-details',
@@ -7,7 +8,7 @@ import { EventEmitter } from '@angular/core';
   styleUrls: ['./stop-details.page.scss'],
 })
 export class StopDetailsPage implements OnInit {
-  @Input() stop!: number;
+  @Input() stop?: Stop;
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
 
   constructor() {}
