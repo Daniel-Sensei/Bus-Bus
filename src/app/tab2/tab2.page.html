@@ -19,7 +19,7 @@
 
            <!-- Contenuto del modal -->
       <!-- Assicurati che il contenuto abbia un'altezza fissa -->
-      <div class="modal-scroll-content">
+      <div class="modal-scroll-content" *ngIf="showStops">
 
           <ion-list *ngIf="selectedSegment === 'default'">
             <!-- Segmento ancorato sopra la lista delle fermate -->
@@ -33,7 +33,7 @@
             </ion-segment>
         
             <!-- Lista delle fermate -->
-            <ion-item *ngFor="let fermata of filteredStops">
+            <ion-item *ngFor="let fermata of filteredStops" (click)="navigateToStopDetails(fermata.id)">
               {{ fermata.name }}
             </ion-item>
           </ion-list>
@@ -55,6 +55,10 @@
             </ion-item>
           </ion-list>
           </div>
+
+        <div *ngIf="!showStops">
+          <app-stop-details [stop]="this.selectedStop" (back)="this.showStops = true"></app-stop-details>
+        </div>
 
         </ion-content>
       </ng-template>

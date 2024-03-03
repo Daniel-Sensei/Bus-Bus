@@ -9,6 +9,8 @@ import { Bus } from '../model/Bus';
 import { BUSES } from '../model/MOCKS/buses_mock';
 
 import { IonModal } from '@ionic/angular';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-tab2',
@@ -30,8 +32,11 @@ export class Tab2Page implements OnInit {
   @ViewChild('modal', { static: true }) modal!: IonModal; // Ottieni il riferimento al modal
   @ViewChild('map', { static: true }) mapContainer!: ElementRef; // Ottieni il riferimento al contenitore della mappa
 
+  showStops: boolean = true;
+  selectedStop: number = 0;
 
-  constructor() { }
+
+  constructor(private router: Router) { }
 
   isModalOpen = true;
 
@@ -223,6 +228,12 @@ export class Tab2Page implements OnInit {
         .bindPopup(stop.name)
         .addTo(this.map);
     });
+  }
+
+  navigateToStopDetails(stopId: number) {
+    this.showStops = false;
+    this.selectedStop = stopId;
+    //this.router.navigate(['/stop-details', stopId]);
   }
 
   addBusesMarkers() {
