@@ -19,7 +19,7 @@
 
            <!-- Contenuto del modal -->
       <!-- Assicurati che il contenuto abbia un'altezza fissa -->
-      <div class="modal-scroll-content" *ngIf="showStops">
+      <div class="modal-scroll-content padding-top-modal" *ngIf="showStops">
 
         <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
           <ion-segment-button value="default">
@@ -45,7 +45,7 @@
           </ion-list>
           </div>
 
-        <div *ngIf="!showStops">
+        <div *ngIf="!showStops" class="padding-top-modal">
           <app-stop-details [stop]="this.selectedStop" (back)="this.showStops = true"></app-stop-details>
         </div>
 

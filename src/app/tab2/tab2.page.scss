@@ -57,6 +57,10 @@ ion-button[slot='fixed'] {
 .modal-above-tabs::part(handle) {
     background-color: var(--ion-color-primary); /* Cambia il colore di sfondo della barra di handle */
     height: 4px; /* Imposta l'altezza della barra di handle */
-    width: 108px;
-    margin-top: 8px; /* Imposta il margine superiore della barra di handle */
+    width: 72px;
+    margin-top: 6px; /* Imposta il margine superiore della barra di handle */
   }
+
+.padding-top-modal {
+    padding-top: 10px;
+}
