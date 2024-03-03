@@ -21,17 +21,16 @@
       <!-- Assicurati che il contenuto abbia un'altezza fissa -->
       <div class="modal-scroll-content" *ngIf="showStops">
 
+        <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
+          <ion-segment-button value="default">
+            <ion-label>Fermate</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="segment">
+            <ion-label>Bus</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
           <ion-list *ngIf="selectedSegment === 'default'">
-            <!-- Segmento ancorato sopra la lista delle fermate -->
-            <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
-              <ion-segment-button value="default">
-                <ion-label>Fermate</ion-label>
-              </ion-segment-button>
-              <ion-segment-button value="segment">
-                <ion-label>Bus</ion-label>
-              </ion-segment-button>
-            </ion-segment>
-        
             <!-- Lista delle fermate -->
             <ion-item *ngFor="let fermata of filteredStops" (click)="navigateToStopDetails(fermata.id)">
               {{ fermata.name }}
@@ -39,16 +38,6 @@
           </ion-list>
         
           <ion-list *ngIf="selectedSegment === 'segment'">
-            <!-- Segmento ancorato sopra la lista dei bus -->
-            <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
-              <ion-segment-button value="default">
-                <ion-label>Fermate</ion-label>
-              </ion-segment-button>
-              <ion-segment-button value="segment">
-                <ion-label>Bus</ion-label>
-              </ion-segment-button>
-            </ion-segment>
-        
             <!-- Lista dei bus -->
             <ion-item *ngFor="let bus of filteredBuses">
               {{ bus.name }}
