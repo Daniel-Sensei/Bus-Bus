@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import { Stop } from '../model/Stop';
+import { IonModal } from '@ionic/angular';
 
 @Component({
   selector: 'app-stop-details',
@@ -8,8 +9,12 @@ import { Stop } from '../model/Stop';
   styleUrls: ['./stop-details.page.scss'],
 })
 export class StopDetailsPage implements OnInit {
+  @Input() modal!: IonModal;
+
   @Input() stop?: Stop;
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
+
+  accordionOpen: boolean = false;
 
   constructor() {}
 
@@ -25,4 +30,9 @@ export class StopDetailsPage implements OnInit {
     this.back.emit();
   }
 
+  resizeModal() {
+    this.accordionOpen = !this.accordionOpen;
+    const breakpoint = this.accordionOpen ? 1 : 0.30;
+    this.modal.setCurrentBreakpoint(breakpoint);
+  }
 }

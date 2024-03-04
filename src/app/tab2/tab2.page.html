@@ -49,7 +49,7 @@
           </div>
 
         <div *ngIf="!showStops" class="padding-top-modal">
-          <app-stop-details [stop]="this.selectedStop" (back)="this.showStops = true"></app-stop-details>
+          <app-stop-details [stop]="this.selectedStop" [modal]="this.modal" (back)="this.showStops = true"></app-stop-details>
         </div>
 
         </ion-content>

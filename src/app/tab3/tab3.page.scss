@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
 
-  font-size: 14px;
+  font-size: 18px;
   /* Imposta la dimensione del badge desiderata (13px DEFAULT) */
   color: var(--ion-color-contrast);
   /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
@@ -31,10 +31,22 @@
 }
 
 .label-small {
-  font-size: 15px;
+  font-size: 16px;
   /* Imposta la dimensione del testo desiderata */
 }
 
+/*
 ion-list {
   padding-top: 0;
+}
+*/
+
+ion-item-divider{
+  font-size: 17px;
+  background: var(--ion-border-color);
+}
+
+ion-item{
+  padding-top: 5px;
+  padding-bottom: 5px;
 }

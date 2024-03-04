@@ -6,37 +6,46 @@
   </ion-toolbar>
 
 
-<ion-content [fullscreen]="true" style="height: 100vh; overflow-y: auto;">
 
   <ion-item lines="none" style="margin-top: 10px;">
     <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon" size="large"></ion-icon>
     <ion-label class="label">
       <div class="bold">Rende - Via Tito Flavio, 70</div>
-      <div>Fermata "Pensiline"</div>
+      <div>Pensiline</div>
     </ion-label>
     <ion-icon slot="end" aria-hidden="true" name="star-outline" class="icon" color="yellow"></ion-icon>
   </ion-item>
 
-  <ion-item>
-    <ion-icon slot="start" aria-hidden="true" name="time-outline" class="icon"></ion-icon>
-    <ion-label class="label">
-      <div class="bold">Orari</div>
-      <div>06:00 - 23:00</div>
-    </ion-label>
-  </ion-item>
+  <ion-accordion-group>
+    <ion-accordion value="first" (click)="resizeModal()">
+      <ion-item slot="header" style="margin-right: 10px;">
+        <ion-icon slot="start" aria-hidden="true" name="time-outline" class="icon" size="large"></ion-icon>
+        <ion-label class="label">
+          <div class="bold">Bus in arrivo</div>
+          <div>Visualizza bus in arrivo</div>
+        </ion-label>
+      </ion-item>
 
-  <ion-list class="list">
-    <ion-item>
-      <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon"></ion-icon>
-      <ion-label class="label">
-        <div class="bold">Linee</div>
-        <div>Linea 1</div>
-        <div>Linea 2</div>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-  
-  
-  
+      <div slot="content">
+        
+        <ion-list class="list">
+          <ion-item>
+            <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon"></ion-icon>
+            <ion-label class="label">
+              <div class="bold">Linee</div>
+              <div>Linea 1</div>
+              <div>Linea 2</div>
+            </ion-label>
+          </ion-item>
+        </ion-list>
 
-</ion-content>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>  
+
+  <div class="div-center" style="margin-top: 5px;">
+    <ion-button shape="round">
+      Portami qui
+    </ion-button>
+  </div>
+

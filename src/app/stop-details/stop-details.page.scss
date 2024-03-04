@@ -1,7 +1,7 @@
-.header{
-    text-align: center;
-    padding-left: 0;
-    
+.header {
+  text-align: center;
+  padding-left: 0;
+
 }
 
 /*
@@ -13,17 +13,25 @@
 */
 
 .icon {
-    margin-right: 10px; /* Aggiungi un margine a destra all'icona */
-  }
-  
-  .bold {
-    font-weight: bold; /* Rendi il testo in grassetto */
-    font-size: 18px;
-  }
-  
-  .label {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
+  margin-right: 10px;
+  /* Aggiungi un margine a destra all'icona */
+}
+
+.bold {
+  font-weight: bold;
+  /* Rendi il testo in grassetto */
+  font-size: 18px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+ion-button[slot='fixed'] {
+  position: fixed;
+  bottom: 16px; // Regola l'altezza dal basso della pagina
+  left: 50%; // Posiziona il bottone a metà della larghezza della pagina
+  transform: translateX(-50%); // Sposta il bottone a sinistra del 50% della propria larghezza
+}
