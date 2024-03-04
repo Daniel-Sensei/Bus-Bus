@@ -89,7 +89,20 @@ export class Tab2Page implements OnInit {
       this.currentPosition = await Geolocation.getCurrentPosition(options);
     } catch (error) {
       console.error('Error getting current position', error);
-      throw error;
+      //imposta una posizione di default
+      this.currentPosition = {
+        coords: {
+          latitude: 39.3620,
+          longitude: 16.2245,
+          accuracy: 0,
+          altitude: null,
+          altitudeAccuracy: null,
+          heading: null,
+          speed: null
+        },
+        timestamp: 0
+      };
+      //throw error;
     }
   }
 
@@ -166,7 +179,7 @@ export class Tab2Page implements OnInit {
         const buttonDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
         buttonDiv.style.backgroundColor = 'white';
         buttonDiv.style.padding = '5px';
-        buttonDiv.innerHTML = '<ion-icon name="locate" style="font-size: 20px;"></ion-icon>';
+        buttonDiv.innerHTML = '<ion-icon aria-hidden="true" name="locate" style="font-size: 20px;"></ion-icon>';
         buttonDiv.title = 'Ricentra sulla tua posizione';
         buttonDiv.onclick = () => {
           this.recenterMap();
@@ -255,7 +268,7 @@ export class Tab2Page implements OnInit {
     );
 
     
-  this.addRoute();
+  //this.addRoute();
 
     this.filteredStops.forEach(stop => {
       const customIcon = L.icon({

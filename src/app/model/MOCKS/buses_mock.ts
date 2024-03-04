@@ -8,4 +8,13 @@ export const BUSES: Bus[] = [
         lon: 16.33111,
         stops: [3, 1, 5]
     },
+
+    //cosenza
+    {
+        id: 2,
+        name: 'Bus B',
+        lat: 39.36231,
+        lon: 16.22758,
+        stops: [6, 7, 8]
+    }
 ];
