@@ -16,6 +16,8 @@ export class StopDetailsPage implements OnInit {
 
   accordionOpen: boolean = false;
 
+  favourite = false;
+
   constructor() {}
 
   ngOnInit() {
@@ -34,5 +36,9 @@ export class StopDetailsPage implements OnInit {
     this.accordionOpen = !this.accordionOpen;
     const breakpoint = this.accordionOpen ? 1 : 0.30;
     this.modal.setCurrentBreakpoint(breakpoint);
+  }
+
+  addFavourite(add: boolean) {
+    this.favourite = add;
   }
 }
