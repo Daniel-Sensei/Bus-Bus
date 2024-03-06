@@ -1,0 +1,57 @@
+ul {
+    list-style-type: none;
+  }
+   
+ 
+ li {
+     width: 2em;
+     height: 2em;
+     text-align: center;
+     line-height: 2em;
+     border-radius: 1em;
+     background: dodgerblue;
+     margin: 1em 1em;
+     color: white;
+     position: relative;
+ }
+
+ li::before {
+     content: '';
+     position: absolute;
+     bottom: 1em;
+     left: 1em;
+     /* width: 4em; */
+     width: .2em;
+     height: 2em;
+     background: red;
+     z-index: -1;
+ }
+
+ li::after {
+     content: 'Fermata 1';
+     position: absolute;
+     top: 0.0em;
+     left: 1em;
+     width: 10em;
+     height: .2em;
+     background: transparent;
+     z-index: -1;
+ }
+
+
+
+ li:first-child::before {
+     display: none;
+ }
+
+ .active {
+     background: dodgerblue;
+ }
+
+ .active~li {
+     background: lightblue;
+ }
+
+ .active~li::before {
+     background: lightblue;
+ }
