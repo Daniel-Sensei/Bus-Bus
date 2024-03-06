@@ -1,59 +1,61 @@
 <ion-content>
   <div #map id="map"></div>
 
-  <ion-button *ngIf="isModalOpen == false" (click)="setOpen(true)" slot="fixed">Visualizza nei dintorni</ion-button>
+  <ion-button shape="round" *ngIf="isModalOpen == false" (click)="setOpen(true)" slot="fixed">Visualizza nei
+    dintorni</ion-button>
 
-  <ion-modal
-      #modal
-      trigger="open-modal"
-      [isOpen]="isModalOpen"
-      [initialBreakpoint]="0.30"
-      [breakpoints]="[0.00, 0.30, 0.50, 1]"
-      [backdropDismiss]="false"
-      [backdropBreakpoint]="0.95"
-      [handle]="true"
-      [cssClass]="'modal-above-tabs'"
-      handle-behavior = "cycle"
-    >
-      <ng-template>
-        <ion-content class="ion-padding">
+  <ion-modal #modal trigger="open-modal" [isOpen]="isModalOpen" [initialBreakpoint]="0.30"
+    [breakpoints]="[0.00, 0.30, 0.50, 1]" [backdropDismiss]="false" [backdropBreakpoint]="0.95" [handle]="true"
+    [cssClass]="'modal-above-tabs'" handle-behavior="cycle">
+    <ng-template>
+      <ion-content class="ion-padding">
 
-           <!-- Contenuto del modal -->
-      <!-- Assicurati che il contenuto abbia un'altezza fissa -->
-      <div *ngIf="showStops">
+        <!-- Contenuto del modal -->
+        <!-- Assicurati che il contenuto abbia un'altezza fissa -->
+        <div *ngIf="showStops">
 
-        <div class="blank-space"></div>
+          <div class="blank-space"></div>
 
-        <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
-          <ion-segment-button value="default">
-            <ion-label>Fermate</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="segment">
-            <ion-label>Bus</ion-label>
-          </ion-segment-button>
-        </ion-segment>
+          <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
+            <ion-segment-button value="default">
+              <ion-label>Fermate</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="segment">
+              <ion-label>Bus</ion-label>
+            </ion-segment-button>
+          </ion-segment>
 
-          <ion-list *ngIf="selectedSegment === 'default'">
-            <!-- Lista delle fermate -->
-            <ion-item *ngFor="let fermata of filteredStops" (click)="navigateToStopDetails(fermata.id)">
-              {{ fermata.name }}
+          <!-- Fermate -->
+          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default'">
+            <ion-item *ngFor="let fermata of filteredStops" (click)="navigateToStopDetails(fermata.id)"
+              class="bus-item">
+              <img src="assets/bus-stop.png" class="img-icon">
+              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;">{{fermata.name}}</ion-label>
+              <ion-label slot="end" class="big-hour">792m</ion-label>
             </ion-item>
           </ion-list>
-        
-          <ion-list *ngIf="selectedSegment === 'segment'">
-            <!-- Lista dei bus -->
-            <ion-item *ngFor="let bus of filteredBuses">
-              {{ bus.name }}
-            </ion-item>
-          </ion-list>
-          </div>
 
-        <div *ngIf="!showStops" class="padding-top-modal">
-          <app-stop-details [stop]="this.selectedStop" [modal]="this.modal" (back)="this.showStops = true"></app-stop-details>
+          <!-- Bus -->
+          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
+            <ion-item *ngFor="let bus of filteredBuses" class="bus-item">
+              <ion-badge slot="start" class="bus-badge">
+                <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+                &nbsp;{{bus.id}} - Multiservizi
+              </ion-badge>
+              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;"></ion-label>
+              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;" slot="end" class="big-hour">+5 min</ion-label>
+            </ion-item>
+            </ion-list>
+
         </div>
 
-        </ion-content>
-      </ng-template>
-    </ion-modal>
+        <div *ngIf="!showStops" class="padding-top-modal">
+          <app-stop-details [stop]="this.selectedStop" [modal]="this.modal"
+            (back)="this.showStops = true"></app-stop-details>
+        </div>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
 </ion-content>

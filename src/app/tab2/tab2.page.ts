@@ -272,7 +272,7 @@ export class Tab2Page implements OnInit {
 
     this.filteredStops.forEach(stop => {
       const customIcon = L.icon({
-        iconUrl: 'assets/bus-stop.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+        iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
         iconSize: [32, 32], // Dimensioni del marker
         iconAnchor: [16, 32], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
         popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker

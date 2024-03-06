@@ -40,14 +40,14 @@ export const STOPS : Stop[] = [
   //cosenza
   {
     id: 6,
-    name: 'Stop 6',
+    name: 'Via della Resistenza, 23',
     lat: 39.36696,
     lon: 16.22678,
     routes: [4, 5]
   },
   {
     id: 7,
-    name: 'Stop 7',
+    name: 'viale della libertà, 54',
     lat: 39.3729,
     lon: 16.2347,
     routes: [4, 5]
