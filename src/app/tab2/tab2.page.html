@@ -12,11 +12,11 @@
 
         <!-- Contenuto del modal -->
         <!-- Assicurati che il contenuto abbia un'altezza fissa -->
-        <div *ngIf="showStops">
+        <div *ngIf="showStops && showBuses">
 
           <div class="blank-space"></div>
 
-          <ion-segment value="default" (ionChange)="segmentChanged($event)" class="top-segment">
+          <ion-segment value="{{this.selectedSegment}}" (ionChange)="segmentChanged($event)" class="top-segment">
             <ion-segment-button value="default">
               <ion-label>Fermate</ion-label>
             </ion-segment-button>
@@ -37,7 +37,7 @@
 
           <!-- Bus -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
-            <ion-item *ngFor="let bus of filteredBuses" class="bus-item">
+            <ion-item *ngFor="let bus of filteredBuses" class="bus-item" (click)="navigateToBusDetails(bus.id)">
               <ion-badge slot="start" class="bus-badge">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
                 &nbsp;{{bus.id}} - Multiservizi
@@ -52,6 +52,12 @@
         <div *ngIf="!showStops" class="padding-top-modal">
           <app-stop-details [stop]="this.selectedStop" [modal]="this.modal"
             (back)="this.showStops = true"></app-stop-details>
+        </div>
+
+        
+        <div *ngIf="!showBuses" class="padding-top-modal">
+          <app-bus-details [bus]="this.selectedBus" [modal]="this.modal"
+            (back)="this.showBuses = true"></app-bus-details>
         </div>
 
       </ion-content>

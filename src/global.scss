@@ -107,3 +107,28 @@
     font-size: 22px;
     font-weight: bold;
   }
+
+  .header {
+    text-align: center;
+    padding-left: 0;
+  
+  }
+  
+  
+  .icon {
+    margin-right: 10px;
+    /* Aggiungi un margine a destra all'icona */
+  }
+  
+  .bold {
+    font-weight: bold;
+    /* Rendi il testo in grassetto */
+    font-size: 18px;
+  }
+  
+  .label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  

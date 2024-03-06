@@ -33,7 +33,9 @@ export class Tab2Page implements OnInit {
   @ViewChild('map', { static: true }) mapContainer!: ElementRef; // Ottieni il riferimento al contenitore della mappa
 
   showStops: boolean = true;
+  showBuses: boolean = true;
   selectedStop?: Stop;
+  selectedBus?: Bus;
 
 
   constructor(private router: Router) { }
@@ -426,6 +428,14 @@ export class Tab2Page implements OnInit {
 
   ionViewWillLeave() {
     this.modal.dismiss();
+  }
+
+  navigateToBusDetails(busId: number) {
+    this.showBuses = false;
+    
+    this.selectedBus = BUSES.find(bus => bus.id === busId);
+
+    //this.router.navigate(['/stop-details', stopId]);
   }
 
 }

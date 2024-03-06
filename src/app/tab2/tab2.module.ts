@@ -8,6 +8,7 @@ import { ExploreContainerComponentModule } from '../explore-container/explore-co
 import { Tab2PageRoutingModule } from './tab2-routing.module';
 
 import { StopDetailsPageModule } from '../stop-details/stop-details.module';
+import { BusDetailsPageModule } from '../bus-details/bus-details.module';
 
 @NgModule({
   imports: [
@@ -15,8 +16,10 @@ import { StopDetailsPageModule } from '../stop-details/stop-details.module';
     CommonModule,
     FormsModule,
     ExploreContainerComponentModule,
+    
     Tab2PageRoutingModule,
-    StopDetailsPageModule
+    StopDetailsPageModule,
+    BusDetailsPageModule
   ],
   declarations: [Tab2Page]
 })
