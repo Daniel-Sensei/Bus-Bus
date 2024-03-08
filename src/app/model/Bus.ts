@@ -3,5 +3,5 @@ export interface Bus {
     name: string;
     lat: number;
     lon: number;
-    stops: number[];
+    stops: any[];
 }

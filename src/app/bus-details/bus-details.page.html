@@ -30,7 +30,8 @@
         
         
         <ul>
-          <li>1</li>
+          <li *ngFor="let stop of bus?.stops" [attr.data-content]="stop"></li>
+          <!--
           <li>2</li>
           <li>3</li>
           <li>4</li>
@@ -39,6 +40,7 @@
           <li>7</li>
           <li>8</li>
           <li>9</li>
+          -->
         </ul>
 
         

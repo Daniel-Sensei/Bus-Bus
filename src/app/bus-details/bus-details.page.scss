@@ -1,57 +1,63 @@
-ul {
+ul {    
     list-style-type: none;
-  }
-   
- 
- li {
-     width: 2em;
-     height: 2em;
-     text-align: center;
-     line-height: 2em;
-     border-radius: 1em;
-     background: dodgerblue;
-     margin: 1em 1em;
-     color: white;
-     position: relative;
- }
-
- li::before {
-     content: '';
-     position: absolute;
-     bottom: 1em;
-     left: 1em;
-     /* width: 4em; */
-     width: .2em;
-     height: 2em;
-     background: red;
-     z-index: -1;
- }
-
- li::after {
-     content: 'Fermata 1';
-     position: absolute;
-     top: 0.0em;
-     left: 1em;
-     width: 10em;
-     height: .2em;
-     background: transparent;
-     z-index: -1;
- }
+    margin-top: -2.4em;
+}
 
 
+li {
+    width: 1.25em; //diametro del pallino
+    height: 1.25em;
+    line-height: 1em;
+    border-radius: 1em;
+    background: #1e90ff;
+    margin: 4em -1em; //margine tra i pallini
+    color: #fff;
+    position: relative;
 
- li:first-child::before {
-     display: none;
- }
+    color: var(--ion-color-contrast);
+    //font-weight: bold;
+}
 
- .active {
-     background: dodgerblue;
- }
+//linee tra i pallini
+li::before {
+    content: '';
+    position: absolute;
+    bottom: 1.2em;
+    left: 0.4em;
+    /* width: 4em; */
+    width: .5em;
+    height: 4.2em;
+    background: red;
+    z-index: -1;
+}
 
- .active~li {
-     background: lightblue;
- }
+li::after {
+    content: attr(data-content) '\a Arrivo: \a Ritardo:';
+    white-space: pre-wrap; /* Per consentire al testo di andare a capo */
+    position: absolute;
+    top: 0.0em;
+    left: 2em; //margine sinistro del testo
+    width: 19em;
+    height: .2em;
+    background: transparent;
+    z-index: -1;
+}
 
- .active~li::before {
-     background: lightblue;
- }
+
+
+
+li:first-child::before {
+    display: none;
+}
+
+.active {
+    background: dodgerblue;
+}
+
+.active~li {
+    background: lightblue;
+}
+
+.active~li::before {
+    background: lightblue;
+}

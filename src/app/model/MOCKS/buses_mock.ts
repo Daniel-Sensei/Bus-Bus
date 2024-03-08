@@ -15,6 +15,6 @@ export const BUSES: Bus[] = [
         name: 'Bus B',
         lat: 39.36231,
         lon: 16.22758,
-        stops: [6, 7, 8]
+        stops: ["Fermata A", "via via degli innocenti e della Speranzavia degli innocenti e della Speranza Resistenza, 32", "via degli innocenti e della Speranza, 3"]
     }
 ];
