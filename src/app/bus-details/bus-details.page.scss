@@ -7,10 +7,10 @@ ul {
 li {
     width: 1.25em; //diametro del pallino
     height: 1.25em;
-    line-height: 1em;
+    //line-height: 1em;
     border-radius: 1em;
-    background: #1e90ff;
-    margin: 4em -1em; //margine tra i pallini
+    background: dodgerblue;
+    margin: 5em -1em; //margine tra i pallini
     color: #fff;
     position: relative;
 
@@ -26,18 +26,21 @@ li::before {
     left: 0.4em;
     /* width: 4em; */
     width: .5em;
-    height: 4.2em;
-    background: red;
+    height: 5.2em;
+    background: dodgerblue;
     z-index: -1;
 }
 
 li::after {
-    content: attr(data-content) '\a Arrivo: \a Ritardo:';
+    content: attr(data-content) '\a Arrivo: 17:52 \a Ritardo: +5 min' url("data:image/svg+xml;charset=utf8,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' height='14' width='85'><text style='alignment-baseline:hanging;font-size:14px;font-family:Arial,sans-serif;fill:#000;'><tspan style='alignment-baseline:inherit;font-weight:bold;'>Bold</tspan> not bold</text></svg>");
     white-space: pre-wrap; /* Per consentire al testo di andare a capo */
+    font-weight: bold;
+    font-size: 17px;
+    
     position: absolute;
-    top: 0.0em;
+    top: -1.0em;
     left: 2em; //margine sinistro del testo
-    width: 19em;
+    width: 18em;
     height: .2em;
     background: transparent;
     z-index: -1;

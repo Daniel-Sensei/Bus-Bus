@@ -6,7 +6,8 @@ export const BUSES: Bus[] = [
         name: 'Bus A',
         lat: 38.97688,
         lon: 16.33111,
-        stops: [3, 1, 5]
+        stops: [3, 1, 5],
+        lastStop: "Fermata A"
     },
 
     //cosenza
@@ -15,6 +16,7 @@ export const BUSES: Bus[] = [
         name: 'Bus B',
         lat: 39.36231,
         lon: 16.22758,
-        stops: ["Fermata A", "via via degli innocenti e della Speranzavia degli innocenti e della Speranza Resistenza, 32", "via degli innocenti e della Speranza, 3", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A","Fermata A"]
+        stops: ["Fermata A", "via degli innocenti e della Speranza, 32", "via degli innocenti e della Speranzaa, 3", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A", "Fermata A","Fermata A"],
+        lastStop: "via degli innocenti e della Speranzaa, 3"
     }
 ];

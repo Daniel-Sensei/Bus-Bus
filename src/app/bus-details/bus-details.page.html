@@ -26,11 +26,11 @@
         </ion-label>
       </ion-item>
 
-      <div slot="content">
+      <div slot="content" style="margin-bottom: -2.5em;">
         
         
         <ul>
-          <li *ngFor="let stop of bus?.stops" [attr.data-content]="stop"></li>
+          <li *ngFor="let stop of bus?.stops" [attr.data-content]="stop" [ngClass]="{ 'active': stop === 'via degli innocenti e della Speranzaa, 3' }"></li>
           <!--
           <li>2</li>
           <li>3</li>
