@@ -10,19 +10,22 @@
   <ion-item lines="none" style="margin-top: 10px;">
     <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon" size="large"></ion-icon>
     <ion-label class="label">
-      <div class="bold">Rende - Via Tito Flavio, 70</div>
-      <div>Pensiline</div>
+      <div class="bold">136 - Consorzio Autolinee</div>
+      <div>1 di 3</div>
     </ion-label>
+
+    <ion-icon *ngIf="!this.favourite" (click)="addFavourite(true)" slot="end" aria-hidden="true" name="star-outline" class="icon"></ion-icon>
+    <ion-icon *ngIf="this.favourite" (click)="addFavourite(false)" slot="end" aria-hidden="true" name="star" class="icon"></ion-icon>
 
   </ion-item>
 
   <ion-accordion-group>
-    <ion-accordion value="first"> <!--(click)="resizeModal()"-->
+    <ion-accordion value="first" (click)="resizeModal()">
       <ion-item slot="header" style="margin-right: 10px;">
         <ion-icon slot="start" aria-hidden="true" name="time-outline" class="icon" size="large"></ion-icon>
         <ion-label class="label">
-          <div class="bold">Bus in arrivo</div>
-          <div>Visualizza bus in arrivo</div>
+          <div class="bold">Prossime fermate</div>
+          <div>Visualizza elenco delle fermate</div>
         </ion-label>
       </ion-item>
 

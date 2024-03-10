@@ -9,6 +9,9 @@ import { IonModal } from '@ionic/angular';
 })
 export class BusDetailsPage implements OnInit {
 
+  accordionOpen: boolean = false;
+  favourite = false;
+
   constructor() { }
 
   ngOnInit() {
@@ -21,6 +24,16 @@ export class BusDetailsPage implements OnInit {
 
   backToBuses(){
     this.back.emit();
+  }
+
+  resizeModal() {
+    this.accordionOpen = !this.accordionOpen;
+    const breakpoint = this.accordionOpen ? 1 : 0.30;
+    this.modal.setCurrentBreakpoint(breakpoint);
+  }
+
+  addFavourite(add: boolean) {
+    this.favourite = add;
   }
 
 }

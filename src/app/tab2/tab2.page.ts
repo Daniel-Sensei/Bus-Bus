@@ -11,6 +11,9 @@ import { BUSES } from '../model/MOCKS/buses_mock';
 import { IonModal } from '@ionic/angular';
 import { Router } from '@angular/router';
 
+import { BusService } from '../bus.service';
+
+
 
 @Component({
   selector: 'app-tab2',
@@ -38,7 +41,11 @@ export class Tab2Page implements OnInit {
   selectedBus?: Bus;
 
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    //private firestore: Firestore
+    private busService: BusService
+    ) { }
 
   isModalOpen = true;
 
@@ -281,8 +288,20 @@ export class Tab2Page implements OnInit {
       });
 
       L.marker([stop.lat, stop.lon], { icon: customIcon }) // Usa il marker personalizzato
-        .bindPopup(stop.name)
+        //.bindPopup(stop.name)
+        .on('click', () => {
+          this.navigateToStopDetails(stop.id); // Aggiunta dell'azione quando clicchi sulla fermata
+          this.centerStopBus(stop);
+        })
         .addTo(this.map);
+    });
+  }
+
+  centerStopBus(pos: Stop | Bus) {
+    const stopLatLng = L.latLng(pos.lat, pos.lon);
+    this.map.flyTo(stopLatLng, 15, {
+      duration: 1,
+      easeLinearity: 0.5
     });
   }
 
@@ -295,10 +314,41 @@ export class Tab2Page implements OnInit {
   }
 
   addBusesMarkers() {
+    // Ottenere i dati dei bus dal Firestore
+    this.busService.getBuses().subscribe(buses => {
+      console.log(buses);
+      // Assicurati che i dati dei bus siano filtrati correttamente
+      this.filteredBuses = buses.filter(bus =>
+        this.isInsideRadius([bus.lat, bus.lon], this.currentPosition.coords, this.selectedRadius)
+      );
+
+      this.filteredBuses.forEach(bus => {
+        const customIcon = L.icon({
+          iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconSize: [32, 32], // Dimensioni del marker
+          iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+        });
+  
+        L.marker([bus.lat, bus.lon], { icon: customIcon }) // Usa il marker personalizzato
+          .bindPopup(bus.name)
+          .addTo(this.map);
+      });
+      
+    });
+  
+  
+
+  /*
     this.filteredBuses = BUSES.filter(BUSES =>
       this.isInsideRadius([BUSES.lat, BUSES.lon], this.currentPosition.coords, this.selectedRadius)
     );
+    */
+    
 
+    
+
+    /*
     this.filteredBuses.forEach(bus => {
       const customIcon = L.icon({
         iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
@@ -311,6 +361,7 @@ export class Tab2Page implements OnInit {
         .bindPopup(bus.name)
         .addTo(this.map);
     });
+    */
   }
 
   

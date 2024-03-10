@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "busbus-19997": {
+      "hosting": {
+        "app": [
+          "busbus-19997"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "busbus-19997"
+  }
+}
