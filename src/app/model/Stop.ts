@@ -1,7 +1,10 @@
+import { Bus } from "./Bus";
+import { Coordinates } from "./Coordinates";
+
 export interface Stop {
-    id: number;
+    id: string;
     name: string;
-    lat: number;
-    lon: number;
-    routes: number[];
+    address: string;
+    coords: Coordinates;
+    nextBuses: Bus[];
 }

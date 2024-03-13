@@ -12,6 +12,7 @@ export class BusService {
 
   constructor(private firestore: Firestore) { }
 
+  /*
   getBuses(): Observable<Bus[]> {
     const busesRef = collection(this.firestore, 'buses');
     return collectionData(busesRef).pipe(
@@ -28,4 +29,5 @@ export class BusService {
       })
     );
   }
+  */
 }

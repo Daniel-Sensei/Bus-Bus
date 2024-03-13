@@ -273,7 +273,7 @@ export class Tab2Page implements OnInit {
 
   addStopsMarkers() {
     this.filteredStops = STOPS.filter(STOPS =>
-      this.isInsideRadius([STOPS.lat, STOPS.lon], this.currentPosition.coords, this.selectedRadius)
+      this.isInsideRadius([STOPS.coords.lat, STOPS.coords.lon], this.currentPosition.coords, this.selectedRadius)
     );
 
     
@@ -287,7 +287,7 @@ export class Tab2Page implements OnInit {
         popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
       });
 
-      L.marker([stop.lat, stop.lon], { icon: customIcon }) // Usa il marker personalizzato
+      L.marker([stop.coords.lat, stop.coords.lon], { icon: customIcon }) // Usa il marker personalizzato
         //.bindPopup(stop.name)
         .on('click', () => {
           this.navigateToStopDetails(stop.id); // Aggiunta dell'azione quando clicchi sulla fermata
@@ -298,14 +298,14 @@ export class Tab2Page implements OnInit {
   }
 
   centerStopBus(pos: Stop | Bus) {
-    const stopLatLng = L.latLng(pos.lat, pos.lon);
+    const stopLatLng = L.latLng(pos.coords.lat, pos.coords.lon);
     this.map.flyTo(stopLatLng, 15, {
       duration: 1,
       easeLinearity: 0.5
     });
   }
 
-  navigateToStopDetails(stopId: number) {
+  navigateToStopDetails(stopId: string) {
     this.showStops = false;
     
     this.selectedStop = STOPS.find(stop => stop.id === stopId);
@@ -315,6 +315,7 @@ export class Tab2Page implements OnInit {
 
   addBusesMarkers() {
     // Ottenere i dati dei bus dal Firestore
+    /*
     this.busService.getBuses().subscribe(buses => {
       console.log(buses);
       // Assicurati che i dati dei bus siano filtrati correttamente
@@ -334,8 +335,9 @@ export class Tab2Page implements OnInit {
           .bindPopup(bus.name)
           .addTo(this.map);
       });
-      
+
     });
+    */
   
   
 
@@ -365,7 +367,7 @@ export class Tab2Page implements OnInit {
   }
 
   
-
+/*
   addRoute() {
 
 
@@ -435,6 +437,7 @@ export class Tab2Page implements OnInit {
       });
     }
   }
+  */
   
 
 
@@ -481,7 +484,7 @@ export class Tab2Page implements OnInit {
     this.modal.dismiss();
   }
 
-  navigateToBusDetails(busId: number) {
+  navigateToBusDetails(busId: string) {
     this.showBuses = false;
     
     this.selectedBus = BUSES.find(bus => bus.id === busId);
