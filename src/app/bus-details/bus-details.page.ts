@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Bus } from '../model/Bus';
 import { IonModal } from '@ionic/angular';
+import { Coordinates } from '../model/Coordinates';
 
 @Component({
   selector: 'app-bus-details',
