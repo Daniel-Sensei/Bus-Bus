@@ -30,7 +30,7 @@
             <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)"
               class="bus-item">
               <img src="assets/bus-stop.png" class="img-icon">
-              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;">{{stop.name}}</ion-label>
+              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;">{{stop.address}}</ion-label>
               <ion-label slot="end" class="big-hour">{{ this.getDistance(this.currentPosition, stop.coords) }} Km</ion-label>
             </ion-item>
           </ion-list>
@@ -38,9 +38,9 @@
           <!-- Bus -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
             <ion-item *ngFor="let bus of filteredBuses" class="bus-item" (click)="navigateToBusDetails(bus)">
-              <ion-badge slot="start" class="bus-badge">
+              <ion-badge  class="bus-badge">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-                &nbsp;{{bus.id}} - Multiservizi
+                &nbsp;{{bus.route.code}} - {{bus.route.company}}
               </ion-badge>
               <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;"></ion-label>
               <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;" slot="end" class="big-hour">+5 min</ion-label>

@@ -344,16 +344,16 @@ export class Tab2Page implements OnInit {
 
 
 
-    /*
-      this.filteredBuses = BUSES.filter(BUSES =>
-        this.isInsideRadius([BUSES.lat, BUSES.lon], this.currentPosition.coords, this.selectedRadius)
-      );
-      */
+
+    this.filteredBuses = BUSES.filter(BUSES =>
+      this.isInsideRadius([BUSES.coords.lat, BUSES.coords.lon], this.currentPosition.coords, this.selectedRadius)
+    );
 
 
 
 
-    /*
+
+
     this.filteredBuses.forEach(bus => {
       const customIcon = L.icon({
         iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
@@ -362,11 +362,11 @@ export class Tab2Page implements OnInit {
         popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
       });
 
-      L.marker([bus.lat, bus.lon], { icon: customIcon }) // Usa il marker personalizzato
-        .bindPopup(bus.name)
+      L.marker([bus.coords.lat, bus.coords.lon], { icon: customIcon }) // Usa il marker personalizzato
+        .bindPopup(bus.id)
         .addTo(this.map);
     });
-    */
+
   }
 
 
