@@ -7,6 +7,6 @@ export interface Bus {
     route: Route;
     coords: Coordinates;
     speed: number;
-    nextStops: Stop[];
-    lastStop: Stop;
+    //nextStops: Stop[];
+    lastStop: number;
 }

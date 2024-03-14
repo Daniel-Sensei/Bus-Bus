@@ -43,6 +43,9 @@ export class Tab2Page implements OnInit {
   selectedStop?: Stop;
   selectedBus?: Bus;
 
+  firstRoute?: L.Routing.Control;
+  secondRoute?: L.Routing.Control;
+
 
   constructor(
     private router: Router,
@@ -293,6 +296,8 @@ export class Tab2Page implements OnInit {
       L.marker([stop.coords.lat, stop.coords.lon], { icon: customIcon }) // Usa il marker personalizzato
         //.bindPopup(stop.name)
         .on('click', () => {
+          this.eraseRoute();
+
           this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
           this.centerStopBus(stop);
         })
@@ -349,11 +354,6 @@ export class Tab2Page implements OnInit {
       this.isInsideRadius([BUSES.coords.lat, BUSES.coords.lon], this.currentPosition.coords, this.selectedRadius)
     );
 
-
-
-
-
-
     this.filteredBuses.forEach(bus => {
       const customIcon = L.icon({
         iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
@@ -363,25 +363,23 @@ export class Tab2Page implements OnInit {
       });
 
       L.marker([bus.coords.lat, bus.coords.lon], { icon: customIcon }) // Usa il marker personalizzato
-        .bindPopup(bus.id)
+        .on('click', () => {
+          this.navigateToBusDetails(bus); // Aggiunta dell'azione quando clicchi sulla fermata
+          //this.centerStopBus(bus);
+          this.drawRoute(bus);
+        })
         .addTo(this.map);
     });
 
   }
 
 
-  /*
-    addRoute() {
-  
-  
-  
-    // Ottieni la lista degli stop per l'autobus A (supponendo che la variabile autobus contenga l'elenco degli autobus)
-    const busA = BUSES.find(bus => bus.name === 'Bus A');
-  
-    var busPosition = {
+
+  drawRoute(bus: Bus) {
+    var position = {
       coords: {
-        latitude: busA!.lat,
-        longitude: busA!.lon,
+        latitude: bus.coords.lat,
+        longitude: bus.coords.lon,
         accuracy: 0,
         altitude: null,
         altitudeAccuracy: null,
@@ -390,57 +388,75 @@ export class Tab2Page implements OnInit {
       },
       timestamp: 0
     };
-  
-    const busAPosition = busPosition.coords;
-  
-    if (busA) {
-      // Determina il primo stop e l'ultimo stop dell'autobus
-      const firstStop = STOPS.find(stop => stop.id === busA.stops[0]);
-      const lastStop = STOPS.find(stop => stop.id === busA.stops[busA.stops.length - 1]);
-  
-      // Creare un array di coordinate dal primo stop all'attuale posizione del bus
-      const firstLegWaypoints = [L.latLng(firstStop!.lat, firstStop!.lon), L.latLng(busAPosition.latitude, busAPosition.longitude)];
-  
-      // Creare un array di coordinate dall'attuale posizione del bus all'ultimo stop
-      const lastLegWaypoints = [L.latLng(busAPosition.latitude, busAPosition.longitude), L.latLng(lastStop!.lat, lastStop!.lon)];
-  
+
+    const busPosition = position.coords;
+
+
+    // Creare un array di coordinate dal primo stop all'attuale posizione del bus
+
+    if (bus.lastStop >= 0) {
+      const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map(stop => L.latLng(stop.coords.lat, stop.coords.lon));
+
+      const firstLegWaypoints = [...firstLegStops, L.latLng(busPosition.latitude, busPosition.longitude)];
       // Aggiungere il controllo di routing alla mappa per il primo percorso (primo stop all'attuale posizione del bus)
-      L.Routing.control({
+      this.firstRoute = L.Routing.control({
         waypoints: firstLegWaypoints,
         lineOptions: {
-          styles: [{color: 'yellow', opacity: 1, weight: 5}],
+          styles: [{ color: 'yellow', opacity: 1, weight: 5 }],
           extendToWaypoints: true,
           missingRouteTolerance: 100
-       },
+        },
         routeWhileDragging: true,
         show: true,
         //lineOptions: { styles: [{ color: 'yellow', weight: 5 }] } // Imposta il colore del percorso in giallo
       }).addTo(this.map);
-  
-      // Aggiungere il controllo di routing alla mappa per il secondo percorso (attuale posizione del bus all'ultimo stop)
-      L.Routing.control({
-        waypoints: lastLegWaypoints,
-        routeWhileDragging: true,
-        show: true,
-        //lineOptions: { styles: [{ color: 'red', weight: 5 }] } // Imposta il colore del percorso in rosso
-      }).addTo(this.map);
-    
-        // Remove waypoints (of the route) from the map
+    }
+
+    const lastLegStops = bus.route.stops.slice(bus.lastStop + 1).map(stop => L.latLng(stop.coords.lat, stop.coords.lon));
+    const lastLegWaypoints = [L.latLng(busPosition.latitude, busPosition.longitude), ...lastLegStops];
+
+    // Aggiungere il controllo di routing alla mappa per il secondo percorso (attuale posizione del bus all'ultimo stop)
+    this.secondRoute = L.Routing.control({
+      waypoints: lastLegWaypoints,
+      routeWhileDragging: true,
+      show: true,
+      //lineOptions: { styles: [{ color: 'red', weight: 5 }] } // Imposta il colore del percorso in rosso
+    }).addTo(this.map);
+
+    // Remove waypoints (of the route) from the map
     this.map.eachLayer((layer: any) => {
       if (layer.options.waypoints && layer.options.waypoints.length) {
         this.map.removeLayer(layer);
       }
     });
-    
-        // Effettuare una query nel DOM per trovare il div che contiene il controllo di routing
-        // Nascondere tutti i div che contengono il controllo di routing
-        const routingControlDivs = document.querySelectorAll('.leaflet-routing-container');
-        routingControlDivs.forEach(div => {
-          (div as HTMLElement).style.display = 'none';
-        });
+
+    // Effettuare una query nel DOM per trovare il div che contiene il controllo di routing
+    // Nascondere tutti i div che contengono il controllo di routing
+    const routingControlDivs = document.querySelectorAll('.leaflet-routing-container');
+    routingControlDivs.forEach(div => {
+      (div as HTMLElement).style.display = 'none';
+    });
+  }
+
+  eraseRoute() {
+    // Rimuovere i punti intermedi (waypoints) dei percorsi
+    this.map.eachLayer((layer: any) => {
+      if (layer.options.waypoints && layer.options.waypoints.length) {
+        this.map.removeLayer(layer);
       }
+    });
+
+    // Rimuovere i layer dei percorsi stessi
+    if (this.firstRoute) {
+      this.map.removeControl(this.firstRoute);
+      this.firstRoute = undefined;
     }
-    */
+    if (this.secondRoute) {
+      this.map.removeControl(this.secondRoute);
+      this.secondRoute = undefined;
+    }
+  }
+
 
 
 
