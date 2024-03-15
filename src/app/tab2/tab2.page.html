@@ -56,7 +56,7 @@
 
         
         <div *ngIf="!showBuses" class="padding-top-modal">
-          <app-bus-details [bus]="this.selectedBus" [modal]="this.modal"
+          <app-bus-details *ngIf="selectedBus" [bus]="this.selectedBus" [modal]="this.modal"
             (back)="this.showBuses = true"></app-bus-details>
         </div>
 

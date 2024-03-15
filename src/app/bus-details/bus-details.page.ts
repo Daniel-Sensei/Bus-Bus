@@ -20,7 +20,7 @@ export class BusDetailsPage implements OnInit {
 
   @Input() modal!: IonModal;
 
-  @Input() bus?: Bus;
+  @Input() bus!: Bus;
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
 
   backToBuses(){

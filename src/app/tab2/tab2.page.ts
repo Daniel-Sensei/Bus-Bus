@@ -13,8 +13,11 @@ import { BUSES } from '../model/MOCKS/buses_mock';
 import { IonModal } from '@ionic/angular';
 import { Router } from '@angular/router';
 
-import { BusService } from '../bus.service';
+//import { BusService } from '../bus.service';
 import { Coordinates } from '../model/Coordinates';
+
+import { BusService } from '../service/bus.service';
+import { GeoPoint } from 'firebase/firestore';
 
 
 
@@ -43,13 +46,14 @@ export class Tab2Page implements OnInit {
   selectedStop?: Stop;
   selectedBus?: Bus;
 
-  firstRoute?: L.Routing.Control;
-  secondRoute?: L.Routing.Control;
+  firstRoute?: L.Routing.Control = undefined;
+  secondRoute?: L.Routing.Control = undefined;
+
+  busMarkers: L.Marker[] = [];
 
 
   constructor(
     private router: Router,
-    //private firestore: Firestore
     private busService: BusService
   ) { }
 
@@ -279,7 +283,7 @@ export class Tab2Page implements OnInit {
 
   addStopsMarkers() {
     this.filteredStops = STOPS.filter(STOPS =>
-      this.isInsideRadius([STOPS.coords.lat, STOPS.coords.lon], this.currentPosition.coords, this.selectedRadius)
+      this.isInsideRadius([STOPS.coords.latitude, STOPS.coords.longitude], this.currentPosition.coords, this.selectedRadius)
     );
 
 
@@ -293,7 +297,7 @@ export class Tab2Page implements OnInit {
         popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
       });
 
-      L.marker([stop.coords.lat, stop.coords.lon], { icon: customIcon }) // Usa il marker personalizzato
+      L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
         //.bindPopup(stop.name)
         .on('click', () => {
           this.eraseRoute();
@@ -306,7 +310,7 @@ export class Tab2Page implements OnInit {
   }
 
   centerStopBus(pos: Stop | Bus) {
-    const stopLatLng = L.latLng(pos.coords.lat, pos.coords.lon);
+    const stopLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
     this.map.flyTo(stopLatLng, 15, {
       duration: 1,
       easeLinearity: 0.5
@@ -319,6 +323,12 @@ export class Tab2Page implements OnInit {
     this.selectedStop = STOPS.find(stopFound => stopFound.id === stop.id);
 
     //this.router.navigate(['/stop-details', stopId]);
+  }
+
+  clearBusMarkers() {
+    this.busMarkers.forEach(marker => {
+      this.map.removeLayer(marker);
+    });
   }
 
   addBusesMarkers() {
@@ -347,29 +357,52 @@ export class Tab2Page implements OnInit {
     });
     */
 
+    
+    this.busService.getAllBuses().subscribe(buses => {
+      //console.log(buses);
+      this.clearBusMarkers();
+      if (this.firstRoute || this.secondRoute) {
+        this.eraseRoute();
 
+        //filtra nell'array buses il this.selectedBus
 
+          this.selectedBus = buses.find(bus => bus.id === this.selectedBus?.id);
+          if (this.selectedBus) {
+            this.drawRoute(this.selectedBus);
+          }
+        
+      }
+      
+      
 
-    this.filteredBuses = BUSES.filter(BUSES =>
-      this.isInsideRadius([BUSES.coords.lat, BUSES.coords.lon], this.currentPosition.coords, this.selectedRadius)
-    );
+      this.filteredBuses = buses.filter(BUSES =>
+        this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
+      );
 
-    this.filteredBuses.forEach(bus => {
-      const customIcon = L.icon({
-        iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-        iconSize: [32, 32], // Dimensioni del marker
-        iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-        popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+      this.filteredBuses.forEach(bus => {
+        const customIcon = L.icon({
+          iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconSize: [32, 32], // Dimensioni del marker
+          iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+        });
+  
+        const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
+          .on('click', () => {
+            this.navigateToBusDetails(bus); // Aggiunta dell'azione quando clicchi sulla fermata
+            //this.centerStopBus(bus);
+            this.eraseRoute();
+            this.drawRoute(bus);
+            //this.centerStopBus(bus);
+          })
+          .addTo(this.map);
+        this.busMarkers.push(busMarker);
       });
-
-      L.marker([bus.coords.lat, bus.coords.lon], { icon: customIcon }) // Usa il marker personalizzato
-        .on('click', () => {
-          this.navigateToBusDetails(bus); // Aggiunta dell'azione quando clicchi sulla fermata
-          //this.centerStopBus(bus);
-          this.drawRoute(bus);
-        })
-        .addTo(this.map);
+        
+        
     });
+  
+
 
   }
 
@@ -378,8 +411,8 @@ export class Tab2Page implements OnInit {
   drawRoute(bus: Bus) {
     var position = {
       coords: {
-        latitude: bus.coords.lat,
-        longitude: bus.coords.lon,
+        latitude: bus.coords.latitude,
+        longitude: bus.coords.longitude,
         accuracy: 0,
         altitude: null,
         altitudeAccuracy: null,
@@ -395,24 +428,25 @@ export class Tab2Page implements OnInit {
     // Creare un array di coordinate dal primo stop all'attuale posizione del bus
 
     if (bus.lastStop >= 0) {
-      const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map(stop => L.latLng(stop.coords.lat, stop.coords.lon));
+      const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map(stop => L.latLng(stop.coords.latitude, stop.coords.longitude));
 
       const firstLegWaypoints = [...firstLegStops, L.latLng(busPosition.latitude, busPosition.longitude)];
       // Aggiungere il controllo di routing alla mappa per il primo percorso (primo stop all'attuale posizione del bus)
       this.firstRoute = L.Routing.control({
         waypoints: firstLegWaypoints,
         lineOptions: {
-          styles: [{ color: 'yellow', opacity: 1, weight: 5 }],
+          styles: [{ color: 'yellow', opacity: 1, weight: 5, dashArray: '10, 10'}],
           extendToWaypoints: true,
           missingRouteTolerance: 100
         },
         routeWhileDragging: true,
-        show: true,
+        show: false,
+        fitSelectedRoutes: false, // Non adattare la mappa al percorso
         //lineOptions: { styles: [{ color: 'yellow', weight: 5 }] } // Imposta il colore del percorso in giallo
       }).addTo(this.map);
     }
 
-    const lastLegStops = bus.route.stops.slice(bus.lastStop + 1).map(stop => L.latLng(stop.coords.lat, stop.coords.lon));
+    const lastLegStops = bus.route.stops.slice(bus.lastStop + 1).map(stop => L.latLng(stop.coords.latitude, stop.coords.longitude));
     const lastLegWaypoints = [L.latLng(busPosition.latitude, busPosition.longitude), ...lastLegStops];
 
     // Aggiungere il controllo di routing alla mappa per il secondo percorso (attuale posizione del bus all'ultimo stop)
@@ -504,29 +538,26 @@ export class Tab2Page implements OnInit {
   }
 
   navigateToBusDetails(bus: Bus) {
+    this.selectedBus = bus;
+
     this.showBuses = false;
-
-    this.selectedBus = BUSES.find(busFound => busFound.id === bus.id);
-
     //this.router.navigate(['/stop-details', stopId]);
   }
 
-  getDistance(pos1: Coordinates | Position, pos2: Coordinates) {
+  getDistance(pos1: GeoPoint | Position, pos2: GeoPoint) {
     //using leaflet-routing-machine calculate distance between two points
     // return distance in meters without calculating the route, just the distance in air
 
-    //if the first position is a Position object, convert it to a Coordinates object
+    //if the first position is a Position object, convert it to a Geopoint object
     if ((pos1 as Position).coords) {
-      pos1 = {
-        lat: (pos1 as Position).coords.latitude,
-        lon: (pos1 as Position).coords.longitude
-      } as Coordinates;
+      const positionCoords = (pos1 as Position).coords;
+      pos1 = new GeoPoint(positionCoords.latitude, positionCoords.longitude);
     }
 
     //use leaflet measure
     // Creare due punti Leaflet LatLng
-    const point1 = L.latLng((pos1 as Coordinates).lat, (pos1 as Coordinates).lon);
-    const point2 = L.latLng(pos2.lat, pos2.lon);
+    const point1 = L.latLng((pos1 as GeoPoint).latitude, (pos1 as GeoPoint).longitude);
+    const point2 = L.latLng(pos2.latitude, pos2.longitude);
 
     // Utilizzare il modulo Leaflet Measure per calcolare la distanza tra i due punti
     const distance = L.GeometryUtil.length([point1, point2]);
