@@ -19,6 +19,8 @@ import { Coordinates } from '../model/Coordinates';
 import { BusService } from '../service/bus.service';
 import { GeoPoint } from 'firebase/firestore';
 
+import { WebSocketService } from '../service/web-socket.service';
+
 
 
 @Component({
@@ -54,7 +56,8 @@ export class Tab2Page implements OnInit {
 
   constructor(
     private router: Router,
-    private busService: BusService
+    private busService: BusService,
+    private webSocketService: WebSocketService
   ) { }
 
   isModalOpen = true;
@@ -67,6 +70,16 @@ export class Tab2Page implements OnInit {
     await this.initializeDefaultMap();
 
     this.addModalListeners();
+
+    this.webSocketService.connect().subscribe(
+      (message: Bus[]) => {
+        //this.buses = message;
+        console.log('WebSocket message:', message);
+      },
+      (error) => {
+        console.error('WebSocket error:', error);
+      }
+    );
   }
 
   addModalListeners() {

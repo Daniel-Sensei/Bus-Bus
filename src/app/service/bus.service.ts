@@ -30,10 +30,21 @@ export class BusService {
     const busesRef = collection(this.firestore, 'buses');
     return collectionData(busesRef).pipe(
       map((buses: any[]) => {
-        console.log(buses);
+        //console.log(buses);
         return buses;
       })
     );
   }
   
 }
+
+/*
+getAllBuses(): Observable<Bus[]> {
+    const busesRef = collection(this.firestore, 'buses');
+    return collectionData(busesRef).pipe(
+      map((buses: any[]) => {
+        console.log(buses);
+        return buses;
+      })
+    );
+    */
