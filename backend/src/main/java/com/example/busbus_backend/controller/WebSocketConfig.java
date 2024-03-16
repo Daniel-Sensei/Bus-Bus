@@ -16,6 +16,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler busesWebSocketHandler() {
-        return new BusesWebSocketController();
+        return new BusWebSocketController();
     }
 }
