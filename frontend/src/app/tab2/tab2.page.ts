@@ -19,7 +19,7 @@ import { Coordinates } from '../model/Coordinates';
 import { BusService } from '../service/bus.service';
 import { GeoPoint } from 'firebase/firestore';
 
-import { WebSocketService } from '../service/web-socket.service';
+//import { WebSocketService } from '../service/web-socket.service';
 
 
 
@@ -48,6 +48,7 @@ export class Tab2Page implements OnInit {
   selectedStop?: Stop;
   selectedBus?: Bus;
 
+  buses: Bus[] = BUSES;
   firstRoute?: L.Routing.Control = undefined;
   secondRoute?: L.Routing.Control = undefined;
 
@@ -57,7 +58,7 @@ export class Tab2Page implements OnInit {
   constructor(
     private router: Router,
     private busService: BusService,
-    private webSocketService: WebSocketService
+    //private webSocketService: WebSocketService
   ) { }
 
   isModalOpen = true;
@@ -71,6 +72,7 @@ export class Tab2Page implements OnInit {
 
     this.addModalListeners();
 
+    /*
     this.webSocketService.connect().subscribe(
       (message: Bus[]) => {
         //this.buses = message;
@@ -80,6 +82,13 @@ export class Tab2Page implements OnInit {
         console.error('WebSocket error:', error);
       }
     );
+    */
+
+    this.busService.getBuses(this.currentPosition.coords.latitude, this.currentPosition.coords.longitude).subscribe(buses => {
+      console.log("connected to websocket");
+      this.buses = buses;
+      this.addBusesMarkers();
+    });
   }
 
   addModalListeners() {
@@ -370,7 +379,7 @@ export class Tab2Page implements OnInit {
     });
     */
 
-    
+    /*
     this.busService.getAllBuses().subscribe(buses => {
       //console.log(buses);
       this.clearBusMarkers();
@@ -385,10 +394,22 @@ export class Tab2Page implements OnInit {
           }
         
       }
+      */
       
-      
+      this.clearBusMarkers();
+      if (this.firstRoute || this.secondRoute) {
+        this.eraseRoute();
 
-      this.filteredBuses = buses.filter(BUSES =>
+        //filtra nell'array buses il this.selectedBus
+
+          this.selectedBus = this.buses.find(bus => bus.id === this.selectedBus?.id);
+          if (this.selectedBus) {
+            this.drawRoute(this.selectedBus);
+          }
+        
+      }
+
+      this.filteredBuses = this.buses.filter(BUSES =>
         this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
       );
 
@@ -413,7 +434,7 @@ export class Tab2Page implements OnInit {
       });
         
         
-    });
+  
   
 
 

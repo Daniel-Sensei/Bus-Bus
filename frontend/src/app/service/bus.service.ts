@@ -7,6 +7,8 @@ import { collection } from '@firebase/firestore';
 import { Firestore, collectionData } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 
+import { WebSocketService } from './web-socket.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,8 @@ export class BusService {
 
   constructor(
     private http: HttpClient,
-    private firestore: Firestore // Inietta AngularFirestore
+    private firestore: Firestore, // Inietta AngularFirestore
+    private webSocketService: WebSocketService
   ) { }
 
   /*
@@ -23,6 +26,14 @@ export class BusService {
     return this.http.get<Bus[]>(Settings.API_ENDPOINT + "api/buses");
   }
   */
+
+  getBuses(latitude: number, longitude: number): Observable<Bus[]> {
+    // Invia la tua posizione al server tramite il servizio WebSocket
+    this.webSocketService.sendPosition(latitude, longitude);
+
+    // Ritorna l'Observable del servizio WebSocket per ricevere i bus aggiornati
+    return this.webSocketService.connect();
+  }
   
 
   

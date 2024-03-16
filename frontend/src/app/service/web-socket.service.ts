@@ -15,4 +15,17 @@ export class WebSocketService {
   connect(): WebSocketSubject<any> {
     return this.socket$;
   }
+
+  sendPosition(latitude: number, longitude: number): void {
+    // Costruisci il messaggio contenente le informazioni di posizione
+    const message = {
+      type: 'position_update',
+      latitude,
+      longitude
+    };
+
+    // Invia il messaggio al server
+    this.socket$.next(message);
+  }
+
 }
