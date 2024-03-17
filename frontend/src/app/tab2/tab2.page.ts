@@ -48,7 +48,7 @@ export class Tab2Page implements OnInit {
   selectedStop?: Stop;
   selectedBus?: Bus;
 
-  buses: Bus[] = BUSES;
+  buses: Bus[] = [];
   firstRoute?: L.Routing.Control = undefined;
   secondRoute?: L.Routing.Control = undefined;
 
@@ -84,11 +84,21 @@ export class Tab2Page implements OnInit {
     );
     */
 
+    /*
     this.busService.getBuses(this.currentPosition.coords.latitude, this.currentPosition.coords.longitude).subscribe(buses => {
       console.log("connected to websocket");
       this.buses = buses;
       this.addBusesMarkers();
     });
+    */
+
+    this.busService.getBusesFromRealtimeDatabase().subscribe(buses => {
+      console.log("connected to realTimeDatabase");
+      console.log(buses);
+      this.buses = buses;
+      this.addBusesMarkers();
+    });
+
   }
 
   addModalListeners() {
@@ -395,49 +405,42 @@ export class Tab2Page implements OnInit {
         
       }
       */
-      
-      this.clearBusMarkers();
-      if (this.firstRoute || this.secondRoute) {
-        this.eraseRoute();
 
-        //filtra nell'array buses il this.selectedBus
-
-          this.selectedBus = this.buses.find(bus => bus.id === this.selectedBus?.id);
-          if (this.selectedBus) {
-            this.drawRoute(this.selectedBus);
-          }
-        
+    this.clearBusMarkers();
+    if (this.firstRoute || this.secondRoute) {
+      this.eraseRoute();
+      //filtra nell'array buses il this.selectedBus
+      this.selectedBus = this.buses.find(bus => bus.id === this.selectedBus?.id);
+      if (this.selectedBus) {
+        this.drawRoute(this.selectedBus);
       }
 
-      this.filteredBuses = this.buses.filter(BUSES =>
-        this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
-      );
+    }
 
-      this.filteredBuses.forEach(bus => {
-        const customIcon = L.icon({
-          iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-          iconSize: [32, 32], // Dimensioni del marker
-          iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
-        });
-  
-        const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
-          .on('click', () => {
-            this.navigateToBusDetails(bus); // Aggiunta dell'azione quando clicchi sulla fermata
-            //this.centerStopBus(bus);
-            this.eraseRoute();
-            this.drawRoute(bus);
-            //this.centerStopBus(bus);
-          })
-          .addTo(this.map);
-        this.busMarkers.push(busMarker);
+
+    this.filteredBuses = this.buses.filter(BUSES =>
+      this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
+    );
+
+    this.filteredBuses.forEach(bus => {
+      const customIcon = L.icon({
+        iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+        iconSize: [32, 32], // Dimensioni del marker
+        iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+        popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
       });
-        
-        
-  
-  
 
-
+      const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
+        .on('click', () => {
+          this.navigateToBusDetails(bus); // Aggiunta dell'azione quando clicchi sulla fermata
+          //this.centerStopBus(bus);
+          this.eraseRoute();
+          this.drawRoute(bus);
+          //this.centerStopBus(bus);
+        })
+        .addTo(this.map);
+      this.busMarkers.push(busMarker);
+    });
   }
 
 
@@ -469,7 +472,7 @@ export class Tab2Page implements OnInit {
       this.firstRoute = L.Routing.control({
         waypoints: firstLegWaypoints,
         lineOptions: {
-          styles: [{ color: 'yellow', opacity: 1, weight: 5, dashArray: '10, 10'}],
+          styles: [{ color: 'yellow', opacity: 1, weight: 5, dashArray: '10, 10' }],
           extendToWaypoints: true,
           missingRouteTolerance: 100
         },

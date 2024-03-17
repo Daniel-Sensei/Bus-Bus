@@ -8,6 +8,10 @@ import { Firestore, collectionData } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 
 import { WebSocketService } from './web-socket.service';
+import { getDatabase, ref, get } from 'firebase/database';
+import { Subject } from 'rxjs';
+import { onValue } from 'firebase/database';
+
 
 
 @Injectable({
@@ -15,17 +19,45 @@ import { WebSocketService } from './web-socket.service';
 })
 export class BusService {
 
+  firebaseDB: any;
+
   constructor(
     private http: HttpClient,
     private firestore: Firestore, // Inietta AngularFirestore
-    private webSocketService: WebSocketService
-  ) { }
+    private webSocketService: WebSocketService,
+  ) {
+    this.firebaseDB = getDatabase();
+   }
 
   /*
   getAllBuses(): Observable<Bus[]> {
     return this.http.get<Bus[]>(Settings.API_ENDPOINT + "api/buses");
   }
   */
+
+  getBusesFromRealtimeDatabase(): Observable<Bus[]> {
+    const busesRef = ref(this.firebaseDB, 'buses');
+    const subject = new Subject<Bus[]>();
+  
+    onValue(busesRef, (snapshot) => {
+      const buses: Bus[] = [];
+      snapshot.forEach(childSnapshot => {
+        const busData = childSnapshot.val();
+        const bus: Bus = {
+          id: childSnapshot.key,
+          coords: busData.coords,
+          route: busData.route,
+          speed: busData.speed,
+          lastStop: busData.lastStop,
+          // Aggiungere altri campi se necessario
+        };
+        buses.push(bus);
+      });
+      subject.next(buses);
+    });
+  
+    return subject.asObservable();
+  }
 
   getBuses(latitude: number, longitude: number): Observable<Bus[]> {
     // Invia la tua posizione al server tramite il servizio WebSocket
