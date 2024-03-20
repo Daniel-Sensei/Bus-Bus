@@ -6,31 +6,28 @@ import java.lang.annotation.Documented;
 import java.util.List;
 
 public class Route {
-    private Long id;
+    private String id;
     private String company;
     private String code;
-    private List<Stop> stops;
-    private List<String[]> hours;
+    private StopOutboundReturn stops;
+    private Schedule timetable;
 
-    // Costruttore senza argomenti necessario per la deserializzazione
     public Route() {
     }
 
-    // Costruttore
-    public Route(Long id, String company, String code, List<Stop> stops, List<String[]> hours) {
+    public Route(String id, String company, String code, StopOutboundReturn stops, Schedule timetable) {
         this.id = id;
         this.company = company;
         this.code = code;
         this.stops = stops;
-        this.hours = hours;
+        this.timetable = timetable;
     }
 
-    // Metodi getter e setter
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -50,20 +47,20 @@ public class Route {
         this.code = code;
     }
 
-    public List<Stop> getStops() {
+    public StopOutboundReturn getStops() {
         return stops;
     }
 
-    public void setStops(List<Stop> stops) {
+    public void setStops(StopOutboundReturn stops) {
         this.stops = stops;
     }
 
-    public List<String[]> getHours() {
-        return hours;
+    public Schedule getTimetable() {
+        return timetable;
     }
 
-    public void setHours(List<String[]> hours) {
-        this.hours = hours;
+    public void setTimetable(Schedule timetable) {
+        this.timetable = timetable;
     }
 }
 
