@@ -3,34 +3,34 @@ package com.example.busbus_backend.persistence.model;
 import java.util.List;
 
 public class StopOutboundReturn {
-    private List<Stop> forward;
-    private List<Stop> back;
+    private List<Stop> forwardStops;
+    private List<Stop> backStops;
 
     // Costruttore senza argomenti necessario per la deserializzazione
     public StopOutboundReturn() {
     }
 
-    public List<Stop> getForward() {
-        return forward;
+    public List<Stop> getForwardStops() {
+        return forwardStops;
     }
 
-    public void setForward(List<Stop> forward) {
-        this.forward = forward;
+    public void setForwardStops(List<Stop> forwardStops) {
+        this.forwardStops = forwardStops;
     }
 
-    public List<Stop> getBack() {
-        return back;
+    public List<Stop> getBackStops() {
+        return backStops;
     }
 
-    public void setBack(List<Stop> back) {
-        this.back = back;
+    public void setBackStops(List<Stop> backStops) {
+        this.backStops = backStops;
     }
 
     @Override
     public String toString() {
         return "StopOutboundReturn{" +
-                "outboundStops=" + forward +
-                ", returnStops=" + back +
+                "outboundStops=" + forwardStops +
+                ", returnStops=" + backStops +
                 '}';
     }
 }

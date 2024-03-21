@@ -33,7 +33,6 @@ public class RouteService {
         try {
             DocumentSnapshot document = getDocumentById(routes, id);
             if (document.exists()) {
-                // TODO: ignorare campo stops [forward, back]
                 Route route = document.toObject(Route.class);
                 route.setId(document.getId());
 
@@ -58,8 +57,8 @@ public class RouteService {
         List<Stop> returnStops = buildStopList(document, "stops.back");
 
         StopOutboundReturn stops = new StopOutboundReturn();
-        stops.setForward(outboundStops);
-        stops.setBack(returnStops);
+        stops.setForwardStops(outboundStops);
+        stops.setBackStops(returnStops);
 
         return stops;
     }
