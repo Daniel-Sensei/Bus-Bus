@@ -2,34 +2,28 @@ package com.example.busbus_backend.persistence.model;
 
 import com.google.cloud.firestore.GeoPoint;
 
-import java.util.List;
-
 public class Stop {
-    private Long id;
+    private String id;
     private String name;
     private String address;
     private GeoPoint coords;
-    private List<Bus> nextBuses;
 
     // Costruttore senza argomenti necessario per la deserializzazione
     public Stop() {
     }
 
-    // Costruttore
-    public Stop(Long id, String name, String address, GeoPoint coords, List<Bus> nextBuses) {
+    public Stop(String id, String name, String address, GeoPoint coords) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.coords = coords;
-        this.nextBuses = nextBuses;
     }
 
-    // Metodi getter e setter
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -57,12 +51,13 @@ public class Stop {
         this.coords = coords;
     }
 
-    public List<Bus> getNextBuses() {
-        return nextBuses;
-    }
-
-    public void setNextBuses(List<Bus> nextBuses) {
-        this.nextBuses = nextBuses;
+    @Override
+    public String toString() {
+        return "Stop{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", coords=" + coords +
+                '}';
     }
 }
-
