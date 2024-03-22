@@ -4,16 +4,13 @@ import com.example.busbus_backend.persistence.model.Bus;
 import com.example.busbus_backend.persistence.model.Route;
 import com.example.busbus_backend.persistence.model.ForwardBackStops;
 import com.google.cloud.firestore.DocumentReference;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.concurrent.ExecutionException;
 
@@ -21,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 @CrossOrigin("http://localhost:8100/")
 public class BusService {
     private final String COLLECTION_NAME = "buses"; // Nome della collezione in Firestore
+    private final String ROUTE_COLLECTION_NAME = "routes";
 
     @GetMapping("/bus")
     public ResponseEntity<Bus> getBus(@RequestParam String id) {

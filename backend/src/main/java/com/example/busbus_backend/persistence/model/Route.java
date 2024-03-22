@@ -114,6 +114,14 @@ public class Route {
     }
 
     public static class Data {
+        @Override
+        public String toString() {
+            return "Data{" +
+                    "forward=" + forward +
+                    ", back=" + back +
+                    '}';
+        }
+
         private Schedule.Timetable forward;
         private Schedule.Timetable back;
 
