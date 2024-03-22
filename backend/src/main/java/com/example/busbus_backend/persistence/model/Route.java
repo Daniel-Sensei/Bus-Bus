@@ -1,23 +1,63 @@
 package com.example.busbus_backend.persistence.model;
 
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.annotation.DocumentId;
 
-import java.lang.annotation.Documented;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class Route {
+    @DocumentId
     private String id;
     private String company;
     private String code;
-    private StopOutboundReturn stops;
+    private ForwardBackStops stops;
     private Schedule timetable;
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "id='" + id + '\'' +
+                ", company='" + company + '\'' +
+                ", code='" + code + '\'' +
+                ", stops=" + stops +
+                ", timetable=" + timetable +
+                ", history=" + history +
+                '}';
+    }
+
     private Map<String, Data> history;
 
     public Route() {
     }
 
-    public Route(String id, String company, String code, StopOutboundReturn stops, Schedule timetable, Map<String, Data> history) {
+    public ForwardBackStops buildStopOutboundReturn(DocumentSnapshot document) throws InterruptedException, ExecutionException {
+        List<Stop> outboundStops = buildStopList(document, "stops.forward");
+        List<Stop> returnStops = buildStopList(document, "stops.back");
+
+        ForwardBackStops stops = new ForwardBackStops();
+        stops.setForwardStops(outboundStops);
+        stops.setBackStops(returnStops);
+        return stops;
+    }
+
+    private List<Stop> buildStopList(DocumentSnapshot document, String fieldPath) throws InterruptedException, ExecutionException {
+        List<DocumentReference> stopRefs = (List<DocumentReference>) document.get(fieldPath);
+        List<Stop> stops = new ArrayList<>();
+        if (stopRefs != null) {
+            for (DocumentReference stopRef : stopRefs) {
+                Stop stop = stopRef.get().get().toObject(Stop.class);
+                stop.setId(stopRef.getId());
+                stops.add(stop);
+            }
+        }
+        return stops;
+    }
+
+    public Route(String id, String company, String code, ForwardBackStops stops, Schedule timetable, Map<String, Data> history) {
         this.id = id;
         this.company = company;
         this.code = code;
@@ -50,11 +90,11 @@ public class Route {
         this.code = code;
     }
 
-    public StopOutboundReturn getStops() {
+    public ForwardBackStops getStops() {
         return stops;
     }
 
-    public void setStops(StopOutboundReturn stops) {
+    public void setStops(ForwardBackStops stops) {
         this.stops = stops;
     }
 

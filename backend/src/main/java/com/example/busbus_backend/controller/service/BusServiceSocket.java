@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class BusService {
+public class BusServiceSocket {
 
     private final BusRepository busRepository;
 
     @Autowired
-    public BusService(BusRepository busRepository) {
+    public BusServiceSocket(BusRepository busRepository) {
         this.busRepository = busRepository;
     }
 

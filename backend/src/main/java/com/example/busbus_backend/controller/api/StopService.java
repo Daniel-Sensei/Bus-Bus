@@ -1,7 +1,6 @@
 package com.example.busbus_backend.controller.api;
 
-import com.example.busbus_backend.persistence.model.Route;
-import com.example.busbus_backend.persistence.model.ForwardBackStops;
+import com.example.busbus_backend.persistence.model.Stop;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -17,24 +16,20 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 @CrossOrigin("http://localhost:8100/")
-public class RouteService {
+public class StopService {
+    private final String COLLECTION_NAME = "stops"; // Nome della collezione in Firestore
 
-    private final String COLLECTION_NAME = "routes"; // Nome della collezione in Firestore
-
-    @GetMapping("/route")
-    public ResponseEntity<Route> getRoute(@RequestParam String id) {
+    @GetMapping("/stop")
+    public ResponseEntity<Stop> getStop(@RequestParam String id) {
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference routes = db.collection(COLLECTION_NAME);
+        CollectionReference stops = db.collection(COLLECTION_NAME);
 
         try {
-            DocumentSnapshot document = getDocumentById(routes, id);
+            DocumentSnapshot document = getDocumentById(stops, id);
             if (document.exists()) {
-                Route route = document.toObject(Route.class);
+                Stop stop = document.toObject(Stop.class);
 
-                ForwardBackStops stops = route.buildStopOutboundReturn(document);
-                route.setStops(stops);
-
-                return new ResponseEntity<>(route, HttpStatus.OK);
+                return new ResponseEntity<>(stop, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -46,6 +41,4 @@ public class RouteService {
     private DocumentSnapshot getDocumentById(CollectionReference collectionReference, String id) throws InterruptedException, ExecutionException {
         return collectionReference.document(id).get().get();
     }
-
-
 }

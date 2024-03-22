@@ -1,8 +1,10 @@
 package com.example.busbus_backend.persistence.model;
 
 import com.google.cloud.firestore.GeoPoint;
+import com.google.cloud.firestore.annotation.DocumentId;
 
 public class Stop {
+    @DocumentId
     private String id;
     private String name;
     private String address;
