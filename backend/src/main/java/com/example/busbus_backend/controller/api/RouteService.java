@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -42,6 +46,37 @@ public class RouteService {
             throw new RuntimeException(e);
         }
     }
+
+    // Restituisce tutti i percorsi, effettuando un raggruppamento per "company"
+    @GetMapping("/allRoutes")
+    public ResponseEntity<Map<String, List<Route>>> getAllRoutes() {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference routes = db.collection(COLLECTION_NAME);
+
+        try {
+            List<Route> allRoutes = routes.get().get().toObjects(Route.class);
+
+            // Creazione di una mappa per raggruppare i percorsi per "company"
+            Map<String, List<Route>> groupedRoutes = new HashMap<>();
+
+            for (Route route : allRoutes) {
+                String company = route.getCompany();
+                if (company != null) {
+                    // Se la chiave non esiste già, aggiungi una nuova voce con un nuovo ArrayList
+                    groupedRoutes.putIfAbsent(company, new ArrayList<>());
+                    // Aggiungi la rotta alla lista esistente
+                    groupedRoutes.get(company).add(route);
+                }
+            }
+
+            return new ResponseEntity<>(groupedRoutes, HttpStatus.OK);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
 
     private DocumentSnapshot getDocumentById(CollectionReference collectionReference, String id) throws InterruptedException, ExecutionException {
         return collectionReference.document(id).get().get();
