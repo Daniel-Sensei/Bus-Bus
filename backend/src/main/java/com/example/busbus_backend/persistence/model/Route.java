@@ -4,6 +4,7 @@ import com.google.cloud.firestore.DocumentReference;
 
 import java.lang.annotation.Documented;
 import java.util.List;
+import java.util.Map;
 
 public class Route {
     private String id;
@@ -11,16 +12,18 @@ public class Route {
     private String code;
     private StopOutboundReturn stops;
     private Schedule timetable;
+    private Map<String, Data> history;
 
     public Route() {
     }
 
-    public Route(String id, String company, String code, StopOutboundReturn stops, Schedule timetable) {
+    public Route(String id, String company, String code, StopOutboundReturn stops, Schedule timetable, Map<String, Data> history) {
         this.id = id;
         this.company = company;
         this.code = code;
         this.stops = stops;
         this.timetable = timetable;
+        this.history = history;
     }
 
     public String getId() {
@@ -61,6 +64,37 @@ public class Route {
 
     public void setTimetable(Schedule timetable) {
         this.timetable = timetable;
+    }
+    public Map<String, Data> getHistory() {
+        return history;
+    }
+
+    public void setHistory(Map<String, Data> history) {
+        this.history = history;
+    }
+
+    public static class Data {
+        private Schedule.Timetable forward;
+        private Schedule.Timetable back;
+
+        public Data() {
+        }
+
+        public Schedule.Timetable getForward() {
+            return forward;
+        }
+
+        public void setForward(Schedule.Timetable forward) {
+            this.forward = forward;
+        }
+
+        public Schedule.Timetable getBack() {
+            return back;
+        }
+
+        public void setBack(Schedule.Timetable back) {
+            this.back = back;
+        }
     }
 }
 
