@@ -1,6 +1,5 @@
 package com.example.busbus_backend.controller.api;
 
-import com.example.busbus_backend.persistence.model.ForwardBackStops;
 import com.example.busbus_backend.persistence.model.Route;
 import com.example.busbus_backend.persistence.model.Schedule;
 import com.example.busbus_backend.persistence.model.Stop;
@@ -21,16 +20,16 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@CrossOrigin("http://localhost:8100/")
+@CrossOrigin("*")
 public class StopService {
-    private final String COLLECTION_NAME = "stops"; // Nome della collezione in Firestore
-    private final String ROUTE_COLLECTION_NAME = "routes";
+    private final String STOPS_COLLECTION = "stops"; // Nome della collezione in Firestore
+    private final String ROUTES_COLLECTION = "routes";
 
 
     @GetMapping("/stop")
     public ResponseEntity<Stop> getStop(@RequestParam String id) {
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference stops = db.collection(COLLECTION_NAME);
+        CollectionReference stops = db.collection(STOPS_COLLECTION);
 
         try {
             DocumentSnapshot document = getDocumentById(stops, id);
@@ -49,7 +48,7 @@ public class StopService {
     @GetMapping("/nextBuses")
     public ResponseEntity<Map<String, List<String>>> getNextBusesByStop(@RequestParam String stopId) {
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference stops = db.collection(COLLECTION_NAME);
+        CollectionReference stops = db.collection(STOPS_COLLECTION);
 
         try {
             //salva la reference del documento del tipo DocumentReference
@@ -92,7 +91,6 @@ public class StopService {
                             List<String> forwardDay = isSunday() ? todayData.getForward().getSunday().get(String.valueOf(indexForward)) : todayData.getForward().getWeek().get(String.valueOf(indexForward));
                             List<String> backDay = isSunday() ? todayData.getBack().getSunday().get(String.valueOf(indexBack)) : todayData.getBack().getWeek().get(String.valueOf(indexBack));
 
-                            System.out.println("forwardDay: " + forwardDay);
                             int startIndexForward = 0;
                             for(String time : forwardDay) {
                                 if(time == null || !time.equals("-")) {
@@ -100,7 +98,6 @@ public class StopService {
                                 }
                             }
 
-                            System.out.println("backDay: " + backDay);
                             int startIndexBack = 0;
                             for(String time : backDay) {
                                 if(time == null || !time.equals("-")) {
@@ -112,11 +109,8 @@ public class StopService {
 
                             List<String> forward = isSunday() ? schedule.getForward().getSunday().get(String.valueOf(indexForward)) : schedule.getForward().getWeek().get(String.valueOf(indexForward));
                             List<String> back = isSunday() ? schedule.getBack().getSunday().get(String.valueOf(indexBack)) : schedule.getBack().getWeek().get(String.valueOf(indexBack));
-                            System.out.println("forward: " + forward);
-                            System.out.println("back: " + back);
 
                             String destination = route.getCode().split("_")[1];
-                            System.out.println("destination: " + destination);
                             //ordina al contrario la destinazione splittando per "-"
                             //esempio: "A-B" diventa "B-A"
                             //la destinazione potrebbe avere più di un "-"
@@ -127,11 +121,9 @@ public class StopService {
                                 invertedDestination += destinationArray[i] + "-";
                             }
                             invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 1);
-                            System.out.println("invertedDestination: " + invertedDestination);
 
                             nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward.subList(startIndexForward, forward.size()));
                             nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back.subList(startIndexBack, back.size()));
-                            System.out.println("nextBuses: " + nextBuses);
 
                             return new ResponseEntity<>(nextBuses, HttpStatus.OK);
 
