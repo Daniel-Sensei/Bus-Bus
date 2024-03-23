@@ -28,8 +28,8 @@ public class Schedule {
     @Override
     public String toString() {
         return "Schedule{" +
-                "outbound=" + forward +
-                ", returnSchedule=" + back +
+                "forward=" + forward +
+                ", back=" + back +
                 '}';
     }
 

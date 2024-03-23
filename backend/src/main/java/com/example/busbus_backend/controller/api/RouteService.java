@@ -54,6 +54,11 @@ public class RouteService {
 
         try {
             List<Route> allRoutes = routes.get().get().toObjects(Route.class);
+            for (Route route : allRoutes) {
+                DocumentSnapshot document = getDocumentById(routes, route.getId());
+                ForwardBackStops stops = route.buildStopOutboundReturn(document);
+                route.setStops(stops);
+            }
 
             // Creazione di una mappa per raggruppare i percorsi per "company"
             Map<String, List<Route>> groupedRoutes = new HashMap<>();
