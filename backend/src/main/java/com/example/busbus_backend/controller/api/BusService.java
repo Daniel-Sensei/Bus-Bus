@@ -95,6 +95,8 @@ public class BusService {
         // check if bodyRequest.token is a valid Firebase token
         String token = bodyRequest.get("token");
         String code = bodyRequest.get("code");
+        System.out.println("code: " + code);
+        System.out.println("token: " + token);
         try {
             FirebaseAuth.getInstance().verifyIdToken(token);
 
@@ -119,6 +121,9 @@ public class BusService {
             Bus bus = new Bus();
             bus.setId(document.getId());
             bus.setRoute(route);
+            bus.setCode(code);
+            GeoPoint coords = new GeoPoint(0, 0);
+            bus.setCoords(coords);
             return new ResponseEntity<>(bus, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

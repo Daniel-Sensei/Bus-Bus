@@ -6,6 +6,7 @@ import com.google.cloud.firestore.annotation.DocumentId;
 public class Bus {
     @DocumentId
     private String id;
+    private String code;
     private Route route;
     private GeoPoint coords;
     private double speed;
@@ -13,17 +14,27 @@ public class Bus {
 
     private int lastStop;
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     // Costruttore senza argomenti necessario per la deserializzazione
     public Bus() {
     }
 
+
     // Costruttore
-    public Bus(String id, Route route, GeoPoint coords, double speed, int lastStop) {
+    public Bus(String id, Route route, GeoPoint coords, double speed, int lastStop, String code) {
         this.id = id;
         this.route = route;
         this.coords = coords;
         this.speed = speed;
         this.lastStop = lastStop;
+        this.code = code;
     }
 
     // Metodi getter e setter
