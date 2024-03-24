@@ -1,17 +1,18 @@
 package com.example.busbus_backend.controller.api;
 
-import com.example.busbus_backend.persistence.model.Bus;
-import com.example.busbus_backend.persistence.model.Route;
-import com.example.busbus_backend.persistence.model.ForwardBackStops;
-import com.example.busbus_backend.persistence.model.Schedule;
-import com.google.cloud.firestore.DocumentReference;
+import com.example.busbus_backend.persistence.model.*;
+import com.google.cloud.firestore.*;
 import org.springframework.web.bind.annotation.*;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
+import com.google.firebase.auth.UserRecord.CreateRequest;
+
+
+
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,19 +25,7 @@ import java.util.concurrent.ExecutionException;
 public class BusService {
     private final String BUSES_COLLECTION = "buses"; // Nome della collezione in Firestore
     private final String ROUTES_COLLECTION = "routes";
-
-    // Metodo per verificare l'autenticazione dell'utente
-    /*
-    private String verifyUserAuthentication(String idToken) {
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
-            return decodedToken.getUid(); // Ritorna l'UID dell'utente autenticato
-        } catch (FirebaseAuthException e) {
-            // L'ID token fornito non è valido
-            throw new RuntimeException("Invalid ID token");
-        }
-    }
-     */
+    private final String COMPANIES_COLLECTION = "companies";
 
     @GetMapping("/bus")
     public ResponseEntity<Bus> getBus(@RequestParam String id) {
@@ -66,6 +55,76 @@ public class BusService {
             throw new RuntimeException(e);
         }
     }
+
+    @PostMapping("/signupCompany")
+    public ResponseEntity<String> signupCompany(@RequestBody BusSignupRequest requestBody) {
+        String email = requestBody.getEmail();
+        String password = requestBody.getPassword();
+        String company = requestBody.getCompany();
+
+        if(company == null || company.isEmpty() || email == null || email.isEmpty() || password == null || password.isEmpty()){
+            return new ResponseEntity<>("I campi email, password e company sono obbligatori", HttpStatus.BAD_REQUEST);
+        }
+
+        CreateRequest request = new CreateRequest()
+                .setEmail(email)
+                .setPassword(password)
+                .setDisabled(false);
+
+        UserRecord companyRecord;
+        try {
+            companyRecord = FirebaseAuth.getInstance().createUser(request);
+            // Salva ulteriori dettagli dell'azienda del bus nel tuo database qui, se necessario.
+            // Le companies sono salvate nella collezione "companies" in Firestore
+            Firestore db = FirestoreClient.getFirestore();
+            CollectionReference companies = db.collection(COMPANIES_COLLECTION);
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", company);
+            data.put("email", email);
+            db.collection(COMPANIES_COLLECTION).document(companyRecord.getUid()).set(data);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Errore durante la registrazione dell'azienda: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("Azienda registrata con successo con ID: " + companyRecord.getUid(), HttpStatus.OK);
+
+    }
+
+    @PostMapping("/busByCode")
+    public ResponseEntity<Bus> getBusByCode (@RequestBody Map<String, String> bodyRequest){
+        // check if bodyRequest.token is a valid Firebase token
+        String token = bodyRequest.get("token");
+        String code = bodyRequest.get("code");
+        try {
+            FirebaseAuth.getInstance().verifyIdToken(token);
+
+            Firestore db = FirestoreClient.getFirestore();
+            CollectionReference buses = db.collection(BUSES_COLLECTION);
+            Query query = buses.whereEqualTo("code", code);
+            QuerySnapshot querySnapshot = query.get().get();
+            if (querySnapshot.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+            DocumentReference routeRef = (DocumentReference) document.get("route");
+            //get document of route
+            DocumentSnapshot routeDocument = routeRef.get().get();
+            Route route = routeDocument.toObject(Route.class);
+            ForwardBackStops stops = route.buildStopOutboundReturn(routeDocument);
+            route.setStops(stops);
+            route.setTimetable(null);
+            route.setHistory(null);
+
+            //set bus field individually
+            Bus bus = new Bus();
+            bus.setId(document.getId());
+            bus.setRoute(route);
+            return new ResponseEntity<>(bus, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 
     @GetMapping("/stopsByBus")
     public ResponseEntity<ForwardBackStops> getStopsByBus(@RequestParam String busId) {
