@@ -11,7 +11,7 @@
 	<groupId>com.example</groupId>
 	<artifactId>BusBus_Backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>BusBus_Backend</name>
 	<description>BusBus_Backend</description>
 	<properties>
@@ -59,6 +59,15 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.json</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 </project>
