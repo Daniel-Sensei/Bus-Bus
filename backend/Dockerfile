@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21
+FROM amazoncorretto:17-alpine3.17-jdk
 
 VOLUME /tmp
 COPY target/*.jar app.jar
