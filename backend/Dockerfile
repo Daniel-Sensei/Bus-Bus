@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk17:jdk-17.0.10_12-alpine
+FROM openjdk:17-alpine
 
 VOLUME /tmp
 COPY target/*.jar app.jar
