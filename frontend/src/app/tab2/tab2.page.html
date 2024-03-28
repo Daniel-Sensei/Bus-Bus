@@ -36,8 +36,8 @@
           </ion-list>
 
           <!-- Bus -->
-          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
-            <ion-item *ngFor="let bus of filteredBuses" class="bus-item" (click)="navigateToBusDetails(bus)">
+          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment' && busesDetailsLoaded">
+            <ion-item *ngFor="let bus of buses" class="bus-item" (click)="navigateToBusDetails(bus.routeId)">
               <ion-badge class="bus-badge">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
                 &nbsp;{{bus.route.code}} - {{bus.route.company}}

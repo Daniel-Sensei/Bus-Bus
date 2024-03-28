@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 
 import { BusService } from '../service/bus.service';
 import { GeoPoint } from 'firebase/firestore';
+import { RouteService } from '../service/route.service';
 
 @Component({
   selector: 'app-tab2',
@@ -44,9 +45,11 @@ export class Tab2Page implements OnInit {
 
   busMarkers: L.Marker[] = [];
   isModalOpen = true;
+  busesDetailsLoaded: boolean = false;
 
   constructor(
     private busService: BusService,
+    private routeService: RouteService,
   ) { }
 
   setOpen(isOpen: boolean) {
@@ -57,14 +60,6 @@ export class Tab2Page implements OnInit {
     await this.initializeDefaultMap();
 
     this.addModalListeners();
-
-    this.busService.getBusesFromRealtimeDatabase().subscribe(buses => {
-      console.log("connected to realTimeDatabase");
-      console.log(buses);
-      this.buses = buses;
-      this.addBusesMarkers();
-    });
-
   }
 
   addModalListeners() {
@@ -324,43 +319,72 @@ export class Tab2Page implements OnInit {
     if (this.firstRoute || this.secondRoute) {
       this.eraseRoute();
       //filtra nell'array buses il this.selectedBus
-      this.selectedBus = this.buses.find(bus => bus.id === this.selectedBus?.id);
+      this.selectedBus = this.filteredBuses.find(bus => bus.id === this.selectedBus?.id);
       //Redraw route if selectedBus is not null
       if (this.selectedBus) {
         this.drawRoute(this.selectedBus);
       }
     }
 
+    this.busService.getBusesWithinRadius(this.currentPosition, this.selectedRadius).subscribe(buses => {
+      this.filteredBuses = buses;
+      console.log(this.filteredBuses);
+      if (this.filteredBuses.length != this.buses.length) {
+        console.log("GETTING ROUTES");
+        this.buses = this.filteredBuses;
+        let cont = 0;
+        this.buses.forEach(bus => {
+          if (bus.route == undefined) {
+            this.routeService.getRouteById(bus.routeId).subscribe((route: any) => {
+              bus.route = route;
+              cont++;
+              if (cont == this.buses.length) {
+                this.busesDetailsLoaded = true;
+                console.log("ROUTES LOADED");
+              }
+            });
+          }
+        });
+      }
 
-    this.filteredBuses = this.buses.filter(BUSES =>
-      this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
-    );
+      /*
+      this.filteredBuses = this.buses.filter(BUSES =>
+        this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
+      );
+      */
 
-    this.filteredBuses.forEach(bus => {
-      const customIcon = L.icon({
-        iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-        iconSize: [32, 32], // Dimensioni del marker
-        iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-        popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+      this.filteredBuses.forEach(bus => {
+        const customIcon = L.icon({
+          iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconSize: [32, 32], // Dimensioni del marker
+          iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+        });
+
+        const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
+          .on('click', () => {
+            this.navigateToBusDetails(bus.routeId); // Aggiunta dell'azione quando clicchi sulla fermata
+            //this.centerStopBus(bus);
+            this.eraseRoute();
+            //this.drawRoute(bus);
+          })
+          .addTo(this.map);
+        this.busMarkers.push(busMarker);
       });
 
-      const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
-        .on('click', () => {
-          this.navigateToBusDetails(bus); // Aggiunta dell'azione quando clicchi sulla fermata
-          //this.centerStopBus(bus);
-          this.eraseRoute();
-          this.drawRoute(bus);
-        })
-        .addTo(this.map);
-      this.busMarkers.push(busMarker);
     });
+
   }
 
-  navigateToBusDetails(bus: Bus) {
-    this.selectedBus = bus;
-
-    this.showBuses = false;
-    this.showStops = true;
+  navigateToBusDetails(busRouteId: string) {
+    this.buses.forEach(bus => {
+      if (bus.routeId === busRouteId) {
+        this.selectedBus = bus;
+        this.showBuses = false;
+        this.showStops = true;
+        return;
+      }
+    });
   }
 
   clearBusMarkers() {
@@ -449,8 +473,8 @@ export class Tab2Page implements OnInit {
     }
   }
 
-  isInsideRadius(stopCoords: [number, number], currentCoords: { latitude: number, longitude: number }, radius: number): boolean {
-    const stopLatLng = L.latLng(stopCoords[0], stopCoords[1]);
+  isInsideRadius(objectCoords: [number, number], currentCoords: { latitude: number, longitude: number }, radius: number): boolean {
+    const stopLatLng = L.latLng(objectCoords[0], objectCoords[1]);
     const currentLatLng = L.latLng(currentCoords.latitude, currentCoords.longitude);
     const distance = stopLatLng.distanceTo(currentLatLng);
     return distance <= radius;
