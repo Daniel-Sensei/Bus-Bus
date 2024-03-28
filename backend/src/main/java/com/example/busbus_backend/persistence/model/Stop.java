@@ -3,6 +3,8 @@ package com.example.busbus_backend.persistence.model;
 import com.google.cloud.firestore.GeoPoint;
 import com.google.cloud.firestore.annotation.DocumentId;
 
+import java.util.Objects;
+
 public class Stop {
     @DocumentId
     private String id;
@@ -51,6 +53,19 @@ public class Stop {
 
     public void setCoords(GeoPoint coords) {
         this.coords = coords;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Stop stop = (Stop) o;
+        return Objects.equals(address, stop.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address);
     }
 
     @Override

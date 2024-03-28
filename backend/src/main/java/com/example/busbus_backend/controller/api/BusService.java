@@ -375,7 +375,8 @@ public class BusService {
                             Map<String,List<String>> day = isSunday() ? timetable.getSunday() : timetable.getWeek();
                             //scorro come una matrice in verticale
                             int numCols = day.get("0").size();
-                            for(int i = 0; i < numCols; i++){
+                            boolean fixed = false;
+                            for(int i = 0; i < numCols && !fixed; i++){
                                 int cont = 0;
                                 for(int j = 0; j < day.size(); j++){
                                     if(day.get(String.valueOf(j)).get(i) != null && day.get(String.valueOf(j)).get(i).equals("-")){
@@ -388,6 +389,7 @@ public class BusService {
                                             day.get(String.valueOf(j)).set(i, null);
                                         }
                                     }
+                                    fixed = true;
                                 }
 
                             }
