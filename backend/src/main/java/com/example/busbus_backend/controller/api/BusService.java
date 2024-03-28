@@ -344,6 +344,77 @@ public class BusService {
         }
     }
 
+    //viene richiamata solo quaqndo c'è cambio di direzione tra froward e back
+    @PostMapping("/fixHistoryGaps")
+    public ResponseEntity<Boolean> fixHistoryGaps(@RequestParam String routeId, @RequestParam String direction) {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference routes = db.collection(ROUTES_COLLECTION);
+
+        try {
+            DocumentReference routeRef = routes.document(routeId);
+            DocumentSnapshot routeSnapshot = routeRef.get().get();
+            if (routeSnapshot.exists()) {
+                // Ottenere il campo "history" dal documento del percorso
+                Map<String, Route.Data> history = routeSnapshot.toObject(Route.class).getHistory();
+
+                // Verificare se l'oggetto history esiste
+                if (history != null) {
+                    // Ottenere l'oggetto Data per la data odierna
+                    String today = getCurrentDate();
+                    Route.Data todayData = history.get(today);
+
+                    // Verificare se l'oggetto Data per la data odierna esiste
+                    if (todayData != null) {
+                        // Ottenere l'oggetto Timetable per la direzione specificata (forward o back)
+                        Schedule.Timetable timetable = direction.equals("forward") ? todayData.getForward() : todayData.getBack();
+
+                        // Verificare se il campo timetable per la direzione specificata esiste
+                        if (timetable != null) {
+                            // Per ogni stop, controlla se ci sono buchi nella history e riempi con il valore precedente
+
+                            Map<String,List<String>> day = isSunday() ? timetable.getSunday() : timetable.getWeek();
+                            //scorro come una matrice in verticale
+                            int numCols = day.get("0").size();
+                            for(int i = 0; i < numCols; i++){
+                                int cont = 0;
+                                for(int j = 0; j < day.size(); j++){
+                                    if(day.get(String.valueOf(j)).get(i) != null && day.get(String.valueOf(j)).get(i).equals("-")){
+                                        cont++;
+                                    }
+                                }
+                                if(cont > 0 && cont < numCols){
+                                    for(int j = 0; j < day.size(); j++){
+                                        if(day.get(String.valueOf(j)).get(i) != null &&  day.get(String.valueOf(j)).get(i).equals("-")){
+                                            day.get(String.valueOf(j)).set(i, null);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            // Aggiornare il campo "history" nel documento del percorso
+
+                            db.runTransaction(transaction -> {
+                                DocumentSnapshot routeSnapshotAgain = transaction.get(routeRef).get();
+                                Route route = routeSnapshotAgain.toObject(Route.class);
+                                if (route != null) {
+                                    route.getHistory().put(today, todayData);
+                                    transaction.update(routeRef, "history", route.getHistory());
+                                }
+                                return true;
+                            });
+
+                            return new ResponseEntity<>(true, HttpStatus.OK);
+                        }
+                    }
+                }
+            }
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // Restituisce true se oggi è domenica, altrimenti false
     private boolean isSunday() {
         return LocalDate.now().getDayOfWeek().toString().equals("SUNDAY");
