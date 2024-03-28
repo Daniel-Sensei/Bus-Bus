@@ -8,20 +8,12 @@ import { Geolocation, Position } from '@capacitor/geolocation';
 import { STOPS } from '../model/MOCKS/stops_mock';
 import { Stop } from '../model/Stop';
 import { Bus } from '../model/Bus';
-import { BUSES } from '../model/MOCKS/buses_mock';
 
 import { IonModal } from '@ionic/angular';
 import { Router } from '@angular/router';
 
-//import { BusService } from '../bus.service';
-import { Coordinates } from '../model/Coordinates';
-
 import { BusService } from '../service/bus.service';
 import { GeoPoint } from 'firebase/firestore';
-
-//import { WebSocketService } from '../service/web-socket.service';
-
-
 
 @Component({
   selector: 'app-tab2',
@@ -32,13 +24,11 @@ export class Tab2Page implements OnInit {
   map!: L.Map;
   currentPosition!: Position;
   selectedRadius: number = 1000;
-  selectedSegment: string = 'default';
+  selectedSegment: string = 'default'; //stops and buses
 
+  // Array di fermate filtrate in base al raggio selezionato
   filteredStops: Stop[] = [];
   filteredBuses: Bus[] = [];
-
-  fermate: string[] = ['Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7', 'Fermata 1', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 2', 'Fermata 3', 'Fermata 4', 'Fermata 5', 'Fermata 6', 'Fermata 7']; // Lista delle fermate
-  autobus: string[] = ['Bus A', 'Bus B', 'Bus C']; // Lista dei bus
 
   @ViewChild('modal', { static: true }) modal!: IonModal; // Ottieni il riferimento al modal
   @ViewChild('map', { static: true }) mapContainer!: ElementRef; // Ottieni il riferimento al contenitore della mappa
@@ -53,15 +43,11 @@ export class Tab2Page implements OnInit {
   secondRoute?: L.Routing.Control = undefined;
 
   busMarkers: L.Marker[] = [];
-
+  isModalOpen = true;
 
   constructor(
-    private router: Router,
     private busService: BusService,
-    //private webSocketService: WebSocketService
   ) { }
-
-  isModalOpen = true;
 
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
@@ -71,26 +57,6 @@ export class Tab2Page implements OnInit {
     await this.initializeDefaultMap();
 
     this.addModalListeners();
-
-    /*
-    this.webSocketService.connect().subscribe(
-      (message: Bus[]) => {
-        //this.buses = message;
-        console.log('WebSocket message:', message);
-      },
-      (error) => {
-        console.error('WebSocket error:', error);
-      }
-    );
-    */
-
-    /*
-    this.busService.getBuses(this.currentPosition.coords.latitude, this.currentPosition.coords.longitude).subscribe(buses => {
-      console.log("connected to websocket");
-      this.buses = buses;
-      this.addBusesMarkers();
-    });
-    */
 
     this.busService.getBusesFromRealtimeDatabase().subscribe(buses => {
       console.log("connected to realTimeDatabase");
@@ -119,6 +85,29 @@ export class Tab2Page implements OnInit {
     }
   }
 
+  initializeMap(): Promise<L.Map> {
+    return new Promise((resolve, reject) => {
+      const map = L.map('map', {
+        center: [42.049, 13.348], // Posizione iniziale della mappa (Italy)
+        zoom: 5,
+        renderer: L.canvas(),
+        zoomControl: false // Rimuovi il controllo di zoom predefinito
+      });
+
+      L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', {
+        attribution: 'Open Street Map'
+      }).addTo(map);
+
+      //used to fix the map not showing correctly when moving
+      map.whenReady(() => {
+        setTimeout(() => {
+          map.invalidateSize();
+          resolve(map);
+        }, 1000);
+      });
+    });
+  }
+
   async getCurrentPosition() {
     try {
       const permissionStatus = await Geolocation.checkPermissions();
@@ -140,6 +129,7 @@ export class Tab2Page implements OnInit {
       this.currentPosition = await Geolocation.getCurrentPosition(options);
     } catch (error) {
       console.error('Error getting current position', error);
+      console.log("DEFAULT POSITION");
       //imposta una posizione di default
       this.currentPosition = {
         coords: {
@@ -155,30 +145,6 @@ export class Tab2Page implements OnInit {
       };
       //throw error;
     }
-  }
-
-  initializeMap(): Promise<L.Map> {
-    return new Promise((resolve, reject) => {
-      const map = L.map('map', {
-        center: [42.049, 13.348],
-        zoom: 5,
-        renderer: L.canvas(),
-        zoomControl: false // Rimuovi il controllo di zoom predefinito
-      });
-
-
-
-      L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', {
-        attribution: 'Open Street Map'
-      }).addTo(map);
-
-      map.whenReady(() => {
-        setTimeout(() => {
-          map.invalidateSize();
-          resolve(map);
-        }, 1000);
-      });
-    });
   }
 
   updateMap() {
@@ -217,10 +183,8 @@ export class Tab2Page implements OnInit {
   }
 
   addCustomControls() {
-    // Rimuovi il controllo dello zoom
-    //this.map.removeControl(this.map.zoomControl);
-
     // Aggiungi un nuovo controllo personalizzato per il ricentramento sulla propria posizione
+    //GPS BUTTON
     const recenterButton = L.Control.extend({
       options: {
         position: 'topleft'
@@ -318,9 +282,6 @@ export class Tab2Page implements OnInit {
       this.isInsideRadius([STOPS.coords.latitude, STOPS.coords.longitude], this.currentPosition.coords, this.selectedRadius)
     );
 
-
-    //this.addRoute();
-
     this.filteredStops.forEach(stop => {
       const customIcon = L.icon({
         iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
@@ -332,7 +293,7 @@ export class Tab2Page implements OnInit {
       L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
         //.bindPopup(stop.name)
         .on('click', () => {
-          this.eraseRoute();
+          this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
 
           this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
           this.centerStopBus(stop);
@@ -351,70 +312,23 @@ export class Tab2Page implements OnInit {
 
   navigateToStopDetails(stop: Stop) {
     this.showStops = false;
+    this.showBuses = true;
 
     this.selectedStop = STOPS.find(stopFound => stopFound.id === stop.id);
-
-    //this.router.navigate(['/stop-details', stopId]);
-  }
-
-  clearBusMarkers() {
-    this.busMarkers.forEach(marker => {
-      this.map.removeLayer(marker);
-    });
   }
 
   addBusesMarkers() {
-    // Ottenere i dati dei bus dal Firestore
-    /*
-    this.busService.getBuses().subscribe(buses => {
-      console.log(buses);
-      // Assicurati che i dati dei bus siano filtrati correttamente
-      this.filteredBuses = buses.filter(bus =>
-        this.isInsideRadius([bus.lat, bus.lon], this.currentPosition.coords, this.selectedRadius)
-      );
-
-      this.filteredBuses.forEach(bus => {
-        const customIcon = L.icon({
-          iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-          iconSize: [32, 32], // Dimensioni del marker
-          iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
-        });
-  
-        L.marker([bus.lat, bus.lon], { icon: customIcon }) // Usa il marker personalizzato
-          .bindPopup(bus.name)
-          .addTo(this.map);
-      });
-
-    });
-    */
-
-    /*
-    this.busService.getAllBuses().subscribe(buses => {
-      //console.log(buses);
-      this.clearBusMarkers();
-      if (this.firstRoute || this.secondRoute) {
-        this.eraseRoute();
-
-        //filtra nell'array buses il this.selectedBus
-
-          this.selectedBus = buses.find(bus => bus.id === this.selectedBus?.id);
-          if (this.selectedBus) {
-            this.drawRoute(this.selectedBus);
-          }
-        
-      }
-      */
-
+    //UPDATE BUSES (REMOVE OLD MARKERS AND ADD NEW ONES)
     this.clearBusMarkers();
+    //REMOVE ROUTE IF EXISTS
     if (this.firstRoute || this.secondRoute) {
       this.eraseRoute();
       //filtra nell'array buses il this.selectedBus
       this.selectedBus = this.buses.find(bus => bus.id === this.selectedBus?.id);
+      //Redraw route if selectedBus is not null
       if (this.selectedBus) {
         this.drawRoute(this.selectedBus);
       }
-
     }
 
 
@@ -436,14 +350,24 @@ export class Tab2Page implements OnInit {
           //this.centerStopBus(bus);
           this.eraseRoute();
           this.drawRoute(bus);
-          //this.centerStopBus(bus);
         })
         .addTo(this.map);
       this.busMarkers.push(busMarker);
     });
   }
 
+  navigateToBusDetails(bus: Bus) {
+    this.selectedBus = bus;
 
+    this.showBuses = false;
+    this.showStops = true;
+  }
+
+  clearBusMarkers() {
+    this.busMarkers.forEach(marker => {
+      this.map.removeLayer(marker);
+    });
+  }
 
   drawRoute(bus: Bus) {
     var position = {
@@ -458,12 +382,9 @@ export class Tab2Page implements OnInit {
       },
       timestamp: 0
     };
-
     const busPosition = position.coords;
 
-
     // Creare un array di coordinate dal primo stop all'attuale posizione del bus
-
     if (bus.lastStop >= 0) {
       const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map(stop => L.latLng(stop.coords.latitude, stop.coords.longitude));
 
@@ -528,10 +449,6 @@ export class Tab2Page implements OnInit {
     }
   }
 
-
-
-
-
   isInsideRadius(stopCoords: [number, number], currentCoords: { latitude: number, longitude: number }, radius: number): boolean {
     const stopLatLng = L.latLng(stopCoords[0], stopCoords[1]);
     const currentLatLng = L.latLng(currentCoords.latitude, currentCoords.longitude);
@@ -551,34 +468,8 @@ export class Tab2Page implements OnInit {
     });
   }
 
-
-  segmentChanged(event: any) {
-    this.selectedSegment = event.detail.value;
-  }
-
-
-  search(event: CustomEvent) {
-    const query = event.detail.value;
-    console.log(query);
-  }
-
   calculateZoomLevel(radius: number): number {
     return Math.round(15 - Math.log(radius / 500) / Math.LN2);
-  }
-
-  ionViewWillEnter() {
-    this.modal.present();
-  }
-
-  ionViewWillLeave() {
-    this.modal.dismiss();
-  }
-
-  navigateToBusDetails(bus: Bus) {
-    this.selectedBus = bus;
-
-    this.showBuses = false;
-    //this.router.navigate(['/stop-details', stopId]);
   }
 
   getDistance(pos1: GeoPoint | Position, pos2: GeoPoint) {
@@ -607,7 +498,23 @@ export class Tab2Page implements OnInit {
 
     // Ritorna la distanza arrotondata
     return Number(roundedDistance);
+  }
 
+  search(event: CustomEvent) {
+    const query = event.detail.value;
+    console.log(query);
+  }
+
+  segmentChanged(event: any) {
+    this.selectedSegment = event.detail.value;
+  }
+
+  ionViewWillEnter() {
+    this.modal.present();
+  }
+
+  ionViewWillLeave() {
+    this.modal.dismiss();
   }
 
 }
