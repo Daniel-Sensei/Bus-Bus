@@ -380,6 +380,7 @@ export class Tab2Page implements OnInit {
     this.buses.forEach(bus => {
       if (bus.routeId === busRouteId) {
         this.selectedBus = bus;
+        console.log(this.selectedBus);
         this.showBuses = false;
         this.showStops = true;
         return;
@@ -410,7 +411,7 @@ export class Tab2Page implements OnInit {
 
     // Creare un array di coordinate dal primo stop all'attuale posizione del bus
     if (bus.lastStop >= 0) {
-      const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map(stop => L.latLng(stop.coords.latitude, stop.coords.longitude));
+      const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
 
       const firstLegWaypoints = [...firstLegStops, L.latLng(busPosition.latitude, busPosition.longitude)];
       // Aggiungere il controllo di routing alla mappa per il primo percorso (primo stop all'attuale posizione del bus)
@@ -428,7 +429,7 @@ export class Tab2Page implements OnInit {
       }).addTo(this.map);
     }
 
-    const lastLegStops = bus.route.stops.slice(bus.lastStop + 1).map(stop => L.latLng(stop.coords.latitude, stop.coords.longitude));
+    const lastLegStops = bus.route.stops.slice(bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
     const lastLegWaypoints = [L.latLng(busPosition.latitude, busPosition.longitude), ...lastLegStops];
 
     // Aggiungere il controllo di routing alla mappa per il secondo percorso (attuale posizione del bus all'ultimo stop)

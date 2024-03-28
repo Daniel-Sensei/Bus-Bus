@@ -31,16 +31,12 @@
 
       <div slot="content" style="margin-bottom: -2.5em;">
         
-        <!--
+        
         <ul>
-          <li *ngFor="let stop of bus?.route?.stops" [attr.data-content]="stop" [ngClass]="{ 'active': stop === 'via degli innocenti e della Speranzaa, 3' }"></li>
-
-        
+          <li *ngFor="let stop of stops; let i = index" [attr.data-content]="stop.name" [ngClass]="{ 'active': bus.lastStop == i }"></li>
         </ul>
-      -->
 
         
-
       </div>
     </ion-accordion>
   </ion-accordion-group>  
