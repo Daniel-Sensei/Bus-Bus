@@ -565,6 +565,25 @@ public class BusService {
         }
     }
 
+    @GetMapping("/companyByEmail")
+    public ResponseEntity<String> getCompanyByEmail(@RequestParam String email) {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference companies = db.collection(COMPANIES_COLLECTION);
+
+        try {
+            Query query = companies.whereEqualTo("email", email);
+            QuerySnapshot querySnapshot = query.get().get();
+            if (querySnapshot.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            DocumentSnapshot companyDocument = querySnapshot.getDocuments().get(0);
+            String company = companyDocument.getString("name");
+            return new ResponseEntity<>(company, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Restituisce true se oggi è domenica, altrimenti false
     private boolean isSunday() {
         return LocalDate.now().getDayOfWeek().toString().equals("SUNDAY");
