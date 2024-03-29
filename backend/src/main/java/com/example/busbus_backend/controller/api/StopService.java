@@ -99,9 +99,11 @@ public class StopService {
                             }
 
                             int startIndexBack = 0;
-                            for(String time : backDay) {
-                                if(time == null || !time.equals("-")) {
-                                    startIndexBack += 1;
+                            if(backDay != null) {
+                                for (String time : backDay) {
+                                    if (time == null || !time.equals("-")) {
+                                        startIndexBack += 1;
+                                    }
                                 }
                             }
 
@@ -110,20 +112,24 @@ public class StopService {
                             List<String> forward = isSunday() ? schedule.getForward().getSunday().get(String.valueOf(indexForward)) : schedule.getForward().getWeek().get(String.valueOf(indexForward));
                             List<String> back = isSunday() ? schedule.getBack().getSunday().get(String.valueOf(indexBack)) : schedule.getBack().getWeek().get(String.valueOf(indexBack));
 
-                            String destination = route.getCode().split("_")[1];
-                            //ordina al contrario la destinazione splittando per "-"
-                            //esempio: "A-B" diventa "B-A"
-                            //la destinazione potrebbe avere più di un "-"
-                            //quindi prendi la''ray splittato e ordina al contrario tutto
-                            String[] destinationArray = destination.split("-");
-                            String invertedDestination = "";
-                            for(int i = destinationArray.length - 1; i >= 0; i--) {
-                                invertedDestination += destinationArray[i] + "-";
-                            }
-                            invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 1);
+                            if(backDay != null) {
+                                String destination = route.getCode().split("_")[1];
+                                //ordina al contrario la destinazione splittando per "-"
+                                //esempio: "A-B" diventa "B-A"
+                                //la destinazione potrebbe avere più di un "-"
+                                //quindi prendi la''ray splittato e ordina al contrario tutto
+                                String[] destinationArray = destination.split("-");
+                                String invertedDestination = "";
+                                for (int i = destinationArray.length - 1; i >= 0; i--) {
+                                    invertedDestination += destinationArray[i] + "-";
+                                }
+                                invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 1);
 
-                            nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward.subList(startIndexForward, forward.size()));
-                            nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back.subList(startIndexBack, back.size()));
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward.subList(startIndexForward, forward.size()));
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back.subList(startIndexBack, back.size()));
+                            } else {
+                                nextBuses.put(route.getCode(), forward.subList(startIndexForward, forward.size()));
+                            }
 
                             return new ResponseEntity<>(nextBuses, HttpStatus.OK);
 

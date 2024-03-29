@@ -80,8 +80,8 @@ public class RouteService {
         CollectionReference routes = db.collection(ROUTES_COLLECTION);
         CollectionReference stops = db.collection(STOPS_COLLECTION);
 
-        List<Stop> stopsToAdd = new ArrayList<>();
-        List<DocumentReference> stopsAlreadyIn = new ArrayList<>();
+        //List<Stop> stopsToAdd = new ArrayList<>();
+        //List<DocumentReference> stopsAlreadyIn = new ArrayList<>();
 
         try {
             //controlla che non sia gia presente una route con lo stesso code e company
@@ -90,58 +90,39 @@ public class RouteService {
                 return new ResponseEntity<>(false, HttpStatus.CONFLICT);
             }
 
+            List<DocumentReference> stopsForwardRefsToAddInRoute = new ArrayList<>();
+            List<DocumentReference> stopsBackRefsToAddInRoute = new ArrayList<>();
+
             //FORWARD
             List<Stop> forwardStops = route.getStops().getForwardStops();
             for (Stop stop : forwardStops) {
-                //controlla che non esista già uno stop con lo stesso address
-                    List<QueryDocumentSnapshot> stopList = stops.whereEqualTo("address", stop.getAddress()).get().get().getDocuments();
-                    if (stopList.isEmpty()) {
-                        stopsToAdd.add(stop);
-                    }
-                    else{
-                        // aggiungi il riferimento dello stop gia presente nel db nel set stopsAlreadyIn
-                        stopsAlreadyIn.add(stopList.get(0).getReference());
-                    }
+                List<QueryDocumentSnapshot> stopList = stops.whereEqualTo("address", stop.getAddress()).get().get().getDocuments();
+                if (stopList.isEmpty()) {
+                    //aggiungi lo stop e salva la reference
+                    DocumentReference stopRef = stops.add(stop).get();
+                    stopsForwardRefsToAddInRoute.add(stopRef);
+                }
+                else {
+                    stopsForwardRefsToAddInRoute.add(stopList.get(0).getReference());
+                }
             }
-            System.out.println("stopsToAdd: " + stopsToAdd);
-            System.out.println("stopsAlreadyIn: " + stopsAlreadyIn);
+
             //BACK
             List<Stop> backStops = route.getStops().getBackStops();
             for (Stop stop : backStops) {
-                //controlla che non esista già uno stop con lo stesso address
-                    List<QueryDocumentSnapshot> stopList = stops.whereEqualTo("address", stop.getAddress()).get().get().getDocuments();
-                    if (stopList.isEmpty()) {
-                        stopsToAdd.add(stop);
-                    }
-                    else{
-                        // aggiungi il riferimento dello stop gia presente nel db nel set stopsAlreadyIn
-                        stopsAlreadyIn.add(stopList.get(0).getReference());
-                    }
-            }
-
-            //aggiungi gli stop che non sono già presenti nel db, salva il riferimento degli stop appena aggiunti
-            // perche devono essere inseriti nel campo stops (forward e back) del documento route
-            List<DocumentReference> stopsForwardRefsToAddInRoute = new ArrayList<>();
-            List<DocumentReference> stopsBackRefsToAddInRoute = new ArrayList<>();
-            for (Stop stop : stopsToAdd) {
-                DocumentReference stopRef = stops.add(stop).get();
-                if (forwardStops.contains(stop)) {
-                    stopsForwardRefsToAddInRoute.add(stopRef);
-                }
-                if (backStops.contains(stop)) {
+                List<QueryDocumentSnapshot> stopList = stops.whereEqualTo("address", stop.getAddress()).get().get().getDocuments();
+                if (stopList.isEmpty()) {
+                    //aggiungi lo stop e salva la reference
+                    DocumentReference stopRef = stops.add(stop).get();
                     stopsBackRefsToAddInRoute.add(stopRef);
+                }
+                else {
+                    stopsBackRefsToAddInRoute.add(stopList.get(0).getReference());
                 }
             }
 
-            //aggiungi i riferimenti degli stop gia presenti nel db nel campo stops (forward e back) del documento route
-            for (DocumentReference stopRef : stopsAlreadyIn) {
-                if (forwardStops.contains(stopRef.get().get().toObject(Stop.class))) {
-                    stopsForwardRefsToAddInRoute.add(stopRef);
-                }
-                if (backStops.contains(stopRef.get().get().toObject(Stop.class))) {
-                    stopsBackRefsToAddInRoute.add(stopRef);
-                }
-            }
+            System.out.println("stopsForwardRefsToAddInRoute: " + stopsForwardRefsToAddInRoute);
+            System.out.println("stopsBackRefsToAddInRoute: " + stopsBackRefsToAddInRoute);
 
             //aggiungi route al db senza i riferimenti degli stop
             //non far comparire proprio i campi backStops e forwardStops nel db
