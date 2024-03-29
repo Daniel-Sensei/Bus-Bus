@@ -80,8 +80,8 @@ public class RouteService {
         CollectionReference routes = db.collection(ROUTES_COLLECTION);
         CollectionReference stops = db.collection(STOPS_COLLECTION);
 
-        Set<Stop> stopsToAdd = new HashSet<>(); //senza duplicati
-        Set<DocumentReference> stopsAlreadyIn = new HashSet<>();
+        List<Stop> stopsToAdd = new ArrayList<>();
+        List<DocumentReference> stopsAlreadyIn = new ArrayList<>();
 
         try {
             //controlla che non sia gia presente una route con lo stesso code e company
@@ -103,6 +103,8 @@ public class RouteService {
                         stopsAlreadyIn.add(stopList.get(0).getReference());
                     }
             }
+            System.out.println("stopsToAdd: " + stopsToAdd);
+            System.out.println("stopsAlreadyIn: " + stopsAlreadyIn);
             //BACK
             List<Stop> backStops = route.getStops().getBackStops();
             for (Stop stop : backStops) {
