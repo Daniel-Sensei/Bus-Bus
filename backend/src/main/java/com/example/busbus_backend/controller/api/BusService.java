@@ -435,6 +435,11 @@ public class BusService {
                 data.put("code", busCode);
                 data.put("route", routeRef);
 
+                //get company from routeSnapshot
+                String company = routeSnapshot.getString("company");
+                data.put("company", company);
+
+
                 // Aggiungere il bus alla collezione "buses" in Firestore
                 DocumentReference newBusRef = buses.add(data).get();
 
@@ -476,6 +481,85 @@ public class BusService {
                 return new ResponseEntity<>(true, HttpStatus.OK);
             }
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        } catch (InterruptedException | ExecutionException e) {
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/routesByBusCode")
+    public ResponseEntity<List<Route>> getRoutesByBusCode(@RequestParam String busCode) {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference buses = db.collection(BUSES_COLLECTION);
+        CollectionReference routes = db.collection(ROUTES_COLLECTION);
+
+        try {
+            Query query = buses.whereEqualTo("code", busCode);
+            QuerySnapshot querySnapshot = query.get().get();
+            if (querySnapshot.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            DocumentSnapshot busDocument = querySnapshot.getDocuments().get(0);
+            String company = busDocument.getString("company");
+
+            //get all routes of the company
+            Query queryRoutes = routes.whereEqualTo("company", company);
+            QuerySnapshot querySnapshotRoutes = queryRoutes.get().get();
+            List<Route> routesList = new ArrayList<>();
+            for (DocumentSnapshot document : querySnapshotRoutes.getDocuments()) {
+                Route route = document.toObject(Route.class);
+                route.setStops(null);
+                route.setTimetable(null);
+                route.setHistory(null);
+                routesList.add(route);
+            }
+            System.out.println("routesList: " + routesList);
+            return new ResponseEntity<>(routesList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/updateBusRoute")
+    public ResponseEntity<Boolean> updateBusRoute(@RequestParam String busCode, @RequestParam String routeId){
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference buses = db.collection(BUSES_COLLECTION);
+        CollectionReference routes = db.collection(ROUTES_COLLECTION);
+
+        try {
+            Query query = buses.whereEqualTo("code", busCode);
+            QuerySnapshot querySnapshot = query.get().get();
+            if (querySnapshot.isEmpty()) {
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            }
+
+            //get the bus document
+            DocumentSnapshot busDocument = querySnapshot.getDocuments().get(0);
+            //aggiorna il campo route (che è di tipo DocumentReference) con il nuovo routeId
+            DocumentReference routeRef = routes.document(routeId);
+            busDocument.getReference().update("route", routeRef);
+
+            //aggiorna anche il RealTime Database
+            DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference busesRef = database.child("buses").child(busDocument.getId());
+            //update the value routeId
+            // Crea una mappa di valori per il nuovo valore di "routeId"
+            Map<String, Object> update = new HashMap<>();
+            update.put("routeId", routeId);
+
+            // Esegui l'aggiornamento nel Realtime Database
+            busesRef.updateChildren(update, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null) {
+                        // Gestione degli errori
+                        System.out.println("Data could not be saved: " + databaseError.getMessage());
+                    } else {
+                        System.out.println("Bus route updated in Realtime Database successfully!");
+                    }
+                }
+            });
+
+            return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (InterruptedException | ExecutionException e) {
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
