@@ -22,6 +22,7 @@ public class FirestoreInitializer {
             // Configura le opzioni di Firebase utilizzando le credenziali caricate
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://busbus-19997-default-rtdb.europe-west1.firebasedatabase.app")
                     .build();
 
             // Inizializza FirebaseApp con le opzioni configurate

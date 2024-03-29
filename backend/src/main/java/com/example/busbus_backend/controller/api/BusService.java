@@ -2,6 +2,9 @@ package com.example.busbus_backend.controller.api;
 
 import com.example.busbus_backend.persistence.model.*;
 import com.google.cloud.firestore.*;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import org.springframework.web.bind.annotation.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -414,6 +417,67 @@ public class BusService {
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/addBus")
+    public ResponseEntity<Boolean> addBus(@RequestParam String busCode, @RequestParam String routeId){
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference buses = db.collection(BUSES_COLLECTION);
+        CollectionReference routes = db.collection(ROUTES_COLLECTION);
+
+        try {
+            DocumentReference routeRef = routes.document(routeId);
+            DocumentSnapshot routeSnapshot = routeRef.get().get();
+            if (routeSnapshot.exists()) {
+                // Creare un nuovo bus con il codice specificato e il riferimento al percorso
+                Map<String, Object> data = new HashMap<>();
+                data.put("code", busCode);
+                data.put("route", routeRef);
+
+                // Aggiungere il bus alla collezione "buses" in Firestore
+                DocumentReference newBusRef = buses.add(data).get();
+
+                // Ottieni l'ID del nuovo bus generato da Firestore
+                String busId = newBusRef.getId();
+
+                // Aggiungi il bus al Realtime Database
+                DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                System.out.println("database: " + database);
+                DatabaseReference busesRef = database.child("buses").child(busId);
+                System.out.println("busesRef: " + busesRef);
+
+                //sostituisci route di data con routeId del parametro
+                Map<String,Double> coords = new HashMap<>();
+                coords.put("latitude", 0.0);
+                coords.put("longitude", 0.0);
+                data.put("coords", coords);
+                data.put("routeId", routeId);
+                data.put("direction", "");
+                data.put("lastStop", 0);
+                data.put("speed", 0);
+
+                data.remove("code");
+                data.remove("route");
+
+                System.out.println("data: " + data);
+                busesRef.setValue(data, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            // Gestione degli errori
+                            System.out.println("Data could not be saved: " + databaseError.getMessage());
+                        } else {
+                            System.out.println("Bus added to Realtime Database successfully!");
+                        }
+                    }
+                });
+
+                return new ResponseEntity<>(true, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+        } catch (InterruptedException | ExecutionException e) {
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
