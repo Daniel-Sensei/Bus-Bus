@@ -374,6 +374,7 @@ export class Tab2Page implements OnInit {
         this.buses.forEach(bus => {
           if (bus.route == undefined) {
             this.routeService.getRouteById(bus.routeId).subscribe((route: any) => {
+              console.log(route);
               bus.route = route;
               cont++;
               if (cont == this.buses.length) {

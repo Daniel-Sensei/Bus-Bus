@@ -16,12 +16,14 @@ export class BusDetailsPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if(this.bus.direction == "forward"){
-      this.stops = Object.values(this.bus.route.stops.forwardStops);
-    }
-    else{
+    console.log("ON INIT BUS: ", this.bus);
+    if(this.bus.direction === "back"){
       this.stops = Object.values(this.bus.route.stops.backStops);
     }
+    else{
+      this.stops = Object.values(this.bus.route.stops.forwardStops);
+    }
+    console.log("stops= ", this.stops);
   }
 
   @Input() modal!: IonModal;
