@@ -3,6 +3,7 @@ package com.example.busbus_backend.controller.api;
 import com.example.busbus_backend.persistence.model.Route;
 import com.example.busbus_backend.persistence.model.Schedule;
 import com.example.busbus_backend.persistence.model.Stop;
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import static java.awt.geom.Point2D.distance;
 
 @RestController
 @CrossOrigin("*")
@@ -45,6 +49,55 @@ public class StopService {
         }
     }
 
+    @GetMapping("/stopsWithinRadius")
+    public ResponseEntity<List<Stop>> getStopsWithinRadius(@RequestParam double latitude, @RequestParam double longitude, @RequestParam double radius) {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference stops = db.collection(STOPS_COLLECTION);
+
+        // ottieni tutti gli stop e successivamente rimuovi quelli fuori dal raggio (espresso in metri)
+        try {
+            List<Stop> allStops = stops.get().get().toObjects(Stop.class);
+            List<Stop> inRadiusStops = new ArrayList<>();
+            for (Stop stop : allStops) {
+                if (isWithinRadius(latitude, longitude, radius, stop)) {
+                    inRadiusStops.add(stop);
+                }
+            }
+
+            // order stops by distance
+            inRadiusStops.sort((s1, s2) -> {
+                double d1 = distance(latitude, longitude, s1.getCoords().getLatitude(), s1.getCoords().getLongitude());
+                double d2 = distance(latitude, longitude, s2.getCoords().getLatitude(), s2.getCoords().getLongitude());
+                return Double.compare(d1, d2);
+            });
+            return new ResponseEntity<>(inRadiusStops, HttpStatus.OK);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean isWithinRadius(double latitude, double longitude, double radius, Stop stop) {
+        // Converti le coordinate in radianti
+        double lat1 = Math.toRadians(latitude);
+        double lon1 = Math.toRadians(longitude);
+        double lat2 = Math.toRadians(stop.getCoords().getLatitude());
+        double lon2 = Math.toRadians(stop.getCoords().getLongitude());
+
+        // Calcola la differenza tra le coordinate
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        // Formula di Haversine per calcolare la distanza
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = 6371000 * c; // Raggio medio della Terra in metri
+
+        // Verifica se la distanza è all'interno del raggio specificato
+        return distance <= radius;
+    }
+
     @GetMapping("/nextBuses")
     public ResponseEntity<Map<String, List<String>>> getNextBusesByStop(@RequestParam String stopId) {
         Firestore db = FirestoreClient.getFirestore();
@@ -56,6 +109,9 @@ public class StopService {
             if (document.exists()) {
                 DocumentReference stopRef = document.getReference();
                 List<DocumentReference> routesRefs = (List<DocumentReference>) document.get("routes");
+                System.out.println(routesRefs);
+                System.out.println("numero di route: " + routesRefs.size());
+
 
                 //crea una mappa vuota
                 Map<String, List<String>> nextBuses = new HashMap<>();
@@ -64,6 +120,7 @@ public class StopService {
                 for( DocumentReference routeRef : routesRefs) {
                     DocumentSnapshot routeDocument = routeRef.get().get();
                     Route route = routeDocument.toObject(Route.class);
+                    System.out.println(route.getCode());
                     //FORWARD
                     stopsReferenceForward = (List<DocumentReference>) routeDocument.get("stops.forward");
                     Integer indexForward = null;
@@ -76,6 +133,7 @@ public class StopService {
                     if(stopsReferenceBack.contains(stopRef)) {
                         indexBack = stopsReferenceBack.indexOf(stopRef);
                     }
+
 
                     //controlla in nella mappa route.history con chiave "giorantaOdierna" nel formato "dd-MM-yyyy"
                     //successivamnete muoviti in sunday se il giorno della settimana è domenica altrimenti in week
@@ -131,14 +189,12 @@ public class StopService {
                                 nextBuses.put(route.getCode(), forward.subList(startIndexForward, forward.size()));
                             }
 
-                            return new ResponseEntity<>(nextBuses, HttpStatus.OK);
-
                         }
                     }
 
                 }
 
-                return new ResponseEntity<>(nextBuses, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(nextBuses, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
