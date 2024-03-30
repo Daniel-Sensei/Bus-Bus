@@ -5,16 +5,15 @@ import 'leaflet-measure';
 import 'leaflet-geometryutil';
 
 import { Geolocation, Position } from '@capacitor/geolocation';
-import { STOPS } from '../model/MOCKS/stops_mock';
 import { Stop } from '../model/Stop';
 import { Bus } from '../model/Bus';
 
 import { IonModal } from '@ionic/angular';
-import { Router } from '@angular/router';
 
 import { BusService } from '../service/bus.service';
 import { GeoPoint } from 'firebase/firestore';
 import { RouteService } from '../service/route.service';
+import { StopService } from '../service/stop.service';
 
 @Component({
   selector: 'app-tab2',
@@ -29,6 +28,7 @@ export class Tab2Page implements OnInit {
 
   // Array di fermate filtrate in base al raggio selezionato
   filteredStops: Stop[] = [];
+  nextBuses: any;
   filteredBuses: Bus[] = [];
 
   @ViewChild('modal', { static: true }) modal!: IonModal; // Ottieni il riferimento al modal
@@ -50,6 +50,7 @@ export class Tab2Page implements OnInit {
   constructor(
     private busService: BusService,
     private routeService: RouteService,
+    private stopService: StopService
   ) { }
 
   setOpen(isOpen: boolean) {
@@ -273,27 +274,29 @@ export class Tab2Page implements OnInit {
   }
 
   addStopsMarkers() {
-    this.filteredStops = STOPS.filter(STOPS =>
-      this.isInsideRadius([STOPS.coords.latitude, STOPS.coords.longitude], this.currentPosition.coords, this.selectedRadius)
-    );
+    this.stopService.getStopsWithinRadius({ latitude: this.currentPosition.coords.latitude, longitude: this.currentPosition.coords.longitude }, this.selectedRadius).subscribe(stops => {
+      //stops are order by the server
+      this.filteredStops = stops;
 
-    this.filteredStops.forEach(stop => {
-      const customIcon = L.icon({
-        iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-        iconSize: [32, 32], // Dimensioni del marker
-        iconAnchor: [16, 32], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-        popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+      this.filteredStops.forEach(stop => {
+        const customIcon = L.icon({
+          iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconSize: [32, 32], // Dimensioni del marker
+          iconAnchor: [16, 32], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+          popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+        });
+
+        L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
+          //.bindPopup(stop.name)
+          .on('click', () => {
+            this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
+
+            this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
+            this.centerStopBus(stop);
+          })
+          .addTo(this.map);
       });
 
-      L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
-        //.bindPopup(stop.name)
-        .on('click', () => {
-          this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
-
-          this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
-          this.centerStopBus(stop);
-        })
-        .addTo(this.map);
     });
   }
 
@@ -306,10 +309,45 @@ export class Tab2Page implements OnInit {
   }
 
   navigateToStopDetails(stop: Stop) {
-    this.showStops = false;
-    this.showBuses = true;
+    if (stop) {
+      this.stopService.getNextBuses(stop.id).subscribe((buses) => {
+        this.showStops = false;
+        this.showBuses = true;
 
-    this.selectedStop = STOPS.find(stopFound => stopFound.id === stop.id);
+        this.selectedStop = this.filteredStops.find(stopFound => stopFound.id === stop.id);
+        // Inizializza un array per contenere tutte le coppie di linee e orari
+        this.nextBuses = [];
+
+        // Itera su tutte le chiavi dell'oggetto (che rappresentano i nomi delle linee)
+        Object.keys(buses).forEach(line => {
+          buses[line].forEach((time: any) => {
+            this.nextBuses.push(`${line}?${time}`);
+          });
+        });
+
+        //splitta la stringa in due parti
+        this.nextBuses = this.nextBuses.map((item: string) => {
+          const [line, time] = item.split('?');
+          return { line, time };
+        });
+
+        //splitta ulteriormente line.code e line.name per "_"
+        this.nextBuses = this.nextBuses.map((item: any) => {
+          const [code, name] = item.line.split('_');
+          return { code, name, time: item.time };
+        });
+
+        // Ordina la lista risultante per orario
+        this.nextBuses.sort((a: any, b: any) => {
+          return a.time.localeCompare(b.time);
+        });
+
+        // Stampa la lista risultante
+        this.nextBuses.forEach((item: string) => {
+          console.log(item);
+        });
+      });
+    }
   }
 
   addBusesMarkers() {

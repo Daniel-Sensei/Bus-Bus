@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import { Stop } from '../model/Stop';
 import { IonModal } from '@ionic/angular';
+import { StopService } from '../service/stop.service';
 
 @Component({
   selector: 'app-stop-details',
@@ -12,16 +13,16 @@ export class StopDetailsPage implements OnInit {
   @Input() modal!: IonModal;
 
   @Input() stop?: Stop;
+  @Input() nextBuses?: any;
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
 
   accordionOpen: boolean = false;
-
   favourite = false;
 
-  constructor() {}
+  constructor(private stopService: StopService) { }
 
   ngOnInit() {
-    console.log('ngOnInit');
+    console.log('ngOnInit of the stop details page', this.stop?.name);
   }
 
   ionViewWillEnter() {

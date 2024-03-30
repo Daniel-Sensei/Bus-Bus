@@ -51,7 +51,7 @@
         </div>
 
         <div *ngIf="!showStops" class="padding-top-modal">
-          <app-stop-details [stop]="this.selectedStop" [modal]="this.modal"
+          <app-stop-details [stop]="this.selectedStop" [nextBuses]="this.nextBuses" [modal]="this.modal"
             (back)="this.showStops = true"></app-stop-details>
         </div>
 
