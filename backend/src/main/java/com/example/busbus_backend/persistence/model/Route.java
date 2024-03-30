@@ -16,20 +16,7 @@ public class Route {
     private String code;
     private ForwardBackStops stops;
     private Schedule timetable;
-
-    @Override
-    public String toString() {
-        return "Route{" +
-                "id='" + id + '\'' +
-                ", company='" + company + '\'' +
-                ", code='" + code + '\'' +
-                ", stops=" + stops +
-                ", timetable=" + timetable +
-                ", history=" + history +
-                '}';
-    }
-
-    private Map<String, Data> history;
+    private Map<String, Schedule> history;
 
     public Route() {
     }
@@ -55,15 +42,6 @@ public class Route {
             }
         }
         return stops;
-    }
-
-    public Route(String id, String company, String code, ForwardBackStops stops, Schedule timetable, Map<String, Data> history) {
-        this.id = id;
-        this.company = company;
-        this.code = code;
-        this.stops = stops;
-        this.timetable = timetable;
-        this.history = history;
     }
 
     public String getId() {
@@ -105,44 +83,25 @@ public class Route {
     public void setTimetable(Schedule timetable) {
         this.timetable = timetable;
     }
-    public Map<String, Data> getHistory() {
+
+    public Map<String, Schedule> getHistory() {
         return history;
     }
 
-    public void setHistory(Map<String, Data> history) {
+    public void setHistory(Map<String, Schedule> history) {
         this.history = history;
     }
 
-    public static class Data {
-        @Override
-        public String toString() {
-            return "Data{" +
-                    "forward=" + forward +
-                    ", back=" + back +
-                    '}';
-        }
-
-        private Schedule.Timetable forward;
-        private Schedule.Timetable back;
-
-        public Data() {
-        }
-
-        public Schedule.Timetable getForward() {
-            return forward;
-        }
-
-        public void setForward(Schedule.Timetable forward) {
-            this.forward = forward;
-        }
-
-        public Schedule.Timetable getBack() {
-            return back;
-        }
-
-        public void setBack(Schedule.Timetable back) {
-            this.back = back;
-        }
+    @Override
+    public String toString() {
+        return "Route{" +
+                "id='" + id + '\'' +
+                ", company='" + company + '\'' +
+                ", code='" + code + '\'' +
+                ", stops=" + stops +
+                ", timetable=" + timetable +
+                ", history=" + history +
+                '}';
     }
 }
 

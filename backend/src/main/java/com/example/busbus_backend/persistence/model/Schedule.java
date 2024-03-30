@@ -3,25 +3,25 @@ import java.util.List;
 import java.util.Map;
 
 public class Schedule {
-    private Timetable forward;
-    private Timetable back;
+    private Map<String, List<String>> forward;
+    private Map<String, List<String>> back;
 
     public Schedule() {
     }
 
-    public Timetable getForward() {
+    public Map<String, List<String>> getForward() {
         return forward;
     }
 
-    public void setForward(Timetable forward) {
+    public void setForward(Map<String, List<String>> forward) {
         this.forward = forward;
     }
 
-    public Timetable getBack() {
+    public Map<String, List<String>> getBack() {
         return back;
     }
 
-    public void setBack(Timetable back) {
+    public void setBack(Map<String, List<String>> back) {
         this.back = back;
     }
 
@@ -31,37 +31,5 @@ public class Schedule {
                 "forward=" + forward +
                 ", back=" + back +
                 '}';
-    }
-
-    public static class Timetable {
-        private Map<String, List<String>> week;
-        private Map<String, List<String>> sunday;
-
-        public Timetable() {
-        }
-
-        public Map<String, List<String>> getWeek() {
-            return week;
-        }
-
-        public void setWeek(Map<String, List<String>> week) {
-            this.week = week;
-        }
-
-        public Map<String, List<String>> getSunday() {
-            return sunday;
-        }
-
-        public void setSunday(Map<String, List<String>> sunday) {
-            this.sunday = sunday;
-        }
-
-        @Override
-        public String toString() {
-            return "Timetable{" +
-                    "week=" + week +
-                    ", sunday=" + sunday +
-                    '}';
-        }
     }
 }

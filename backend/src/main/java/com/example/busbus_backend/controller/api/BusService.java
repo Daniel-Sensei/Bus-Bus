@@ -48,6 +48,7 @@ public class BusService {
                 //set bus field individually
                 Bus bus = new Bus();
                 bus.setId(document.getId());
+                bus.setCode(document.getString("code"));
                 bus.setRoute(route);
 
                 return new ResponseEntity<>(bus, HttpStatus.OK);
@@ -133,7 +134,6 @@ public class BusService {
         }
     }
 
-
     @GetMapping("/stopsByBus")
     public ResponseEntity<ForwardBackStops> getStopsByBus(@RequestParam String busId) {
         Firestore db = FirestoreClient.getFirestore();
@@ -171,24 +171,23 @@ public class BusService {
                 String currentTime = getCurrentTime();
 
                 // Ottenere il campo "history" dal documento del percorso
-                Map<String, Route.Data> history = routeSnapshot.toObject(Route.class).getHistory();
+                Map<String, Schedule> history = routeSnapshot.toObject(Route.class).getHistory();
 
                 // Verificare se l'oggetto history esiste
                 if (history != null) {
                     // Ottenere l'oggetto Data per la data odierna
                     String today = getCurrentDate();
-                    Route.Data todayData = history.get(today);
+                    Schedule todayData = history.get(today);
 
                     // Verificare se l'oggetto Data per la data odierna esiste
                     if (todayData != null) {
                         // Ottenere l'oggetto Timetable per la direzione specificata (forward o back)
-                        Schedule.Timetable timetable = direction.equals("forward") ? todayData.getForward() : todayData.getBack();
+                        Map<String, List<String>> timetable = direction.equals("forward") ? todayData.getForward() : todayData.getBack();
 
                         // Verificare se il campo timetable per la direzione specificata esiste
                         if (timetable != null) {
                             // Aggiornare il valore per lo stopIndex specificato nell'oggetto Timetable con l'orario attuale
-                            // Se è domenica, aggiungere l'orario all'oggetto "sunday" invece di "week"
-                            List<String> stopTimes = isSunday() ? timetable.getSunday().get(stopIndex) : timetable.getWeek().get(stopIndex);
+                            List<String> stopTimes = timetable.get(stopIndex);
                             if (stopTimes != null) {
                                 for(int i = 0; i < stopTimes.size(); i++){
                                     System.out.println("stopTimes.get(i): " + stopTimes.get(i));
@@ -201,7 +200,7 @@ public class BusService {
                             } else {
                                 stopTimes = new ArrayList<>();
                                 stopTimes.add(currentTime);
-                                timetable.getWeek().put(stopIndex, stopTimes);
+                                timetable.put(stopIndex, stopTimes);
                             }
 
                             // Aggiornare il campo "history" nel documento del percorso
@@ -257,13 +256,13 @@ public class BusService {
             DocumentSnapshot routeSnapshot = routeRef.get().get();
             if (routeSnapshot.exists()) {
                 // Ottenere il campo "history" dal documento del percorso
-                Map<String, Route.Data> history = routeSnapshot.toObject(Route.class).getHistory();
+                Map<String, Schedule> history = routeSnapshot.toObject(Route.class).getHistory();
 
                 // Verificare se l'oggetto history esiste
                 if (history != null) {
                     // Creare un nuovo oggetto "history" con un oggetto "Data" vuoto per la data odierna
-                    Map<String, Route.Data> newHistory = new HashMap<>();
-                    newHistory.put(getCurrentDate(), new Route.Data());
+                    Map<String, Schedule> newHistory = new HashMap<>();
+                    newHistory.put(getCurrentDate(), new Schedule());
                     System.out.println("newHistory: " + newHistory);
 
                     // prendi il campo timetable dal documento del percorso
@@ -274,21 +273,17 @@ public class BusService {
                     // crea solo week o solo sunday a seconda del giorno della settimana
 
                     // Utilizzo del metodo per sostituire i valori non nulli con il segnaposto per entrambe le direzioni (forward e back)
-                    Map<String, List<String>> forwardDay = isSunday() ? timetable.getForward().getSunday() : timetable.getForward().getWeek();
+                    Map<String, List<String>> forwardDay = timetable.getForward();
                     replaceNonNullValuesWithPlaceholder(forwardDay);
                     System.out.println("Forward day: " + forwardDay);
 
-                    Map<String, List<String>> backDay = isSunday() ? timetable.getBack().getSunday() : timetable.getBack().getWeek();
+                    Map<String, List<String>> backDay = timetable.getBack();
                     replaceNonNullValuesWithPlaceholder(backDay);
                     System.out.println("Back day: " + backDay);
 
                     // Aggiungi a newHistory l'oggetto Data con le mappe appena create
-                    newHistory.get(getCurrentDate()).setForward(new Schedule.Timetable());
-                    newHistory.get(getCurrentDate()).setBack(new Schedule.Timetable());
-                    newHistory.get(getCurrentDate()).getForward().setWeek(timetable.getForward().getWeek());
-                    newHistory.get(getCurrentDate()).getForward().setSunday(timetable.getForward().getSunday());
-                    newHistory.get(getCurrentDate()).getBack().setWeek(timetable.getBack().getWeek());
-                    newHistory.get(getCurrentDate()).getBack().setSunday(timetable.getBack().getSunday());
+                    newHistory.get(getCurrentDate()).setBack(backDay);
+                    newHistory.get(getCurrentDate()).setForward(forwardDay);
                     System.out.println("newHistory: " + newHistory);
 
 
@@ -358,27 +353,27 @@ public class BusService {
             DocumentSnapshot routeSnapshot = routeRef.get().get();
             if (routeSnapshot.exists()) {
                 // Ottenere il campo "history" dal documento del percorso
-                Map<String, Route.Data> history = routeSnapshot.toObject(Route.class).getHistory();
+                Map<String, Schedule> history = routeSnapshot.toObject(Route.class).getHistory();
 
                 // Verificare se l'oggetto history esiste
                 if (history != null) {
                     // Ottenere l'oggetto Data per la data odierna
                     String today = getCurrentDate();
-                    Route.Data todayData = history.get(today);
+                    Schedule todayData = history.get(today);
 
                     // Verificare se l'oggetto Data per la data odierna esiste
                     if (todayData != null) {
                         // Ottenere l'oggetto Timetable per la direzione specificata (forward o back)
-                        Schedule.Timetable timetable = direction.equals("forward") ? todayData.getForward() : todayData.getBack();
+                        Map<String, List<String>> timetable = direction.equals("forward") ? todayData.getForward() : todayData.getBack();
 
                         // Verificare se il campo timetable per la direzione specificata esiste
                         if (timetable != null) {
                             // Per ogni stop, controlla se ci sono buchi nella history e riempi con il valore precedente
 
-                            Map<String,List<String>> day = isSunday() ? timetable.getSunday() : timetable.getWeek();
+                            Map<String,List<String>> day = timetable;
                             //scorro come una matrice in verticale
                             int numCols = day.get("0").size();
-                            boolean fixed = false;
+                            boolean fixed = false; //faccio solo una colonna alla volta
                             for(int i = 0; i < numCols && !fixed; i++){
                                 int cont = 0;
                                 for(int j = 0; j < day.size(); j++){
@@ -386,7 +381,8 @@ public class BusService {
                                         cont++;
                                     }
                                 }
-                                if(cont > 0 && cont < numCols){
+                                if(cont > 0 && cont < day.size()){
+                                    System.out.println("Devo fixare");
                                     for(int j = 0; j < day.size(); j++){
                                         if(day.get(String.valueOf(j)).get(i) != null &&  day.get(String.valueOf(j)).get(i).equals("-")){
                                             day.get(String.valueOf(j)).set(i, null);

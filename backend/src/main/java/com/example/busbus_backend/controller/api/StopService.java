@@ -139,15 +139,15 @@ public class StopService {
                     //successivamnete muoviti in sunday se il giorno della settimana è domenica altrimenti in week
                     //se la mappa non è vuota allora prendi la lista di orari di forward con chiave indexForward
                     // prendi anche la lista di orari di back con chiave indexBack
-                    Map<String, Route.Data> history = route.getHistory();
+                    Map<String, Schedule> history = route.getHistory();
                     if (history != null) {
                         // Ottenere l'oggetto Data per la data odierna
                         String today = getCurrentDate();
-                        Route.Data todayData = history.get(today);
+                        Schedule todayData = history.get(today);
                         if (todayData != null) {
                             // Ottenere la lista di orari per la fermata
-                            List<String> forwardDay = isSunday() ? todayData.getForward().getSunday().get(String.valueOf(indexForward)) : todayData.getForward().getWeek().get(String.valueOf(indexForward));
-                            List<String> backDay = isSunday() ? todayData.getBack().getSunday().get(String.valueOf(indexBack)) : todayData.getBack().getWeek().get(String.valueOf(indexBack));
+                            List<String> forwardDay = todayData.getForward().get(String.valueOf(indexForward));
+                            List<String> backDay = todayData.getBack().get(String.valueOf(indexBack));
 
                             int startIndexForward = 0;
                             for(String time : forwardDay) {
@@ -167,8 +167,8 @@ public class StopService {
 
                             Schedule schedule = route.getTimetable();
 
-                            List<String> forward = isSunday() ? schedule.getForward().getSunday().get(String.valueOf(indexForward)) : schedule.getForward().getWeek().get(String.valueOf(indexForward));
-                            List<String> back = isSunday() ? schedule.getBack().getSunday().get(String.valueOf(indexBack)) : schedule.getBack().getWeek().get(String.valueOf(indexBack));
+                            List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
+                            List<String> back =schedule.getBack().get(String.valueOf(indexBack));
 
                             if(backDay != null) {
                                 String destination = route.getCode().split("_")[1];
@@ -206,9 +206,6 @@ public class StopService {
 
     private String getCurrentDate() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-    }
-    private boolean isSunday() {
-        return LocalDate.now().getDayOfWeek().toString().equals("SUNDAY");
     }
 
     private DocumentSnapshot getDocumentById(CollectionReference collectionReference, String id) throws InterruptedException, ExecutionException {
