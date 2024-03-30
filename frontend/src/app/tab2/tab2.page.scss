@@ -3,15 +3,7 @@
 }
 
 .modal-above-tabs {
-    //position: absolute;
-    /* Remove default positioning */
-    //top: 0; /* Position to top of the screen */
-    //left: 0; /* Position to left of the screen */
-    //right: 0; /* Stretch to full width */
     bottom: 56px;
-    /* Don't cover the bottom */
-    /* Adjust height as needed */
-    
 }
 
 .modal-above-tabs::part(handle) {
@@ -22,6 +14,12 @@
     width: 72px;
     margin-top: 10px;
     /* Imposta il margine superiore della barra di handle */
+}
+
+.modal-above-tabs::part(content) {
+    border-radius: 20px 20px 0 0px; // Here the border radius
+    box-shadow: 0px 0px 20px 5px rgb(0 0 0 / 15%);
+    padding-top: 10px;
 }
 
 ion-button[slot='fixed'] {
@@ -35,4 +33,9 @@ ion-button[slot='fixed'] {
     width: 30px;
     height: 30px;
     margin-right: 10px;
+}
+
+
+ion-segment{
+    border-radius: 10px;
 }

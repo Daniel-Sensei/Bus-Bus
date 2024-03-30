@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouteService } from '../service/route.service';
 
 interface Company {
   name: string;
@@ -12,20 +13,9 @@ interface Company {
 })
 export class Tab3Page {
 
-  companies: Company[] = [
-    {
-      name: 'Azienda A',
-      lines: ['121', '122', '138']
-    },
-    {
-      name: 'Azienda B',
-      lines: ['10', '11']
-    }
-  ];
-
   selectedCompany: Company | null = null;
 
-  constructor() {}
+  constructor(private routeService: RouteService) {}
 
   toggleCompany(company: Company) {
     this.selectedCompany = (this.selectedCompany === company) ? null : company;

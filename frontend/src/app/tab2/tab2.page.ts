@@ -156,25 +156,87 @@ export class Tab2Page implements OnInit {
       this.addMarkerAndCircle(currentLatLng);
     });
 
-    this.addCustomControls();
-    this.addRadiusControl();
+    this.addTopBar();
+
+    //this.addCustomControls();
+    this.addTopBarListner();
     this.addStopsMarkers();
     this.addBusesMarkers();
   }
 
+  addTopBar() {
+    const TopBarControl = L.Control.extend({
+        onAdd: () => {
+            const topBarDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            topBarDiv.style.width = '100%'; // Imposta la larghezza al 100%
+            topBarDiv.style.display = 'flex'; // Usa flexbox per allineare il contenuto al centro
+            topBarDiv.style.justifyContent = 'center'; // Allinea il contenuto al centro
+            topBarDiv.style.marginLeft = "28px"; // Sposta il controllo a sinistra di 100px per centrarlo correttamente
+            topBarDiv.style.border = '0px'; // Aggiungi un bordo al controllo
+            topBarDiv.innerHTML = `
+                <div style="display: flex; height: 40px; justify-content: center; align-items: center; border-radius: 10px; width: 100%; background-color: var(--background); margin-right: 10px; margin-top: 10px;">
+                    <div style="height: 100%; display: flex; align-items: center; border-right: solid 1px; border-color: var(--ion-color-step-600, #999999);">
+                        <button style="margin-left: 10px; padding-right: 7px; background-color: transparent;" onclick="recenterMap()">
+                        <ion-icon aria-hidden="true" name="locate" style="font-size: 20px; background-color: transparent;">
+                        </ion-icon></button>
+                    </div>
+
+                    <div style="display: flex; border-right: solid 1px; height: 100%; align-items: center; width: 100%; border-color: var(--ion-color-step-600, #999999);">
+                        <ion-icon aria-hidden="true" name="search-outline" style="font-size: 20px; background-color: transparent; margin-left: 7px; margin-right: 3px;"></ion-icon>
+                        <input id="searchInput" type="text" placeholder="Cerca una linea" style="width: 100%; height: 90%; border: 0; background-color: transparent; font-weight:bold;">
+                    </div>
+
+                    <div style="display: flex; height: 100%;">
+                        <button id="1" style="background: var(--ion-color-primary); border: 0; border-right: solid 1px; padding-left: 15px; padding-right: 15px; font-weight: bold; border-color: var(--ion-color-step-600, #999999);" onclick="updateRadius(1000)">1</button>
+                        <button id="2" style="border: 0; background-color: transparent; border-right: solid 1px; padding-left: 15px; padding-right: 15px; font-weight: bold; border-color: var(--ion-color-step-600, #999999);" onclick="updateRadius(2000)">2</button>
+                        <button id="5" style="border: 0; background-color: transparent; padding-left: 15px; padding-right: 15px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; font-weight: bold;" onclick="updateRadius(5000)">5</button>
+                    </div>
+                </div>
+            `;
+
+            // Bind the search functionality to the input field
+            const searchInput = topBarDiv.querySelector('#searchInput');
+            searchInput?.addEventListener('input', () => {
+                const searchTerm = searchInput;
+                console.log(searchTerm);
+                // Perform search functionality here
+                // E.g., filter markers or perform any other relevant actions based on the search term
+            });
+
+            return topBarDiv;
+        },
+        onRemove: () => {}
+    });
+
+    const topBarControl = new TopBarControl({ position: 'topright' });
+    topBarControl.addTo(this.map);
+}
+
+
   addMarkerAndCircle(currentLatLng: L.LatLng) {
+
+    const myMarker = L.icon({
+      iconUrl: 'assets/my-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+      iconSize: [20, 20], // Dimensioni del marker
+      iconAnchor: [10, 20], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+    });
+
+    //L.marker(currentLatLng, { icon: myMarker }).addTo(this.map);
+
+    
     const marker = L.circleMarker(currentLatLng, {
       radius: 8,
-      color: 'blue',
-      fillColor: '#3388ff',
-      fillOpacity: 0.8
+      color: '#f0bc5e',
+      fillColor: '#f0bc5e',
+      fillOpacity: 0.6,
     }).addTo(this.map);
+    
 
     const circle = L.circle(currentLatLng, {
-      radius: 1000,
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.2
+      radius: this.selectedRadius,
+      color: '#f0bc5e',
+      fillColor: '#f0bc5e',
+      fillOpacity: 0.2,
     }).addTo(this.map);
   }
 
@@ -193,7 +255,7 @@ export class Tab2Page implements OnInit {
         buttonDiv.innerHTML = '<ion-icon aria-hidden="true" name="locate" style="font-size: 20px;"></ion-icon>';
         buttonDiv.title = 'Ricentra sulla tua posizione';
         buttonDiv.onclick = () => {
-          this.recenterMap();
+          this.updateRadius();
         };
         return buttonDiv;
       }
@@ -203,7 +265,7 @@ export class Tab2Page implements OnInit {
     this.map.addControl(recenterControl);
   }
 
-  recenterMap() {
+  updateRadius() {
     const currentPosition = this.currentPosition.coords;
     const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
     this.map.flyTo(currentLatLng, 15, {
@@ -212,27 +274,18 @@ export class Tab2Page implements OnInit {
     });
   }
 
-  addRadiusControl() {
-    const RadiusControl = L.Control.extend({
-      onAdd: () => {
-        const buttonDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-        buttonDiv.style.display = 'flex';
-        buttonDiv.style.borderRadius = '10px';
-        buttonDiv.innerHTML = `
-          <button id="1" style="background: var(--ion-color-primary); padding: 5px; border-top-left-radius: 8px; border-bottom-left-radius: 8px;" onclick="recenterMap(1000)">1km</button>
-          <button id="2" style="padding: 5px;" onclick="recenterMap(2000)">2km</button>
-          <button id="5" style="padding: 5px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;" onclick="recenterMap(5000)">5km</button>
-        `;
-        return buttonDiv;
-      },
-      onRemove: () => { }
-    });
-
-    const recenterButton = new RadiusControl({ position: 'topright' });
-    recenterButton.addTo(this.map);
+  addTopBarListner() {
+    (window as any).recenterMap = () => {
+      const currentPosition = this.currentPosition.coords;
+      const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
+      this.map.flyTo(currentLatLng, this.calculateZoomLevel(this.selectedRadius), {
+        duration: 1,
+        easeLinearity: 0.5
+      });
+    }
 
     // Function to recenter the map on current position with a specified radius
-    (window as any).recenterMap = (radius: number) => {
+    (window as any).updateRadius = (radius: number = this.selectedRadius ) => {
       this.selectedRadius = radius;
       this.updateRadiusStyle(radius);
 
@@ -265,8 +318,8 @@ export class Tab2Page implements OnInit {
 
       L.circle(currentLatLng, {
         radius: radius,
-        color: 'red',
-        fillColor: '#f03',
+        color: '#f0bc5e',
+        fillColor: '#f0bc5e',
         fillOpacity: 0.2
       }).addTo(this.map);
     };
@@ -281,9 +334,9 @@ export class Tab2Page implements OnInit {
       this.filteredStops.forEach(stop => {
         const customIcon = L.icon({
           iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-          iconSize: [32, 32], // Dimensioni del marker
-          iconAnchor: [16, 32], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-          popupAnchor: [0, -32] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+          iconSize: [16, 16], // Dimensioni del marker
+          iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
         });
 
         L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
@@ -395,9 +448,9 @@ export class Tab2Page implements OnInit {
       this.filteredBuses.forEach(bus => {
         const customIcon = L.icon({
           iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-          iconSize: [32, 32], // Dimensioni del marker
-          iconAnchor: [16, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+          iconSize: [22, 22], // Dimensioni del marker
+          iconAnchor: [11, 11], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+          popupAnchor: [0, -11] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
         });
 
         const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
@@ -527,7 +580,7 @@ export class Tab2Page implements OnInit {
       if (parseInt(button.id) === radius / 1000) {
         button.style.background = 'var(--ion-color-primary)';
       } else {
-        button.style.background = '';
+        button.style.background = 'transparent';
       }
     });
   }
