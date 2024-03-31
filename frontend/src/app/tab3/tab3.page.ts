@@ -14,11 +14,17 @@ interface Company {
 export class Tab3Page {
 
   selectedCompany: Company | null = null;
+  routes: any[] = [];
+  loading: boolean = true; // Aggiungi una variabile per il caricamento
 
   constructor(private routeService: RouteService) {}
 
-  toggleCompany(company: Company) {
-    this.selectedCompany = (this.selectedCompany === company) ? null : company;
+  ngOnInit() {
+    this.routeService.getAllRoutes().subscribe((routes: any) => {
+      console.log(routes);  
+      this.routes = routes;
+      this.loading = false; // Imposta il caricamento su false una volta scaricati i dati
+    });
   }
 
   search(event: CustomEvent) {

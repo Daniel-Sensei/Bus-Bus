@@ -14,4 +14,8 @@ export class RouteService {
   getRouteById(id: string) {
     return this.http.get(environment.API_URL + 'route?id=' + id);
   }
+
+  getAllRoutes() {
+    return this.http.get(environment.API_URL + 'allRoutes');
+  }
 }

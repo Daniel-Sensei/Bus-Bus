@@ -1,5 +1,3 @@
-
-
 .icon-center {
   margin-right: 4px;
   /* Aggiunge un po' di spazio tra l'icona e il testo */
@@ -16,12 +14,48 @@ ion-list {
 }
 */
 
-ion-item-divider{
+ion-item-divider {
   font-size: 17px;
   background: var(--ion-border-color);
 }
 
-ion-item{
+ion-item {
   padding-top: 5px;
   padding-bottom: 5px;
+}
+
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.search-bar {
+  padding-left: 10px;
+  padding-right: 10px;
+  --border-radius: 20px;
+}
+
+
+ion-item-divider {
+  //color: var(--ion-color-contrast);
+  font-size: 22px;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Sfondo grigio trasparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-overlay ion-spinner {
+  color: var(--ion-color-primary); /* Colore dell'icona di caricamento */
+  width: 40px;
+  height: 40px;
 }

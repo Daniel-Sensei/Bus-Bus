@@ -1,144 +1,29 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>
-      Linee
-    </ion-title>
-    <ion-searchbar slot="start" (ionChange)="search($event)" placeholder="Cerca una linea"></ion-searchbar>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-list lines="full">
-    <ion-item-group>
-      <ion-item-divider>
-        <ion-label>Autolinee Romano</ion-label>
-      </ion-item-divider>
-  
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          120
-        </ion-badge>
-        <ion-label class="label-small">Unical - Piazzale</ion-label>
-      </ion-item>
-            
-      
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-    </ion-item-group>
+  <ion-toolbar>
+    <ion-searchbar class="search-bar" slot="start" (ionChange)="search($event)"
+      placeholder="Cerca una linea"></ion-searchbar>
+  </ion-toolbar>
 
-    <!-- DUPLICAZIONE -->
-    <ion-item-group>
-      <ion-item-divider>
-        <ion-label>Autolinee Romano</ion-label>
-      </ion-item-divider>
-  
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          120
-        </ion-badge>
-        <ion-label class="label-small">Unical - Piazzale</ion-label>
-      </ion-item>
-            
-      
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-    </ion-item-group>
-    <ion-item-group>
-      <ion-item-divider>
-        <ion-label>Autolinee Romano</ion-label>
-      </ion-item-divider>
-  
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          120
-        </ion-badge>
-        <ion-label class="label-small">Unical - Piazzale</ion-label>
-      </ion-item>
-            
-      
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-    </ion-item-group>
-    <ion-item-group>
-      <ion-item-divider>
-        <ion-label>Autolinee Romano</ion-label>
-      </ion-item-divider>
-  
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          120
-        </ion-badge>
-        <ion-label class="label-small">Unical - Piazzale</ion-label>
-      </ion-item>
-            
-      
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-    </ion-item-group>
-    <ion-item-group>
-      <ion-item-divider>
-        <ion-label>Autolinee Romano</ion-label>
-      </ion-item-divider>
-  
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          120
-        </ion-badge>
-        <ion-label class="label-small">Unical - Piazzale</ion-label>
-      </ion-item>
-            
-      
-      <ion-item>
-        <ion-badge slot="start" class="bus-badge">
-          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-          10
-        </ion-badge>
-        <ion-label class="label-small">Aereoporto - Nicastro</ion-label>
-      </ion-item>
-    </ion-item-group>
-  
+  <div *ngIf="loading" class="loading-overlay">
+    <!-- Aggiungi qui l'effetto di caricamento, ad esempio uno spinner -->
+    <ion-spinner></ion-spinner>
+  </div>
 
+  <ion-list lines="full" *ngIf="!loading">
+    <ion-item-group *ngFor="let company of routes | keyvalue">
+
+      <ion-item-divider>
+        <ion-label>{{company.key}}</ion-label>
+      </ion-item-divider>
+
+      <ion-item *ngFor="let route of company.value">
+        <ion-badge slot="start" class="bus-badge">
+          <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+          {{ route.code.split('_')[0] }}
+        </ion-badge>
+        <ion-label class="label-small">{{ route.code.split('_')[1] }}</ion-label>
+      </ion-item>
+
+    </ion-item-group>
   </ion-list>
 </ion-content>
