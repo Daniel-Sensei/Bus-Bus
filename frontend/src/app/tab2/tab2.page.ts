@@ -32,6 +32,7 @@ export class Tab2Page implements OnInit {
   filteredBuses: Bus[] = [];
 
   @ViewChild('modal', { static: true }) modal!: IonModal; // Ottieni il riferimento al modal
+  @ViewChild('cardModal', { static: true }) cardModal!: IonModal; // Ottieni il riferimento al modal
   @ViewChild('map', { static: true }) mapContainer!: ElementRef; // Ottieni il riferimento al contenitore della mappa
 
   showStops: boolean = true;
@@ -47,6 +48,8 @@ export class Tab2Page implements OnInit {
   isModalOpen = true;
   busesDetailsLoaded: boolean = false;
 
+
+
   constructor(
     private busService: BusService,
     private routeService: RouteService,
@@ -57,7 +60,11 @@ export class Tab2Page implements OnInit {
     this.isModalOpen = isOpen;
   }
 
+  presentingElement: Element | null = null;
+
   async ngOnInit() {
+    this.presentingElement = document.querySelector('.ion-page');
+
     await this.initializeDefaultMap();
 
     this.addModalListeners();
@@ -183,8 +190,8 @@ export class Tab2Page implements OnInit {
 
                     <div style="display: flex; border-right: solid 1px; height: 100%; align-items: center; width: 100%; border-color: var(--ion-color-step-600, #999999);">
                         <ion-icon aria-hidden="true" name="search-outline" style="font-size: 20px; background-color: transparent; margin-left: 7px; margin-right: 3px;"></ion-icon>
-                        <input id="searchInput" type="text" placeholder="Cerca una linea" style="width: 100%; height: 90%; border: 0; background-color: transparent; font-weight:bold;">
-                    </div>
+                        <input id="searchInput" readonly onclick="openCardModal()" type="text" placeholder="Cerca sulla mappa" style="width: 100%; height: 90%; border: 0; background-color: transparent; font-weight:bold;">
+                        </div>
 
                     <div style="display: flex; height: 100%;">
                         <button id="1" style="background: var(--ion-color-primary); border: 0; border-right: solid 1px; padding-left: 15px; padding-right: 15px; font-weight: bold; border-color: var(--ion-color-step-600, #999999);" onclick="updateRadius(1000)">1</button>
@@ -195,13 +202,17 @@ export class Tab2Page implements OnInit {
             `;
 
             // Bind the search functionality to the input field
+            /*
             const searchInput = topBarDiv.querySelector('#searchInput');
             searchInput?.addEventListener('input', () => {
                 const searchTerm = searchInput;
                 console.log(searchTerm);
+                console.log(this.cardModal);
+                this.cardModal.present();
                 // Perform search functionality here
                 // E.g., filter markers or perform any other relevant actions based on the search term
             });
+            */
 
             return topBarDiv;
         },
@@ -275,6 +286,10 @@ export class Tab2Page implements OnInit {
   }
 
   addTopBarListner() {
+    (window as any).openCardModal = () => {
+      this.cardModal.present();
+    }
+
     (window as any).recenterMap = () => {
       const currentPosition = this.currentPosition.coords;
       const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);

@@ -29,7 +29,8 @@
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default'">
             <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)" class="bus-item">
               <img src="assets/bus-stop.png" class="img-icon">
-              <ion-label style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.address}}</ion-label>
+              <ion-label
+                style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.address}}</ion-label>
               <ion-label style="font-size: 22px;" slot="end">{{ this.getDistance(this.currentPosition, stop.coords)
                 }}Km</ion-label>
             </ion-item>
@@ -61,6 +62,49 @@
             (back)="this.showBuses = true"></app-bus-details>
         </div>
 
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal #cardModal trigger="open-modal" [presentingElement]="presentingElement"
+    style="margin-top: 10px; border-radius: 20px 20px 0 0px; box-shadow: 0px 0px 20px 5px rgb(0 0 0 / 15%);">
+    <ng-template>
+      <div class="card-modal-header">
+        <ion-buttons slot="end">
+          <ion-icon aria-hidden="true" (click)="cardModal.dismiss()" name="chevron-back-outline"></ion-icon>
+          <ion-input placeholder="Cerca sulla mappa" style="width: 100%;"></ion-input>
+        </ion-buttons>
+      </div>
+      <ion-content>
+        <ion-list>
+          <ion-item>
+            <ion-avatar slot="start">
+              <ion-img src="../../assets/marker-round.png"></ion-img>
+            </ion-avatar>
+            <ion-label>
+              <h2>Pensiline</h2>
+              <p>via della Resistenza, 132, Rende</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-avatar slot="start">
+              <ion-img src="../../assets/marker-round.png"></ion-img>
+            </ion-avatar>
+            <ion-label>
+              <h2>Pensiline</h2>
+              <p>via della Resistenza, 132, Rende</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-avatar slot="start">
+              <ion-img src="../../assets/marker-round.png"></ion-img>
+            </ion-avatar>
+            <ion-label>
+              <h2>Pensiline</h2>
+              <p>via della Resistenza, 132, Rende</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
       </ion-content>
     </ng-template>
   </ion-modal>
