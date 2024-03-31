@@ -73,6 +73,7 @@
 }
 
 .bus-badge {
+  color: var(--ion-color-contrast); /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
   background-color: transparent;
   padding: 6px 8px;
   margin-right: 8px;

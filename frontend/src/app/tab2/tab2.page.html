@@ -41,7 +41,7 @@
             <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)">
               <ion-badge class="bus-badge" style="font-size: 16px;">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-                &nbsp;{{bus.route.code}} - {{bus.route.company}}
+                &nbsp;{{ bus.route.code.split('_')[0] }} - {{ bus.route.company }}
               </ion-badge>
               <ion-label style="font-size: 17px; padding-top: 12px; padding-bottom: 12px;"></ion-label>
               <ion-label style="font-size: 22px; padding-top: 12px; padding-bottom: 12px;" slot="end">+5 min</ion-label>

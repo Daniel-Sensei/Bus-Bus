@@ -10,8 +10,8 @@
   <ion-item lines="none" style="margin-top: 10px;">
     <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon" size="large"></ion-icon>
     <ion-label class="label">
-      <div class="bold">{{bus.route.code}} - {{bus.route.company}}</div>
-      <div>1 di 3</div>
+      <div class="bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ bus.route.code.split('_')[0] }} - {{ destination }}</div>
+      <div>{{bus.route.company}}</div>
     </ion-label>
 
     <ion-icon *ngIf="!this.favourite" (click)="addFavourite(true)" slot="end" aria-hidden="true" name="star-outline" class="icon"></ion-icon>
@@ -41,7 +41,7 @@
     </ion-accordion>
   </ion-accordion-group>  
 
-  <div class="div-center" style="margin-top: 5px;">
+  <div class="div-center" style="margin-top: 2px;">
     <ion-button shape="round">
       Portami qui
     </ion-button>

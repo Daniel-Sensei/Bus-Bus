@@ -9,7 +9,7 @@ li {
     height: 1.25em;
     //line-height: 1em;
     border-radius: 1em;
-    background: dodgerblue;
+    background: var(--ion-color-primary);
     margin: 5em -1em; //margine tra i pallini
     color: #fff;
     position: relative;
@@ -27,7 +27,7 @@ li::before {
     /* width: 4em; */
     width: .5em;
     height: 5.2em;
-    background: dodgerblue;
+    background: var(--ion-color-primary);
     z-index: -1;
 }
 
@@ -54,13 +54,13 @@ li:first-child::before {
 }
 
 .active {
-    background: dodgerblue;
+    background: var(--ion-color-primary);
 }
 
 .active~li {
-    background: lightblue;
+    background: var(--ion-color-primary-tint);
 }
 
 .active~li::before {
-    background: lightblue;
+    background: var(--ion-color-primary-tint);
 }
