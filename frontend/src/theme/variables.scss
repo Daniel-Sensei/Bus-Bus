@@ -1,10 +1,9 @@
-// Ionic Variables and Theming. For more info, please see:
-// http://ionicframework.com/docs/theming/
+/* Ionic Variables and Theming. For more info, please see: http://ionicframework.com/docs/theming/ */
 
 @font-face {
   font-family: Ubuntu;
-  src: url("../../resources/fonts/Ubuntu/Ubuntu-Regular.ttf"); //change url accordingly
-  }
+  src: url("../../resources/fonts/Ubuntu/Ubuntu-Regular.ttf"); /* change url accordingly */
+}
 
 /** Ionic CSS Variables **/
 :root {
@@ -12,12 +11,12 @@
   --ion-font-family: Ubuntu, sans-serif;
 
   /** primary **/
-  --ion-color-primary: #2dd36f;
-  --ion-color-primary-rgb: 45, 211, 111;
+  --ion-color-primary: #f0bc5e; /* Updated primary color */
+  --ion-color-primary-rgb: 240, 188, 94; /* Updated primary color RGB */
   --ion-color-primary-contrast: #000000;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
-  --ion-color-primary-shade: #28ba62;
-  --ion-color-primary-tint: #42d77d;
+  --ion-color-primary-shade: #d4a94d;
+  --ion-color-primary-tint: #f2c873;
 
   /** secondary **/
   --ion-color-secondary: #3dc2ff;
@@ -205,7 +204,7 @@
    */
 
   .md body {
-    --ion-background-color: #191919; //changed from #121212
+    --ion-background-color: #191919; /* changed from #121212 */
     --ion-background-color-rgb: 18,18,18;
 
     --ion-text-color: #ffffff;
@@ -233,9 +232,9 @@
     --ion-color-step-900: #e7e7e7;
     --ion-color-step-950: #f3f3f3;
 
-    --ion-item-background: #191919; //changed from #1e1e1e
+    --ion-item-background: #191919; /* changed from #1e1e1e */
 
-    --ion-toolbar-background: #121212; //changed from #1f1f1f
+    --ion-toolbar-background: #121212; /* changed from #1f1f1f */
 
     --ion-tab-bar-background: #1f1f1f;
 
@@ -244,9 +243,6 @@
 }
 
 html {
-  /* 
-   * For more information on dynamic font scaling, visit the documentation:
-   * https://ionicframework.com/docs/layout/dynamic-font-scaling
-   */
+  /* For more information on dynamic font scaling, visit the documentation: https://ionicframework.com/docs/layout/dynamic-font-scaling */
   --ion-dynamic-font: var(--ion-default-dynamic-font);
 }

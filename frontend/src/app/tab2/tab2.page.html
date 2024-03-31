@@ -37,17 +37,18 @@
           </ion-list>
 
           <!-- Bus -->
-          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment' && busesDetailsLoaded">
-            <ion-item *ngFor="let bus of buses" class="bus-item" (click)="navigateToBusDetails(bus.routeId)">
-              <ion-badge class="bus-badge">
+          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
+            <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)">
+              <ion-badge class="bus-badge" style="font-size: 16px;">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
                 &nbsp;{{bus.route.code}} - {{bus.route.company}}
               </ion-badge>
-              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;"></ion-label>
-              <ion-label style="font-size: 17px; padding-top: 15px; padding-bottom: 15px;" slot="end"
-                class="big-hour">+5 min</ion-label>
+              <ion-label style="font-size: 17px; padding-top: 12px; padding-bottom: 12px;"></ion-label>
+              <ion-label style="font-size: 22px; padding-top: 12px; padding-bottom: 12px;" slot="end">+5 min</ion-label>
             </ion-item>
           </ion-list>
+          
+          
 
         </div>
 
