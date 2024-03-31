@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true">
   <ion-toolbar>
-    <ion-searchbar class="search-bar" slot="start" (ionChange)="search($event)"
+    <ion-searchbar class="search-bar" slot="start" (input)="search($event)"
       placeholder="Cerca una linea"></ion-searchbar>
   </ion-toolbar>
 
@@ -10,7 +10,7 @@
   </div>
 
   <ion-list lines="full" *ngIf="!loading">
-    <ion-item-group *ngFor="let company of routes | keyvalue">
+    <ion-item-group *ngFor="let company of filteredRoutes | keyvalue">
 
       <ion-item-divider>
         <ion-label>{{company.key}}</ion-label>
