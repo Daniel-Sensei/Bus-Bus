@@ -60,7 +60,7 @@ public class BusService {
         }
     }
 
-    @PostMapping("/signupCompany")
+        @PostMapping("/signupCompany")
     public ResponseEntity<String> signupCompany(@RequestBody BusSignupRequest requestBody) {
         String email = requestBody.getEmail();
         String password = requestBody.getPassword();
@@ -92,6 +92,18 @@ public class BusService {
 
         return new ResponseEntity<>("Azienda registrata con successo con ID: " + companyRecord.getUid(), HttpStatus.OK);
 
+    }
+
+    @PostMapping("/verifyTokenIntegrity")
+    public ResponseEntity<Boolean> verifyTokenIntegrity(@RequestBody Map<String, String> bodyRequest) {
+        String token = bodyRequest.get("token");
+        try {
+            System.out.println("token: " + token);
+            FirebaseAuth.getInstance().verifyIdToken(token);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping("/busByCode")
