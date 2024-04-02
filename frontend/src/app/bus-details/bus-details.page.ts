@@ -57,7 +57,7 @@ export class BusDetailsPage implements OnInit {
 
   resizeModal() {
     this.accordionOpen = !this.accordionOpen;
-    const breakpoint = this.accordionOpen ? 1 : 0.32;
+    const breakpoint = this.accordionOpen ? 1 : 0.33;
     this.modal.setCurrentBreakpoint(breakpoint);
   }
 

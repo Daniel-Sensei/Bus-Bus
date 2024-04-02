@@ -34,46 +34,56 @@
 /* SHEET MODAL */
 /* Stile per il segmento */
 .top-segment {
-    position: sticky;
-    top: 0;
-    z-index: 1100;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
 
-    /* Assicura che il segmento sia sopra all'header */
-    --background: var(--ion-item-background);
+  /* Assicura che il segmento sia sopra all'header */
+  --background: var(--ion-item-background);
 
-    //imposta il colore di sfondo bianco per il tema chiaro
-    @media (prefers-color-scheme: light) {
-        --background: #fff;
-    }
+  //imposta il colore di sfondo bianco per il tema chiaro
+  @media (prefers-color-scheme: light) {
+    --background: #fff;
+  }
 
-    margin-top: -30px;
-    /* Sposta il segmento sopra lo spazio bianco */
-    //padding-top: 10px;
+  margin-top: -30px;
+  /* Sposta il segmento sopra lo spazio bianco */
+  //padding-top: 10px;
 }
 
 .blank-space {
-    position: sticky;
-    top: -20px;
-    z-index: 1000;
-    height: 22px;
+  position: sticky;
+  top: -20px;
+  z-index: 1000;
+  height: 22px;
 
 
-    background: var(--ion-item-background);
-    
-    //imposta il colore di sfondo bianco per il tema chiaro
-    @media (prefers-color-scheme: light) {
-        background: #fff;
-    }
+  background: var(--ion-item-background);
+
+  //imposta il colore di sfondo bianco per il tema chiaro
+  @media (prefers-color-scheme: light) {
+    background: #fff;
+  }
 }
 
-.div-center{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.div-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.div-center ion-button {
+
+  //imposta margine personalizzato se la lunghezza è maggiore di 1000px in verticale
+  @media (min-height: 890px) {
+    //for long phone
+    margin-top: 14px;
+  }
 }
 
 .bus-badge {
-  color: var(--ion-color-contrast); /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
+  color: var(--ion-color-contrast);
+  /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
   background-color: transparent;
   padding: 6px 8px;
   margin-right: 8px;
@@ -99,32 +109,31 @@
 }
 
 
-  .big-hour{
-    font-size: 22px;
-    font-weight: bold;
-  }
+.big-hour {
+  font-size: 22px;
+  font-weight: bold;
+}
 
-  .header {
-    text-align: center;
-    padding-left: 0;
-  
-  }
-  
-  
-  .icon {
-    margin-right: 10px;
-    /* Aggiungi un margine a destra all'icona */
-  }
-  
-  .bold {
-    font-weight: bold;
-    /* Rendi il testo in grassetto */
-    font-size: 18px;
-  }
-  
-  .label {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
+.header {
+  text-align: center;
+  padding-left: 0;
+
+}
+
+
+.icon {
+  margin-right: 10px;
+  /* Aggiungi un margine a destra all'icona */
+}
+
+.bold {
+  font-weight: bold;
+  /* Rendi il testo in grassetto */
+  font-size: 18px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
