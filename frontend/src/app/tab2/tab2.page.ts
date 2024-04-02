@@ -177,11 +177,10 @@ export class Tab2Page implements OnInit {
             const topBarDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
             topBarDiv.style.width = '100%'; // Imposta la larghezza al 100%
             topBarDiv.style.display = 'flex'; // Usa flexbox per allineare il contenuto al centro
-            topBarDiv.style.justifyContent = 'center'; // Allinea il contenuto al centro
-            topBarDiv.style.marginLeft = "28px"; // Sposta il controllo a sinistra di 100px per centrarlo correttamente
+            //topBarDiv.style.marginLeft = "50%"; // Sposta il controllo a sinistra di 100px per centrarlo correttamente
             topBarDiv.style.border = '0px'; // Aggiungi un bordo al controllo
             topBarDiv.innerHTML = `
-                <div style="display: flex; height: 40px; justify-content: center; align-items: center; border-radius: 10px; width: 100%; background-color: var(--background); margin-right: 10px; margin-top: 10px;">
+                <div style="display: flex; height: 40px; justify-content: center; align-items: center; border-radius: 10px; width: 100%; background-color: var(--background); margin-top: 10px;">
                     <div style="height: 100%; display: flex; align-items: center; border-right: solid 1px; border-color: var(--ion-color-step-600, #999999);">
                         <button style="margin-left: 10px; padding-right: 7px; background-color: transparent;" onclick="recenterMap()">
                         <ion-icon aria-hidden="true" name="locate" style="font-size: 20px; background-color: transparent;">
@@ -201,18 +200,14 @@ export class Tab2Page implements OnInit {
                 </div>
             `;
 
-            // Bind the search functionality to the input field
-            /*
-            const searchInput = topBarDiv.querySelector('#searchInput');
-            searchInput?.addEventListener('input', () => {
-                const searchTerm = searchInput;
-                console.log(searchTerm);
-                console.log(this.cardModal);
-                this.cardModal.present();
-                // Perform search functionality here
-                // E.g., filter markers or perform any other relevant actions based on the search term
-            });
-            */
+            // Modifica lo stile del genitore di topBarDiv
+            const parentDiv = document.querySelector('.leaflet-top.leaflet-right') as HTMLElement;
+            if (parentDiv) {
+              parentDiv.style.left = '0'; // Allinea il controllo a sinistra
+              parentDiv.style.paddingLeft = '6.5%'; // Aggiungi un padding a sinistra
+              parentDiv.style.paddingRight = '2%'; // Aggiungi un padding a destra
+            }
+
 
             return topBarDiv;
         },
