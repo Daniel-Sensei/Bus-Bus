@@ -35,7 +35,7 @@ export class StopDetailsPage implements OnInit {
 
   resizeModal() {
     this.accordionOpen = !this.accordionOpen;
-    const breakpoint = this.accordionOpen ? 1 : 0.30;
+    const breakpoint = this.accordionOpen ? 1 : 0.32;
     this.modal.setCurrentBreakpoint(breakpoint);
   }
 
