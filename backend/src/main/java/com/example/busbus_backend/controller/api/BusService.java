@@ -2,8 +2,6 @@ package com.example.busbus_backend.controller.api;
 
 import com.example.busbus_backend.persistence.model.*;
 import com.google.cloud.firestore.*;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -15,9 +13,6 @@ import org.springframework.http.ResponseEntity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
-
-
-
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -62,7 +57,7 @@ public class BusService {
         }
     }
 
-        @PostMapping("/signupCompany")
+    @PostMapping("/signupCompany")
     public ResponseEntity<String> signupCompany(@RequestBody BusSignupRequest requestBody) {
         String email = requestBody.getEmail();
         String password = requestBody.getPassword();
@@ -94,50 +89,6 @@ public class BusService {
 
         return new ResponseEntity<>("Azienda registrata con successo con ID: " + companyRecord.getUid(), HttpStatus.OK);
 
-    }
-
-    @PostMapping("/verifyTokenIntegrity")
-    public ResponseEntity<Boolean> verifyTokenIntegrity(@RequestBody Map<String, String> bodyRequest) {
-        String token = bodyRequest.get("token");
-        try {
-            System.out.println("token: " + token);
-            FirebaseAuth.getInstance().verifyIdToken(token);
-            return new ResponseEntity<>(true, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    //crea la chiamata verify-custom-token
-    //che verifica la validità di un custom token
-    //ci si aspetta il token nell'header Authorization
-    @GetMapping("verify-custom-token")
-    public ResponseEntity<Boolean> verifyCustomToken(@RequestHeader("Authorization") String token){
-        try {
-            //estraggo il token dall'header
-            String customToken = token.substring(7);
-            System.out.println("customToken: " + customToken);
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(customToken);
-            System.out.println("decodedToken: " + decodedToken);
-            return new ResponseEntity<>(true, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @GetMapping("generate-custom-token")
-    public ResponseEntity<String> generateCustomToken(@RequestParam String uid){
-        try {
-            //String customToken = FirebaseAuth.getInstance().createCustomToken(uid);
-            //crea un custom token impostando la data di scadenza a 30 giorni
-            String customToken = FirebaseAuth.getInstance().createCustomToken(uid, new HashMap<String, Object>(){{
-                put("expirationTime", System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000);
-            }});
-            System.out.println(customToken);
-            return new ResponseEntity<>(customToken, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PostMapping("/busByCode")
@@ -624,11 +575,6 @@ public class BusService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    // Restituisce true se oggi è domenica, altrimenti false
-    private boolean isSunday() {
-        return LocalDate.now().getDayOfWeek().toString().equals("SUNDAY");
     }
 
     // Restituisce la data odierna nel formato "dd-MM-yyyy"

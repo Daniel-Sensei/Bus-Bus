@@ -183,5 +183,4 @@ public class RouteService {
         return collectionReference.document(id).get().get();
     }
 
-
 }

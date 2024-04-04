@@ -29,7 +29,6 @@ public class StopService {
     private final String STOPS_COLLECTION = "stops"; // Nome della collezione in Firestore
     private final String ROUTES_COLLECTION = "routes";
 
-
     @GetMapping("/stop")
     public ResponseEntity<Stop> getStop(@RequestParam String id) {
         Firestore db = FirestoreClient.getFirestore();
