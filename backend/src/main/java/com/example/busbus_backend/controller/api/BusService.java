@@ -91,15 +91,10 @@ public class BusService {
 
     }
 
-    @PostMapping("/busByCode")
-    public ResponseEntity<Bus> getBusByCode (@RequestBody Map<String, String> bodyRequest){
-        // check if bodyRequest.token is a valid Firebase token
-        String token = bodyRequest.get("token");
-        String code = bodyRequest.get("code");
+    @GetMapping("/busByCode")
+    public ResponseEntity<Bus> getBusByCode (@RequestParam String code){
         System.out.println("code: " + code);
-        System.out.println("token: " + token);
         try {
-            FirebaseAuth.getInstance().verifyIdToken(token);
 
             Firestore db = FirestoreClient.getFirestore();
             CollectionReference buses = db.collection(BUSES_COLLECTION);
