@@ -5,12 +5,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
+@RestController
+@CrossOrigin("*")
 public class LoginService {
     @GetMapping("generate-custom-token")
     public ResponseEntity<String> generateCustomToken(@RequestParam String uid){
@@ -29,6 +29,8 @@ public class LoginService {
     @GetMapping("verify-custom-token")
     public ResponseEntity<Boolean> verifyCustomToken(@RequestHeader("Authorization") String token){
         try {
+            //il token è preceduto dalla stringa "Bearer ", quindi la rimuoviamo
+            token = token.substring(7);
             Jwts.parser().setSigningKey(TokenManager.getSecretKey()).parseClaimsJws(token);
             //stampa data di scadenza del token
             System.out.println("Scadenza: " + Jwts.parser().setSigningKey(TokenManager.getSecretKey()).parseClaimsJws(token).getBody().getExpiration());
