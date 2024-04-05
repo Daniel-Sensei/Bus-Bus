@@ -455,6 +455,8 @@ export class Tab2Page implements OnInit {
       );
       */
 
+      this.clearBusMarkers();
+
       this.filteredBuses.forEach(bus => {
         const customIcon = L.icon({
           iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
