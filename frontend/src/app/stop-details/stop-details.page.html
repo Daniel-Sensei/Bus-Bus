@@ -10,8 +10,15 @@
 <ion-item lines="none" style="margin-top: 10px;">
   <ion-icon slot="start" aria-hidden="true" name="pin-outline" class="icon" size="large"></ion-icon>
   <ion-label class="label">
-    <div class="bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{this.stop?.address}}</div>
-    <div *ngIf="this.stop?.address != this.stop?.name">{{this.stop?.name}}</div>
+
+    <div *ngIf="stop?.address != stop?.name; else elseBlock">
+      <div class="bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stop?.name }}</div>
+      <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stop?.address }}</div>
+    </div>
+    <ng-template #elseBlock>
+      <div class="bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stop?.address }}</div>
+    </ng-template>
+
   </ion-label>
 
   <ion-icon *ngIf="!this.favourite" (click)="addFavourite(true)" slot="end" aria-hidden="true" name="star-outline"

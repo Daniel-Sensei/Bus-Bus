@@ -52,13 +52,13 @@
 
         </div>
 
-        <div *ngIf="!showStops" class="padding-top-modal">
+        <div *ngIf="!showStops">
           <app-stop-details [stop]="this.selectedStop" [nextBuses]="this.nextBuses" [modal]="this.modal"
             (back)="this.showStops = true"></app-stop-details>
         </div>
 
 
-        <div *ngIf="!showBuses" class="padding-top-modal">
+        <div *ngIf="!showBuses">
           <app-bus-details *ngIf="selectedBus" [bus]="this.selectedBus" [modal]="this.modal"
             (back)="this.showBuses = true"></app-bus-details>
         </div>
