@@ -360,12 +360,13 @@ public class BusService {
 
                         // Verificare se il campo timetable per la direzione specificata esiste
                         if (timetable != null) {
-                            // Per ogni stop, controlla se ci sono buchi nella history e riempi con il valore precedente
-
+                            // Per ogni stop, controlla se ci sono buchi nella history e riempi con null
                             Map<String,List<String>> day = timetable;
+                            System.out.println("day: " + day);
                             //scorro come una matrice in verticale
                             int numCols = day.get("0").size();
                             boolean fixed = false; //faccio solo una colonna alla volta
+
                             for(int i = 0; i < numCols && !fixed; i++){
                                 int cont = 0;
                                 for(int j = 0; j < day.size(); j++){
@@ -375,12 +376,13 @@ public class BusService {
                                 }
                                 if(cont > 0 && cont < day.size()){
                                     System.out.println("Devo fixare");
-                                    for(int j = 0; j < day.size(); j++){
+                                    for(int j = 0; j < day.size() - 1; j++){
                                         if(day.get(String.valueOf(j)).get(i) != null &&  day.get(String.valueOf(j)).get(i).equals("-")){
                                             day.get(String.valueOf(j)).set(i, null);
                                         }
                                     }
                                     fixed = true;
+                                    System.out.println("ho finito di fixare, esco");
                                 }
 
                             }
