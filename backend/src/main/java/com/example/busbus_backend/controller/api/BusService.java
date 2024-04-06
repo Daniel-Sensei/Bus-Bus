@@ -1,6 +1,7 @@
 package com.example.busbus_backend.controller.api;
 
 import com.example.busbus_backend.persistence.model.*;
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -171,6 +172,8 @@ public class BusService {
                     String today = getCurrentDate();
                     Schedule todayData = history.get(today);
 
+                    System.out.println("todayData: " + todayData);
+
                     // Verificare se l'oggetto Data per la data odierna esiste
                     if (todayData != null) {
                         // Ottenere l'oggetto Timetable per la direzione specificata (forward o back)
@@ -195,18 +198,32 @@ public class BusService {
                                 timetable.put(stopIndex, stopTimes);
                             }
 
-                            // Aggiornare il campo "history" nel documento del percorso
-                            db.runTransaction(transaction -> {
-                                DocumentSnapshot routeSnapshotAgain = transaction.get(routeRef).get();
-                                Route route = routeSnapshotAgain.toObject(Route.class);
-                                if (route != null) {
-                                    route.getHistory().put(today, todayData);
-                                    transaction.update(routeRef, "history", route.getHistory());
-                                }
-                                return true;
-                            });
+                            try {
+                                ApiFuture<Boolean> future = db.runTransaction(transaction -> {
+                                    DocumentSnapshot routeSnapshotAgain = transaction.get(routeRef).get();
+                                    Route route = routeSnapshotAgain.toObject(Route.class);
+                                    if (route != null) {
+                                        route.getHistory().put(today, todayData);
+                                        System.out.println("route.getHistory(): " + route.getHistory());
 
-                            return new ResponseEntity<>(true, HttpStatus.OK);
+                                        transaction.update(routeRef, "history", route.getHistory());
+                                    }
+                                    return true;
+                                });
+
+                                // Attendi il completamento della transazione
+                                Boolean result = future.get();
+
+                                if (result) {
+                                    return new ResponseEntity<>(true, HttpStatus.OK);
+                                } else {
+                                    // Gestisci il caso in cui la transazione non ha avuto successo
+                                    return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+                                }
+                            } catch (InterruptedException | ExecutionException e) {
+                                // Gestisci le eccezioni
+                                return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+                            }
                         }
                     }
                     else{
@@ -408,6 +425,10 @@ public class BusService {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static int getSize(Map<String, List<String>> day) {
+        return day.size();
     }
 
     @PostMapping("/addBus")
