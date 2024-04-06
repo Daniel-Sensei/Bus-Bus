@@ -369,12 +369,12 @@ public class BusService {
 
                             for(int i = 0; i < numCols && !fixed; i++){
                                 int cont = 0;
-                                for(int j = 0; j < day.size(); j++){
+                                for(int j = 0; j < day.size() - 1; j++){
                                     if(day.get(String.valueOf(j)).get(i) != null && day.get(String.valueOf(j)).get(i).equals("-")){
                                         cont++;
                                     }
                                 }
-                                if(cont > 0 && cont < day.size()){
+                                if(cont > 0 && cont < day.size() - 1){
                                     System.out.println("Devo fixare");
                                     for(int j = 0; j < day.size() - 1; j++){
                                         if(day.get(String.valueOf(j)).get(i) != null &&  day.get(String.valueOf(j)).get(i).equals("-")){
