@@ -97,8 +97,9 @@ export class Tab2Page implements OnInit {
         zoomControl: false // Rimuovi il controllo di zoom predefinito
       });
 
-      L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', {
-        attribution: 'Open Street Map'
+      L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', { //transport
+        attribution: 'Open Street Map',
+        className: 'map-tiles'
       }).addTo(map);
 
       //used to fix the map not showing correctly when moving
@@ -343,7 +344,7 @@ export class Tab2Page implements OnInit {
 
       this.filteredStops.forEach(stop => {
         const customIcon = L.icon({
-          iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconUrl: this.getIconDirectory() +  'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
           iconSize: [16, 16], // Dimensioni del marker
           iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
           popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
@@ -464,7 +465,7 @@ export class Tab2Page implements OnInit {
 
       this.filteredBuses.forEach(bus => {
         const customIcon = L.icon({
-          iconUrl: 'assets/bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconUrl: this.getIconDirectory() + 'bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
           iconSize: [22, 22], // Dimensioni del marker
           iconAnchor: [11, 11], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
           popupAnchor: [0, -11] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
@@ -484,6 +485,15 @@ export class Tab2Page implements OnInit {
     });
 
   }
+
+  getIconDirectory(): string {
+    // Controlla se il tema preferito dall'utente è scuro o chiaro
+    const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+    // Restituisci il percorso dell'immagine in base al tema
+    return isDarkTheme ? 'assets/dark/' : 'assets/light/';
+  }
+  
 
   navigateToBusDetails(busRouteId: string) {
     this.buses.forEach(bus => {
@@ -531,7 +541,7 @@ export class Tab2Page implements OnInit {
 
     stops.forEach(stop => {
       const customIcon = L.icon({
-        iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+        iconUrl: this.getIconDirectory() +  'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
         iconSize: [16, 16], // Dimensioni del marker
         iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
         popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker

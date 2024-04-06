@@ -28,13 +28,13 @@
           <!-- Fermate -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default'">
             <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)" (click)="centerStopBus(stop)" class="bus-item">
-              <img src="assets/bus-stop.png" class="img-icon">
+              <img [src]="getIconDirectory() + 'bus-stop.png'" class="img-icon">
               <ion-label
                 style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.address}}</ion-label>
-              <ion-label style="font-size: 22px;" slot="end">{{ this.getDistance(this.currentPosition, stop.coords)
-                }}Km</ion-label>
+              <ion-label style="font-size: 22px;" slot="end">{{ this.getDistance(this.currentPosition, stop.coords) }}Km</ion-label>
             </ion-item>
           </ion-list>
+          
 
           <!-- Bus -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
