@@ -91,7 +91,7 @@ export class Tab2Page implements OnInit {
   initializeMap(): Promise<L.Map> {
     return new Promise((resolve, reject) => {
       const map = L.map('map', {
-        center: [42.049, 13.348], // Posizione iniziale della mappa (Italy)
+        center: [39.229, 12.810], // Posizione iniziale della mappa (Italy)
         zoom: 5,
         renderer: L.canvas(),
         zoomControl: false // Rimuovi il controllo di zoom predefinito
@@ -363,7 +363,12 @@ export class Tab2Page implements OnInit {
     });
   }
 
-  centerStopBus(pos: Stop | Bus) {
+  centerStopBus = async (pos: Stop | Bus) => {
+    //se il breakpoint del modal è 1, allora imposta il breakpoint a 0.30
+    if (await this.modal.getCurrentBreakpoint() === 1) {
+      this.modal.setCurrentBreakpoint(0.30);
+    }
+
     const stopLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
     this.map.flyTo(stopLatLng, 15, {
       duration: 1,
@@ -468,7 +473,7 @@ export class Tab2Page implements OnInit {
         const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
           .on('click', () => {
             this.navigateToBusDetails(bus.routeId); // Aggiunta dell'azione quando clicchi sulla fermata
-            //this.centerStopBus(bus);
+            this.centerStopBus(bus);
             this.eraseRoute();
             //this.drawRoute(bus);
           })
@@ -512,10 +517,40 @@ export class Tab2Page implements OnInit {
       timestamp: 0
     };
     const busPosition = position.coords;
+    //find bus in this.buses
+    bus = this.buses.find(b => b.id === bus.id) as Bus;
+    console.log("DRAW ROUTE: ", bus);
+
+    let stops: any[] = [];
+    if(bus.direction === "forward"){
+      stops = bus.route.stops.forwardStops;
+    }
+    else{
+      stops = bus.route.stops.backStops;
+    }
+
+    stops.forEach(stop => {
+      const customIcon = L.icon({
+        iconUrl: 'assets/bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+        iconSize: [16, 16], // Dimensioni del marker
+        iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
+        popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+      });
+
+      L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
+        //.bindPopup(stop.name)
+        .on('click', () => {
+          this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
+
+          this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
+          this.centerStopBus(stop);
+        })
+        .addTo(this.map);
+    });
 
     // Creare un array di coordinate dal primo stop all'attuale posizione del bus
     if (bus.lastStop >= 0) {
-      const firstLegStops = bus.route.stops.slice(0, bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
+      const firstLegStops = stops.slice(0, bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
 
       const firstLegWaypoints = [...firstLegStops, L.latLng(busPosition.latitude, busPosition.longitude)];
       // Aggiungere il controllo di routing alla mappa per il primo percorso (primo stop all'attuale posizione del bus)
@@ -533,7 +568,7 @@ export class Tab2Page implements OnInit {
       }).addTo(this.map);
     }
 
-    const lastLegStops = bus.route.stops.slice(bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
+    const lastLegStops = stops.slice(bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
     const lastLegWaypoints = [L.latLng(busPosition.latitude, busPosition.longitude), ...lastLegStops];
 
     // Aggiungere il controllo di routing alla mappa per il secondo percorso (attuale posizione del bus all'ultimo stop)

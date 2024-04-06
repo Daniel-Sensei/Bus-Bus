@@ -86,6 +86,33 @@ export class BusService {
     return subject.asObservable();
   }
 
+  public getBusFromRealtimeDatabase(busId: string): Observable<Bus> {
+    const busRef = ref(this.firebaseDB, `buses/${busId}`);
+    const subject = new Subject<Bus>();
+  
+    onValue(busRef, (snapshot) => {
+      const busData = snapshot.val();
+      if (busData) {
+        const bus: Bus = {
+          id: snapshot.key!,
+          coords: busData.coords,
+          route: busData.route,
+          routeId: busData.routeId,
+          speed: busData.speed,
+          lastStop: busData.lastStop,
+          direction: busData.direction,
+          // Aggiungere altri campi se necessario
+        };
+        subject.next(bus);
+      } else {
+        subject.next(null as unknown as Bus); // Emittiamo null se il bus non viene trovato nel database
+      }
+    });
+  
+    return subject.asObservable();
+  }
+  
+
 
   getAllBuses(): Observable<Bus[]> {
     const busesRef = collection(this.firestore, 'buses');

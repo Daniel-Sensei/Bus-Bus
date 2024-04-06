@@ -27,7 +27,7 @@
 
           <!-- Fermate -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default'">
-            <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)" class="bus-item">
+            <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)" (click)="centerStopBus(stop)" class="bus-item">
               <img src="assets/bus-stop.png" class="img-icon">
               <ion-label
                 style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.address}}</ion-label>
@@ -38,7 +38,7 @@
 
           <!-- Bus -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'">
-            <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)">
+            <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)" (click)="centerStopBus(bus)">
               <ion-badge class="bus-badge" style="font-size: 16px;">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
                 &nbsp;{{ bus.route.code.split('_')[0] }} - {{ bus.route.company }}
@@ -67,6 +67,7 @@
     </ng-template>
   </ion-modal>
 
+  <!-- Search Modal -->
   <ion-modal #cardModal trigger="open-modal" [presentingElement]="presentingElement"
     style="margin-top: 10px; border-radius: 20px 20px 0 0px; box-shadow: 0px 0px 20px 5px rgb(0 0 0 / 15%);">
     <ng-template>
