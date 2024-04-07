@@ -20,6 +20,8 @@ import { GeoPoint } from 'firebase/firestore';
 import { RouteService } from '../service/route.service';
 import { StopService } from '../service/stop.service';
 
+import { PositionService } from '../service/position.service';
+
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -56,12 +58,14 @@ export class Tab2Page implements OnInit {
 
   //
   places: any[] = [];
+  isComponentLoaded: boolean = false;
 
 
   constructor(
     private busService: BusService,
     private routeService: RouteService,
-    private stopService: StopService
+    private stopService: StopService,
+    private positionService: PositionService
   ) { }
 
   setOpen(isOpen: boolean) {
@@ -71,6 +75,7 @@ export class Tab2Page implements OnInit {
   presentingElement: Element | null = null;
 
   async ngOnInit() {
+    console.log("INITIALIZING TAB2");
     this.presentingElement = document.querySelector('.ion-page');
 
     await this.initializeDefaultMap();
@@ -140,7 +145,14 @@ export class Tab2Page implements OnInit {
         timeout: 10000,
         enableHighAccuracy: true
       };
+
+      let position = this.positionService.getCurrentPosition();
+      if(position.coords.latitude == 0 && position.coords.longitude == 0){
       this.currentPosition = await Geolocation.getCurrentPosition(options);
+      }
+      else{
+        this.currentPosition = position;
+      }
     } catch (error) {
       console.error('Error getting current position', error);
       console.log("DEFAULT POSITION");
@@ -163,7 +175,9 @@ export class Tab2Page implements OnInit {
 
   updateMap() {
     const currentPosition = this.currentPosition.coords;
+    console.log("CURRENT POSITION: ", currentPosition);
     const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
+    console.log("CURRENT LATLNG: ", currentLatLng);
 
     this.map.flyTo(currentLatLng, 14, {
       duration: 1.5,
@@ -717,6 +731,19 @@ export class Tab2Page implements OnInit {
 
   ionViewWillEnter() {
     this.modal.present();
+  }
+
+  ionViewDidEnter() {
+    console.log("ION DID ENTER");
+    let position = this.positionService.getCurrentPosition();
+    if(position.coords.latitude != 0 && position.coords.longitude != 0){
+      //aspetta che il componente sia caricato al 100%
+      setTimeout(() => {
+        this.currentPosition = position;
+        this.updateMap();
+      }, 1000);
+
+    }
   }
 
   ionViewWillLeave() {

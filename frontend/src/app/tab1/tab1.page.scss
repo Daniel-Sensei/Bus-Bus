@@ -1,0 +1,11 @@
+ion-toolbar {
+    --background: var(--ion-color-primary);
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .search-bar {
+    padding-left: 10px;
+    padding-right: 10px;
+    --border-radius: 20px;
+  }
