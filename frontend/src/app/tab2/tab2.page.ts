@@ -3,6 +3,11 @@ import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-measure';
 import 'leaflet-geometryutil';
+import 'leaflet-control-geocoder';
+
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
+
+const provider = new OpenStreetMapProvider();
 
 import { Geolocation, Position } from '@capacitor/geolocation';
 import { Stop } from '../model/Stop';
@@ -44,10 +49,13 @@ export class Tab2Page implements OnInit {
   firstRoute?: L.Routing.Control = undefined;
   secondRoute?: L.Routing.Control = undefined;
 
-  busMarkers: L.Marker[] = [];
+  busesMarkers: L.Marker[] = [];
+  stopsMarkers: L.Marker[] = [];
   isModalOpen = true;
   busesDetailsLoaded: boolean = false;
 
+  //
+  places: any[] = [];
 
 
   constructor(
@@ -81,6 +89,8 @@ export class Tab2Page implements OnInit {
     try {
       this.map = await this.initializeMap();
       await this.getCurrentPosition();
+      this.addTopBar();
+      this.addTopBarListner();
       this.updateMap();
     } catch (error) {
       console.error('Error initializing map', error);
@@ -164,23 +174,22 @@ export class Tab2Page implements OnInit {
       this.addMarkerAndCircle(currentLatLng);
     });
 
-    this.addTopBar();
+    this.showStops = true;
+    this.showBuses = true;
 
-    //this.addCustomControls();
-    this.addTopBarListner();
     this.addStopsMarkers();
     this.addBusesMarkers();
   }
 
   addTopBar() {
     const TopBarControl = L.Control.extend({
-        onAdd: () => {
-            const topBarDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-            topBarDiv.style.width = '100%'; // Imposta la larghezza al 100%
-            topBarDiv.style.display = 'flex'; // Usa flexbox per allineare il contenuto al centro
-            //topBarDiv.style.marginLeft = "50%"; // Sposta il controllo a sinistra di 100px per centrarlo correttamente
-            topBarDiv.style.border = '0px'; // Aggiungi un bordo al controllo
-            topBarDiv.innerHTML = `
+      onAdd: () => {
+        const topBarDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        topBarDiv.style.width = '100%'; // Imposta la larghezza al 100%
+        topBarDiv.style.display = 'flex'; // Usa flexbox per allineare il contenuto al centro
+        //topBarDiv.style.marginLeft = "50%"; // Sposta il controllo a sinistra di 100px per centrarlo correttamente
+        topBarDiv.style.border = '0px'; // Aggiungi un bordo al controllo
+        topBarDiv.innerHTML = `
                 <div style="display: flex; height: 40px; justify-content: center; align-items: center; border-radius: 10px; width: 100%; background-color: var(--background); margin-top: 10px;">
                     <div style="height: 100%; display: flex; align-items: center; border-right: solid 1px; border-color: var(--ion-color-step-600, #999999);">
                         <button style="margin-left: 10px; padding-right: 7px; background-color: transparent;" onclick="recenterMap()">
@@ -201,43 +210,54 @@ export class Tab2Page implements OnInit {
                 </div>
             `;
 
-            // Modifica lo stile del genitore di topBarDiv
-            const parentDiv = document.querySelector('.leaflet-top.leaflet-right') as HTMLElement;
-            if (parentDiv) {
-              parentDiv.style.left = '0'; // Allinea il controllo a sinistra
-              parentDiv.style.paddingLeft = '6.5%'; // Aggiungi un padding a sinistra
-              parentDiv.style.paddingRight = '2%'; // Aggiungi un padding a destra
-            }
+        // Modifica lo stile del genitore di topBarDiv
+        const parentDiv = document.querySelector('.leaflet-top.leaflet-right') as HTMLElement;
+        if (parentDiv) {
+          parentDiv.style.left = '0'; // Allinea il controllo a sinistra
+          parentDiv.style.paddingLeft = '6.5%'; // Aggiungi un padding a sinistra
+          parentDiv.style.paddingRight = '2%'; // Aggiungi un padding a destra
+        }
 
 
-            return topBarDiv;
-        },
-        onRemove: () => {}
+        return topBarDiv;
+      },
+      onRemove: () => { }
     });
 
     const topBarControl = new TopBarControl({ position: 'topright' });
     topBarControl.addTo(this.map);
-}
+  }
 
 
   addMarkerAndCircle(currentLatLng: L.LatLng) {
 
+    /*
     const myMarker = L.icon({
       iconUrl: 'assets/my-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
       iconSize: [20, 20], // Dimensioni del marker
       iconAnchor: [10, 20], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
     });
+    */
 
     //L.marker(currentLatLng, { icon: myMarker }).addTo(this.map);
 
-    
+
+    //clear marker and circle if exists
+    this.map.eachLayer((layer: any) => {
+      if (layer instanceof L.CircleMarker) {
+        this.map.removeLayer(layer);
+      }
+    });
+
+
+
     const marker = L.circleMarker(currentLatLng, {
       radius: 8,
       color: '#f0bc5e',
       fillColor: '#f0bc5e',
       fillOpacity: 0.6,
     }).addTo(this.map);
-    
+
 
     const circle = L.circle(currentLatLng, {
       radius: this.selectedRadius,
@@ -286,7 +306,9 @@ export class Tab2Page implements OnInit {
       this.cardModal.present();
     }
 
-    (window as any).recenterMap = () => {
+    (window as any).recenterMap = async () => {
+      await this.getCurrentPosition();
+      this.updateMap();
       const currentPosition = this.currentPosition.coords;
       const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
       this.map.flyTo(currentLatLng, this.calculateZoomLevel(this.selectedRadius), {
@@ -296,7 +318,7 @@ export class Tab2Page implements OnInit {
     }
 
     // Function to recenter the map on current position with a specified radius
-    (window as any).updateRadius = (radius: number = this.selectedRadius ) => {
+    (window as any).updateRadius = (radius: number = this.selectedRadius) => {
       this.selectedRadius = radius;
       this.updateRadiusStyle(radius);
 
@@ -337,20 +359,28 @@ export class Tab2Page implements OnInit {
 
   }
 
+  clearStopsMarkers() {
+    this.stopsMarkers.forEach(marker => {
+      this.map.removeLayer(marker);
+    });
+  }
+
   addStopsMarkers() {
+    this.clearStopsMarkers();
+
     this.stopService.getStopsWithinRadius({ latitude: this.currentPosition.coords.latitude, longitude: this.currentPosition.coords.longitude }, this.selectedRadius).subscribe(stops => {
       //stops are order by the server
       this.filteredStops = stops;
 
       this.filteredStops.forEach(stop => {
         const customIcon = L.icon({
-          iconUrl: this.getIconDirectory() +  'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+          iconUrl: this.getIconDirectory() + 'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
           iconSize: [16, 16], // Dimensioni del marker
           iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
           popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
         });
 
-        L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
+        const stopMarker = L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
           //.bindPopup(stop.name)
           .on('click', () => {
             this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
@@ -359,6 +389,7 @@ export class Tab2Page implements OnInit {
             this.centerStopBus(stop);
           })
           .addTo(this.map);
+        this.stopsMarkers.push(stopMarker);
       });
 
     });
@@ -422,6 +453,7 @@ export class Tab2Page implements OnInit {
   addBusesMarkers() {
     //UPDATE BUSES (REMOVE OLD MARKERS AND ADD NEW ONES)
     this.clearBusMarkers();
+    this.buses = [];
     //REMOVE ROUTE IF EXISTS
     if (this.firstRoute || this.secondRoute) {
       this.eraseRoute();
@@ -479,7 +511,7 @@ export class Tab2Page implements OnInit {
             //this.drawRoute(bus);
           })
           .addTo(this.map);
-        this.busMarkers.push(busMarker);
+        this.busesMarkers.push(busMarker);
       });
 
     });
@@ -489,11 +521,11 @@ export class Tab2Page implements OnInit {
   getIconDirectory(): string {
     // Controlla se il tema preferito dall'utente è scuro o chiaro
     const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
+
     // Restituisci il percorso dell'immagine in base al tema
     return isDarkTheme ? 'assets/dark/' : 'assets/light/';
   }
-  
+
 
   navigateToBusDetails(busRouteId: string) {
     this.buses.forEach(bus => {
@@ -508,7 +540,7 @@ export class Tab2Page implements OnInit {
   }
 
   clearBusMarkers() {
-    this.busMarkers.forEach(marker => {
+    this.busesMarkers.forEach(marker => {
       this.map.removeLayer(marker);
     });
   }
@@ -532,16 +564,16 @@ export class Tab2Page implements OnInit {
     console.log("DRAW ROUTE: ", bus);
 
     let stops: any[] = [];
-    if(bus.direction === "forward"){
+    if (bus.direction === "forward") {
       stops = bus.route.stops.forwardStops;
     }
-    else{
+    else {
       stops = bus.route.stops.backStops;
     }
 
     stops.forEach(stop => {
       const customIcon = L.icon({
-        iconUrl: this.getIconDirectory() +  'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
+        iconUrl: this.getIconDirectory() + 'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
         iconSize: [16, 16], // Dimensioni del marker
         iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
         popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
@@ -690,5 +722,41 @@ export class Tab2Page implements OnInit {
   ionViewWillLeave() {
     this.modal.dismiss();
   }
+
+  searchPlaces(event: Event) {
+    const query = (event.target as HTMLInputElement).value;
+    console.log(query);
+    this.searchAddress(query);
+  }
+
+  async searchAddress(query: string) {
+    if (query && query.length > 0) {
+      const results = await provider.search({ query: query });
+      //console.log(results);
+      this.places = results.map(result => {
+        return {
+          name: result.label,
+          lat: result.y,
+          lng: result.x
+        };
+      });
+      console.log(this.places);
+    }
+  }
+
+  changeCurrentPosition(lat: number, lng: number) {
+    this.currentPosition.coords.latitude = lat;
+    this.currentPosition.coords.longitude = lng;
+    this.cardModal.dismiss();
+    this.updateMap();
+  }
+
+  focusInput() {
+    setTimeout(() => {
+      const input = document.querySelector('ion-input') as HTMLIonInputElement;
+      input.setFocus();
+    }, 0); // 500 milliseconds di ritardo per garantire che il modal sia completamente aperto
+  }
+  
 
 }
