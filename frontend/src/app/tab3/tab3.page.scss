@@ -1,23 +1,4 @@
-.icon-center {
-  margin-right: 4px;
-  /* Aggiunge un po' di spazio tra l'icona e il testo */
-}
 
-.label-small {
-  font-size: 17px;
-  /* Imposta la dimensione del testo desiderata */
-}
-
-/*
-ion-list {
-  padding-top: 0;
-}
-*/
-
-ion-item-divider {
-  font-size: 17px;
-  background: var(--ion-border-color);
-}
 
 
 
@@ -31,12 +12,6 @@ ion-toolbar {
   padding-left: 10px;
   padding-right: 10px;
   --border-radius: 20px;
-}
-
-
-ion-item-divider {
-  //color: var(--ion-color-contrast);
-  font-size: 22px;
 }
 
 .loading-overlay {

@@ -151,3 +151,25 @@
   font-size: 20px;
   margin-right: 5px
 }
+
+/* LISTA */
+.icon-center {
+  margin-right: 4px;
+  /* Aggiunge un po' di spazio tra l'icona e il testo */
+}
+
+.label-small {
+  font-size: 17px;
+  /* Imposta la dimensione del testo desiderata */
+}
+
+/*
+ion-list {
+  padding-top: 0;
+}
+*/
+
+ion-item-divider {
+  font-size: 22px;
+  background: var(--ion-border-color);
+}

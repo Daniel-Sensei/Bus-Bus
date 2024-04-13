@@ -1,7 +1,6 @@
 <ion-content [fullscreen]="true">
   <ion-toolbar>
-    <ion-searchbar class="search-bar" slot="start" (click)="openSearchModal()"
-      placeholder="Cerca sulla mappa">
+    <ion-searchbar class="search-bar" slot="start" (click)="openSearchModal()" placeholder="Cerca sulla mappa">
     </ion-searchbar>
   </ion-toolbar>
 
@@ -13,7 +12,8 @@
       <div class="card-modal-header">
         <ion-buttons slot="end">
           <ion-icon aria-hidden="true" (click)="cardModal.dismiss()" name="chevron-back-outline"></ion-icon>
-          <ion-input placeholder="Cerca sulla mappa" (ionChange)="searchPlaces($event)" style="width: 100%;"></ion-input>
+          <ion-input placeholder="Cerca sulla mappa" (ionChange)="searchPlaces($event)"
+            style="width: 100%;"></ion-input>
         </ion-buttons>
       </div>
       <ion-content>
@@ -28,9 +28,67 @@
               <!--<p>via della Resistenza, 132, Rende</p>-->
             </ion-label>
           </ion-item>
-      
+
         </ion-list>
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <ion-list lines="full">
+
+    <ion-item-group>
+
+      <ion-item-divider>
+        <ion-label>Linee Preferite</ion-label>
+      </ion-item-divider>
+
+      <div>
+        <ion-item slot="header">
+          <ion-badge slot="start" class="bus-badge" style="margin-top: 10px; margin-bottom: 10px;">
+            <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+            136 Consorzio Autolinee Conseza
+          </ion-badge>
+        </ion-item>
+        <ion-item slot="header">
+          <ion-badge slot="start" class="bus-badge" style="margin-top: 10px; margin-bottom: 10px;">
+            <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+            136 Consorzio Autolinee Conseza
+          </ion-badge>
+        </ion-item>
+        <ion-item slot="header">
+          <ion-badge slot="start" class="bus-badge" style="margin-top: 10px; margin-bottom: 10px;">
+            <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+            136 Consorzio Autolinee Conseza
+          </ion-badge>
+        </ion-item>
+      </div>
+
+      <ion-item-divider>
+        <ion-label>Fermate Preferite</ion-label>
+      </ion-item-divider>
+
+      <div>
+        <ion-item slot="header">
+          <ion-avatar slot="start">
+            <ion-img src="../../assets/bus-stop-round.png"></ion-img>
+          </ion-avatar>
+          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">Loc. Magolà</ion-label>
+        </ion-item>
+      </div>
+
+      <ion-item-divider>
+        <ion-label>Ricerche Recenti</ion-label>
+      </ion-item-divider>
+
+      <div>
+        <ion-item slot="header">
+          <ion-avatar slot="start">
+            <ion-img src="../../assets/marker-round.png"></ion-img>
+          </ion-avatar>
+          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">Consorzio</ion-label>
+        </ion-item>
+      </div>
+
+    </ion-item-group>
+  </ion-list>
 </ion-content>

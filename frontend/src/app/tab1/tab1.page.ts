@@ -63,4 +63,12 @@ export class Tab1Page {
       console.log(this.places);
     }
   }
+
+  getIconDirectory(): string {
+    // Controlla se il tema preferito dall'utente è scuro o chiaro
+    const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Restituisci il percorso dell'immagine in base al tema
+    return isDarkTheme ? 'assets/dark/' : 'assets/light/';
+  }
 }

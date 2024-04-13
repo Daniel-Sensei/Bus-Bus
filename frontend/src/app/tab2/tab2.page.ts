@@ -93,7 +93,15 @@ export class Tab2Page implements OnInit {
   async initializeDefaultMap() {
     try {
       this.map = await this.initializeMap();
-      await this.getCurrentPosition();
+
+      let position = this.positionService.getCurrentPosition();
+      if(position.coords.latitude == 0 && position.coords.longitude == 0){
+        await this.getCurrentPosition();
+      }
+      else{
+        this.currentPosition = position;
+      }
+      
       this.addTopBar();
       this.addTopBarListner();
       this.updateMap();
@@ -146,13 +154,7 @@ export class Tab2Page implements OnInit {
         enableHighAccuracy: true
       };
 
-      let position = this.positionService.getCurrentPosition();
-      if(position.coords.latitude == 0 && position.coords.longitude == 0){
       this.currentPosition = await Geolocation.getCurrentPosition(options);
-      }
-      else{
-        this.currentPosition = position;
-      }
     } catch (error) {
       console.error('Error getting current position', error);
       console.log("DEFAULT POSITION");
