@@ -4,6 +4,8 @@ import { Stop } from '../model/Stop';
 import { IonModal } from '@ionic/angular';
 import { StopService } from '../service/stop.service';
 
+import { PreferencesService } from '../service/preferences.service';
+
 @Component({
   selector: 'app-stop-details',
   templateUrl: './stop-details.page.html',
@@ -19,10 +21,17 @@ export class StopDetailsPage implements OnInit {
   accordionOpen: boolean = false;
   favourite = false;
 
-  constructor(private stopService: StopService) { }
+  constructor(private stopService: StopService, private preferencesService: PreferencesService) { }
 
   ngOnInit() {
     console.log('ngOnInit of the stop details page', this.stop?.name);
+    this.checkFavourite();
+  }
+
+  checkFavourite() {
+    this.preferencesService.getFavorites('favouriteStops').then(stops => {
+      this.favourite = stops.includes((this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    });
   }
 
   ionViewWillEnter() {
@@ -41,5 +50,11 @@ export class StopDetailsPage implements OnInit {
 
   addFavourite(add: boolean) {
     this.favourite = add;
+    if(add){
+    this.preferencesService.addToFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    }
+    else{
+      this.preferencesService.removeFromFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    }
   }
 }

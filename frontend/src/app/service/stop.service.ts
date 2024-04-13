@@ -12,6 +12,10 @@ export class StopService {
 
   constructor(private http: HttpClient) { }
 
+  getStop(id: string): Observable<any> {
+    return this.http.get(environment.API_URL + 'stop?id=' + id);
+  }
+
   getStopsWithinRadius(coords: {latitude: number, longitude: number}, radius: number): Observable<any> {
     return this.http.get(environment.API_URL + 'stopsWithinRadius?latitude=' + coords.latitude + '&longitude=' + coords.longitude + '&radius=' + radius);
   }

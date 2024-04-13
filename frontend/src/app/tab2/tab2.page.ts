@@ -21,6 +21,7 @@ import { RouteService } from '../service/route.service';
 import { StopService } from '../service/stop.service';
 
 import { PositionService } from '../service/position.service';
+import { PreferencesService } from '../service/preferences.service';
 
 @Component({
   selector: 'app-tab2',
@@ -59,13 +60,15 @@ export class Tab2Page implements OnInit {
   //
   places: any[] = [];
   isComponentLoaded: boolean = false;
+  drawMarker: boolean = true;
 
 
   constructor(
     private busService: BusService,
     private routeService: RouteService,
     private stopService: StopService,
-    private positionService: PositionService
+    private positionService: PositionService,
+    private preferencesService: PreferencesService
   ) { }
 
   setOpen(isOpen: boolean) {
@@ -95,13 +98,17 @@ export class Tab2Page implements OnInit {
       this.map = await this.initializeMap();
 
       let position = this.positionService.getCurrentPosition();
-      if(position.coords.latitude == 0 && position.coords.longitude == 0){
+      console.log("POSITION: ", position);
+      if (position.coords.latitude == 0 && position.coords.longitude == 0) {
+        console.log("POSITION NOT SET");
         await this.getCurrentPosition();
       }
-      else{
+      else {
+        console.log("POSITION SET");
         this.currentPosition = position;
+        this.drawMarker = false;
       }
-      
+
       this.addTopBar();
       this.addTopBarListner();
       this.updateMap();
@@ -177,9 +184,7 @@ export class Tab2Page implements OnInit {
 
   updateMap() {
     const currentPosition = this.currentPosition.coords;
-    console.log("CURRENT POSITION: ", currentPosition);
     const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
-    console.log("CURRENT LATLNG: ", currentLatLng);
 
     this.map.flyTo(currentLatLng, 14, {
       duration: 1.5,
@@ -266,14 +271,14 @@ export class Tab2Page implements OnInit {
     });
 
 
-
-    const marker = L.circleMarker(currentLatLng, {
-      radius: 8,
-      color: '#f0bc5e',
-      fillColor: '#f0bc5e',
-      fillOpacity: 0.6,
-    }).addTo(this.map);
-
+    if (this.drawMarker) {
+      const marker = L.circleMarker(currentLatLng, {
+        radius: 8,
+        color: '#f0bc5e',
+        fillColor: '#f0bc5e',
+        fillOpacity: 0.6,
+      }).addTo(this.map);
+    }
 
     const circle = L.circle(currentLatLng, {
       radius: this.selectedRadius,
@@ -281,6 +286,7 @@ export class Tab2Page implements OnInit {
       fillColor: '#f0bc5e',
       fillOpacity: 0.2,
     }).addTo(this.map);
+
   }
 
   addCustomControls() {
@@ -324,6 +330,7 @@ export class Tab2Page implements OnInit {
 
     (window as any).recenterMap = async () => {
       await this.getCurrentPosition();
+      this.drawMarker = true;
       this.updateMap();
       const currentPosition = this.currentPosition.coords;
       const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
@@ -732,16 +739,18 @@ export class Tab2Page implements OnInit {
   }
 
   ionViewWillEnter() {
+    console.log("ION WILL ENTER");
     this.modal.present();
   }
 
   ionViewDidEnter() {
     console.log("ION DID ENTER");
     let position = this.positionService.getCurrentPosition();
-    if(position.coords.latitude != 0 && position.coords.longitude != 0){
+    if (position.coords.latitude != 0 && position.coords.longitude != 0) {
       //aspetta che il componente sia caricato al 100%
       setTimeout(() => {
         this.currentPosition = position;
+        this.drawMarker = false;
         this.updateMap();
       }, 1000);
 
@@ -773,10 +782,15 @@ export class Tab2Page implements OnInit {
     }
   }
 
-  changeCurrentPosition(lat: number, lng: number) {
+  changeCurrentPosition(name: string, lat: number, lng: number) {
+    if (name != '') {
+      this.preferencesService.addToFavorites('recentSearches', lat + ',' + lng + '_' + name);
+    }
+
     this.currentPosition.coords.latitude = lat;
     this.currentPosition.coords.longitude = lng;
     this.cardModal.dismiss();
+    this.drawMarker = false;
     this.updateMap();
   }
 
@@ -786,6 +800,6 @@ export class Tab2Page implements OnInit {
       input.setFocus();
     }, 0); // 500 milliseconds di ritardo per garantire che il modal sia completamente aperto
   }
-  
+
 
 }

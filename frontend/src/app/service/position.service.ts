@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Position } from '@capacitor/geolocation';
 
+import { StopService } from './stop.service';
+import { Stop } from '../model/Stop';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,7 +21,7 @@ export class PositionService {
     timestamp: 0
   }
 
-  constructor() { }
+  constructor(private stopService: StopService) { }
 
   setCurrentPosition(lat: number, lng: number) {
     this.currentPosition.coords.latitude = lat;
@@ -27,6 +30,7 @@ export class PositionService {
 
   getCurrentPosition() {
     const position = this.currentPosition;
+    console.log('Current position:', position);
     this.clearCurrentPosition();
     return position;
   }
@@ -45,4 +49,15 @@ export class PositionService {
       timestamp: 0
     };
   }
+
+  async setCurrentPositionFromStopId(stopId: string) {
+    try {
+      const stop: Stop = await this.stopService.getStop(stopId).toPromise();
+      console.log('Setting current position to', stop.coords.latitude, stop.coords.longitude);
+      this.setCurrentPosition(stop.coords.latitude, stop.coords.longitude);
+    } catch (error) {
+      console.error('Error while setting current position from stop id:', error);
+    }
+  }
+  
 }

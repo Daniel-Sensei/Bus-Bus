@@ -81,7 +81,7 @@
       <ion-content>
         <ion-list>
 
-          <ion-item *ngFor="let place of places" (click)="changeCurrentPosition(place.lat, place.lng)">
+          <ion-item *ngFor="let place of places" (click)="changeCurrentPosition(place.name, place.lat, place.lng)">
             <ion-avatar slot="start">
               <ion-img src="../../assets/marker-round.png"></ion-img>
             </ion-avatar>

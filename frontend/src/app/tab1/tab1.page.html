@@ -19,7 +19,7 @@
       <ion-content>
         <ion-list>
 
-          <ion-item *ngFor="let place of places" (click)="changeCurrentPosition(place.lat, place.lng)">
+          <ion-item *ngFor="let place of places" (click)="changeCurrentPosition(place.name, place.lat, place.lng)">
             <ion-avatar slot="start">
               <ion-img src="../../assets/marker-round.png"></ion-img>
             </ion-avatar>
@@ -68,11 +68,11 @@
       </ion-item-divider>
 
       <div>
-        <ion-item slot="header">
+        <ion-item slot="header" *ngFor="let stop of favouriteStops" (click)="setStopPosition(stop.split('_')[0])">
           <ion-avatar slot="start">
             <ion-img src="../../assets/bus-stop-round.png"></ion-img>
           </ion-avatar>
-          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">Loc. Magolà</ion-label>
+          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">{{stop.split('_')[1]}}</ion-label>
         </ion-item>
       </div>
 
@@ -81,11 +81,11 @@
       </ion-item-divider>
 
       <div>
-        <ion-item slot="header">
+        <ion-item slot="header" *ngFor="let place of recentSearches" (click)="changeCurrentPosition('', place.split('_')[0].split(',')[0], place.split('_')[0].split(',')[1])">
           <ion-avatar slot="start">
             <ion-img src="../../assets/marker-round.png"></ion-img>
           </ion-avatar>
-          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">Consorzio</ion-label>
+          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">{{place.split('_')[1]}}</ion-label>
         </ion-item>
       </div>
 
