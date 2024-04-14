@@ -17,6 +17,15 @@ public class Route {
     private ForwardBackStops stops;
     private Schedule timetable;
     private Map<String, Schedule> history;
+    private Schedule delays;
+
+    public Schedule getDelays() {
+        return delays;
+    }
+
+    public void setDelays(Schedule delays) {
+        this.delays = delays;
+    }
 
     public Route() {
     }

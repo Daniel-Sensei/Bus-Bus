@@ -3,7 +3,6 @@ package com.example.busbus_backend.controller.api;
 import com.example.busbus_backend.persistence.model.Route;
 import com.example.busbus_backend.persistence.model.Schedule;
 import com.example.busbus_backend.persistence.model.Stop;
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -164,7 +163,12 @@ public class StopService {
                                 }
                             }
 
-                            Schedule schedule = route.getTimetable();
+                            Schedule schedule = route.getDelays();
+                            if(!checkDelaysIntegrity(schedule)) {
+                                System.out.println("Delays are NOT ok");
+                                schedule = route.getTimetable();
+                            }
+                            //schedule = route.getTimetable();
 
                             List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
                             List<String> back =schedule.getBack().get(String.valueOf(indexBack));
@@ -201,6 +205,28 @@ public class StopService {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean checkDelaysIntegrity(Schedule delays) {
+        //check if there are null values in the delays
+        for (Map.Entry<String, List<String>> entry : delays.getForward().entrySet()) {
+            for (String time : entry.getValue()) {
+                if (time == null) {
+                    return false;
+                }
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry : delays.getBack().entrySet()) {
+            for (String time : entry.getValue()) {
+                if (time == null) {
+                    return false;
+                }
+            }
+        }
+
+        System.out.println("Delays are ok");
+        return true;
     }
 
     private String getCurrentDate() {
