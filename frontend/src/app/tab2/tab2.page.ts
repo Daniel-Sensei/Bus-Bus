@@ -61,6 +61,7 @@ export class Tab2Page implements OnInit {
   places: any[] = [];
   isComponentLoaded: boolean = false;
   drawMarker: boolean = true;
+  onInit: boolean = false;
 
 
   constructor(
@@ -84,6 +85,8 @@ export class Tab2Page implements OnInit {
     await this.initializeDefaultMap();
 
     this.addModalListeners();
+
+    this.onInit = true;
   }
 
   addModalListeners() {
@@ -745,15 +748,16 @@ export class Tab2Page implements OnInit {
 
   ionViewDidEnter() {
     console.log("ION DID ENTER");
-    let position = this.positionService.getCurrentPosition();
-    if (position.coords.latitude != 0 && position.coords.longitude != 0) {
-      //aspetta che il componente sia caricato al 100%
-      setTimeout(() => {
-        this.currentPosition = position;
-        this.drawMarker = false;
-        this.updateMap();
-      }, 1000);
-
+    if (this.onInit) {
+      let position = this.positionService.getCurrentPosition();
+      if (position.coords.latitude != 0 && position.coords.longitude != 0) {
+        //aspetta che il componente sia caricato al 100%
+        setTimeout(() => {
+          this.currentPosition = position;
+          this.drawMarker = false;
+          this.updateMap();
+        }, 1000);
+      }
     }
   }
 
