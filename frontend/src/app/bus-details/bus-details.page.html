@@ -43,9 +43,9 @@
 
 
                 <ion-icon *ngIf="bus.lastStop >= i" style="font-size: 18px; margin-right: 15px;" color="primary"
-                  name="ellipse"></ion-icon>
+                  name="ellipse" slot="start"></ion-icon>
                 <ion-icon *ngIf="bus.lastStop < i" style="font-size: 18px; margin-right: 15px;" color="primary"
-                  name="ellipse-outline"></ion-icon>
+                  name="ellipse-outline" slot="start"></ion-icon>
 
                 <div style="margin-left: 10px; padding-top: 10px; padding-bottom: 10px;">
                   <div *ngIf="stop?.address != stop?.name; else elseBlock">
@@ -69,7 +69,7 @@
                   <ion-label style="font-size: 20px;" class="bold"> 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12</ion-label>
                 </div>
                 <ng-template #nextArrival>
-                  <ion-label style="font-size: 16px;">Prossimi Arrivi Previsti:</ion-label><br>
+                  <ion-label style="font-size: 18px;">Prossimi Arrivi Previsti:</ion-label><br>
                   <ion-label style="font-size: 20px;" class="bold"> 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12</ion-label>
                 </ng-template>
 

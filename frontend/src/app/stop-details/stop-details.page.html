@@ -29,8 +29,8 @@
 </ion-item>
 
 <ion-accordion-group>
-  <ion-accordion value="first" (click)="resizeModal()">
-    <ion-item slot="header" style="margin-right: 10px;">
+  <ion-accordion value="first">
+    <ion-item (click)="resizeModal()" slot="header" style="margin-right: 10px;">
       <ion-icon slot="start" aria-hidden="true" name="time-outline" class="icon" size="large"></ion-icon>
       <ion-label class="label">
         <div class="bold">Bus in arrivo</div>
