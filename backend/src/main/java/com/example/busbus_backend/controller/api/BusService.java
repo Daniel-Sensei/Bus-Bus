@@ -204,9 +204,9 @@ public class BusService {
 
                         for (Map.Entry<String, List<String>> entry : timetable.entrySet()) {
                             List<String> times = entry.getValue();
-                            String stopName = direction.equals("forward") ? stops.getForwardStops().get(Integer.parseInt(entry.getKey())).getName() : stops.getBackStops().get(Integer.parseInt(entry.getKey())).getName();
+                            String stopId = direction.equals("forward") ? stops.getForwardStops().get(Integer.parseInt(entry.getKey())).getId() : stops.getBackStops().get(Integer.parseInt(entry.getKey())).getId();
 
-                            nextArrivals.put(stopName, times);
+                            nextArrivals.put(stopId, times);
                         }
                     }
                 }
