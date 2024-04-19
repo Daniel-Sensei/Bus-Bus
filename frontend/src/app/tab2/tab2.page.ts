@@ -476,6 +476,21 @@ export class Tab2Page implements OnInit {
     }
   }
 
+  getAvgBusDelay(busId: string, direction: string){
+    this.busService.getAvgDelayByBusAndDirection(busId, direction).then((response) => {
+      console.log(response);
+      if(response > 0){
+        return ("+" + response + " min");
+      }
+      else{
+        return ("-" + response + " min");
+      }
+    }, (error) => {
+      console.error("Error getting average delay: ", error);
+      return "N/A";
+    });
+  }
+
   addBusesMarkers() {
     //UPDATE BUSES (REMOVE OLD MARKERS AND ADD NEW ONES)
     this.clearBusMarkers();
@@ -507,6 +522,17 @@ export class Tab2Page implements OnInit {
               if (cont == this.buses.length) {
                 this.busesDetailsLoaded = true;
                 console.log("ROUTES LOADED");
+              }
+            });
+          }
+          if (bus.delay == undefined) {
+            this.busService.getCurrentDelayByBusAndDirection(bus.id, bus.direction).then((response) => {
+              console.log("Delay di " + bus.id + ": " + response)
+              if(response >= 0){
+                bus.delay = "+" + response + " min";
+              }
+              else{
+                bus.delay = response + " min";
               }
             });
           }

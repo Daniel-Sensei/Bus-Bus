@@ -11,4 +11,6 @@ export interface Bus {
     //nextStops: Stop[];
     lastStop: number;
     direction: string;
+
+    delay?: string;
 }

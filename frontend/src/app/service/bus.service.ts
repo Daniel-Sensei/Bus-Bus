@@ -122,6 +122,24 @@ export class BusService {
       throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
     }
   }
+
+  public getAvgDelayByBusAndDirection(busId: string, direction: string): Promise<any> {
+    try {
+      return this.http.get(environment.API_URL + 'avg-bus-delay?busId=' + busId + '&direction=' + direction).toPromise();
+    } catch (error) {
+      console.error("Errore durante la chiamata HTTP:", error);
+      throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
+    }
+  }
+
+  public getCurrentDelayByBusAndDirection(busId: string, direction: string): Promise<any> {
+    try {
+      return this.http.get(environment.API_URL + 'current-bus-delay?busId=' + busId + '&direction=' + direction).toPromise();
+    } catch (error) {
+      console.error("Errore durante la chiamata HTTP:", error);
+      throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
+    }
+  }
   
 
 
