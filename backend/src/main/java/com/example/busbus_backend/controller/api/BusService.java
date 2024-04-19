@@ -6,6 +6,7 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import org.apache.coyote.Response;
 import org.springframework.web.bind.annotation.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -684,6 +685,67 @@ public class BusService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/avg-bus-delay")
+    public ResponseEntity<Integer> getAvgBusDetails(@RequestParam String busCode, @RequestParam String direction){
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference buses = db.collection(BUSES_COLLECTION);
+        CollectionReference routes = db.collection(ROUTES_COLLECTION);
+
+        try {
+            Query query = buses.whereEqualTo("code", busCode);
+            QuerySnapshot querySnapshot = query.get().get();
+            if (querySnapshot.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            DocumentSnapshot busDocument = querySnapshot.getDocuments().get(0);
+            DocumentReference routeRef = (DocumentReference) busDocument.get("route");
+            DocumentSnapshot routeDocument = routeRef.get().get();
+            Route route = routeDocument.toObject(Route.class);
+            Schedule delays = route.getDelays();
+            if(!checkDelaysIntegrity(delays)){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            //calcola la media dei ritardi
+            //la media è fatta comparando orario per orario tra "delays" e "timetable"
+            Schedule timetable = route.getTimetable();
+            Map<String, List<String>> timetableDirection = direction.equals("forward") ? timetable.getForward() : timetable.getBack();
+            Map<String, List<String>> delaysDirection = direction.equals("forward") ? delays.getForward() : delays.getBack();
+
+            int totalDelay = 0;
+            int numDelays = 0;
+            for (Map.Entry<String, List<String>> entry : timetableDirection.entrySet()) {
+                List<String> timetableTimes = entry.getValue();
+                List<String> delaysTimes = delaysDirection.get(entry.getKey());
+                for(int i = 0; i < timetableTimes.size(); i++){
+                    if(delaysTimes.get(i) != null && !delaysTimes.get(i).equals("-")){
+                        System.out.println("timetableTimes.get(i): " + timetableTimes.get(i));
+                        System.out.println("delaysTimes.get(i): " + delaysTimes.get(i));
+                        totalDelay += getDelay(timetableTimes.get(i), delaysTimes.get(i));
+                        numDelays++;
+                    }
+                }
+            }
+
+            int avgDelay = numDelays > 0 ? totalDelay / numDelays : 0;
+            return new ResponseEntity<>(avgDelay, HttpStatus.OK);
+
+
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private int getDelay(String timetableTime, String delayTime){
+        String[] timetableParts = timetableTime.split(":");
+        String[] delayParts = delayTime.split(":");
+        int timetableMinutes = Integer.parseInt(timetableParts[0]) * 60 + Integer.parseInt(timetableParts[1]);
+        int delayMinutes = Integer.parseInt(delayParts[0]) * 60 + Integer.parseInt(delayParts[1]);
+        System.out.println("diff: " + (delayMinutes - timetableMinutes));
+        return delayMinutes - timetableMinutes;
     }
 
     // Restituisce la data odierna nel formato "dd-MM-yyyy"
