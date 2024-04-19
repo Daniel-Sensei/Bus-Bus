@@ -688,18 +688,15 @@ public class BusService {
     }
 
     @GetMapping("/avg-bus-delay")
-    public ResponseEntity<Integer> getAvgBusDetails(@RequestParam String busCode, @RequestParam String direction){
+    public ResponseEntity<Integer> getAvgBusDetails(@RequestParam String busId, @RequestParam String direction){
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference buses = db.collection(BUSES_COLLECTION);
         CollectionReference routes = db.collection(ROUTES_COLLECTION);
 
         try {
-            Query query = buses.whereEqualTo("code", busCode);
-            QuerySnapshot querySnapshot = query.get().get();
-            if (querySnapshot.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            DocumentSnapshot busDocument = querySnapshot.getDocuments().get(0);
+            //get the bus document
+            DocumentSnapshot busDocument = getDocumentById(buses, busId);
+
             DocumentReference routeRef = (DocumentReference) busDocument.get("route");
             DocumentSnapshot routeDocument = routeRef.get().get();
             Route route = routeDocument.toObject(Route.class);
