@@ -736,12 +736,62 @@ public class BusService {
         }
     }
 
+    @GetMapping("/current-bus-delay")
+    public ResponseEntity<Integer> getCurrentDelay(@RequestParam String busId, @RequestParam String direction){
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference buses = db.collection(BUSES_COLLECTION);
+        CollectionReference routes = db.collection(ROUTES_COLLECTION);
+
+        try {
+            //get the bus document
+            DocumentSnapshot busDocument = getDocumentById(buses, busId);
+
+            DocumentReference routeRef = (DocumentReference) busDocument.get("route");
+            DocumentSnapshot routeDocument = routeRef.get().get();
+            Route route = routeDocument.toObject(Route.class);
+
+            //calcola il ritardo attuale
+            //il ritardo attuale è calcolato confrontando l'orario attuale con l'orario del timetable
+            Schedule timetable = route.getTimetable();
+            Map<String, List<String>> timetableDirection = direction.equals("forward") ? timetable.getForward() : timetable.getBack();
+
+            Map<String, Schedule> history = route.getHistory();
+            // Verificare se l'oggetto history esiste
+            if (history != null) {
+                // Ottenere l'oggetto Data per la data odierna
+                String today = getCurrentDate();
+                Schedule todayData = history.get(today);
+
+                // Verificare se l'oggetto Data per la data odierna esiste
+                if (todayData != null) {
+                    // Ottenere l'oggetto Timetable per la direzione specificata (forward o back)
+                    Map<String, List<String>> day = direction.equals("forward") ? todayData.getForward() : todayData.getBack();
+
+                    int numCols = day.get("0").size();
+
+                    for (int i = numCols - 1; i >= 0; i--) {
+                        for (int j = day.size() - 1; j >= 0; j--) {
+                            if(day.get(String.valueOf(j)).get(i) != null && !day.get(String.valueOf(j)).get(i).equals("-")){
+                                return new ResponseEntity<>(getDelay(timetableDirection.get(String.valueOf(j)).get(i), day.get(String.valueOf(j)).get(i)), HttpStatus.OK);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            //int avgDelay = numDelays > 0 ? totalDelay / numDelays : 0;
+            return new ResponseEntity<>(0, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private int getDelay(String timetableTime, String delayTime){
         String[] timetableParts = timetableTime.split(":");
         String[] delayParts = delayTime.split(":");
         int timetableMinutes = Integer.parseInt(timetableParts[0]) * 60 + Integer.parseInt(timetableParts[1]);
         int delayMinutes = Integer.parseInt(delayParts[0]) * 60 + Integer.parseInt(delayParts[1]);
-        System.out.println("diff: " + (delayMinutes - timetableMinutes));
         return delayMinutes - timetableMinutes;
     }
 
