@@ -58,19 +58,19 @@
                 </div>
               </ion-item>
 
-              <div slot="content" class="accordation-details">
+              <div slot="content" class="accordation-details" *ngIf="arrivals != null">
 
                 <div *ngIf="bus.lastStop < i; else nextArrival">
                   <ion-label style="font-size: 18px;">Arrivo Previsto:</ion-label><ion-label style="font-size: 22px;"
-                    class="bold"> 12:12</ion-label><br>
-                  <ion-label style="font-size: 18px;">Ritardo:</ion-label><ion-label style="font-size: 22px;"
-                    class="bold"> +5 min</ion-label><br><br>
+                    class="bold"> {{getNextArrivalByStop(stop.id)}}</ion-label><br>
+                  <!--<ion-label style="font-size: 18px;">Ritardo:</ion-label><ion-label style="font-size: 22px;"
+                    class="bold"> +5 min</ion-label>--><br>
                   <ion-label style="font-size: 16px;">Prossimi Arrivi Previsti:</ion-label><br>
-                  <ion-label style="font-size: 20px;" class="bold"> 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12</ion-label>
+                  <ion-label style="font-size: 20px;" class="bold"> {{getNextArrivalsByStopMinusFirst(stop.id)}}</ion-label>
                 </div>
                 <ng-template #nextArrival>
                   <ion-label style="font-size: 18px;">Prossimi Arrivi Previsti:</ion-label><br>
-                  <ion-label style="font-size: 20px;" class="bold"> 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12 - 12:12</ion-label>
+                  <ion-label style="font-size: 20px;" class="bold"> {{getNextArrivalsByStop(stop.id)}}</ion-label>
                 </ng-template>
 
               </div>

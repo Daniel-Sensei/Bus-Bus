@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Bus } from '../model/Bus';
-import { Settings } from '../Settings';
 import { collection } from '@firebase/firestore';
 import { Firestore, collectionData } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
@@ -10,7 +9,9 @@ import { map } from 'rxjs/operators';
 import { getDatabase, ref, get } from 'firebase/database';
 import { Subject } from 'rxjs';
 import { onValue } from 'firebase/database';
-import {  Position } from '@capacitor/geolocation';
+import { Position } from '@capacitor/geolocation';
+import { environment } from 'src/environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -110,6 +111,16 @@ export class BusService {
     });
   
     return subject.asObservable();
+  }
+
+  public async getArrivalsByBusAndDirection(busId: string, direction: string): Promise<any> {
+    try {
+      const response = await this.http.get(environment.API_URL + 'next-arrivals-by-bus-direction?busId=' + busId + '&direction=' + direction).toPromise();
+      return response;
+    } catch (error) {
+      console.error("Errore durante la chiamata HTTP:", error);
+      throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
+    }
   }
   
 

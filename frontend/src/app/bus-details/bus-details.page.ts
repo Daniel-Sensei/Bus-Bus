@@ -14,6 +14,7 @@ export class BusDetailsPage implements OnInit {
   accordionOpen: boolean = false;
   favourite = false;
   destination: string = "";
+  arrivals: any;
 
   constructor(private busService: BusService) { }
 
@@ -39,6 +40,38 @@ export class BusDetailsPage implements OnInit {
     return destination;
   }
 
+  getNextArrivalByStop(stopId: string) {
+    //find the stopId as a key in the arrivals map
+    //the value of the key is an array of arrival times
+    //return the first element of the array
+    let arrival = this.arrivals[stopId];
+    if(arrival){
+      return arrival[0];
+    }
+  }
+
+  getNextArrivalsByStop(stopId: string) {
+    //find the stopId as a key in the arrivals map
+    //the value of the key is an array of arrival times
+    //return all the element joined by a " - "
+    let arrival = this.arrivals[stopId];
+    if(arrival){
+      return arrival.join(" - ");
+    }
+  }
+
+  getNextArrivalsByStopMinusFirst(stopId: string) {
+    //find the stopId as a key in the arrivals map
+    //the value of the key is an array of arrival times
+    //return all the element joined by a " - ", excluding the first element
+    //dont use shift() because it modifies the original array
+    let arrival = this.arrivals[stopId];
+    if(arrival){
+      let newArrival = arrival.slice(1);
+      return newArrival.join(" - ");
+    }
+  }
+
   getStopsAndDestination(){
     if(this.bus.direction === "back"){
       this.stops = Object.values(this.bus.route.stops.backStops);
@@ -49,17 +82,24 @@ export class BusDetailsPage implements OnInit {
       this.destination = this.getDestination();
     }
   }
+  
+  async getArrivals(){
+    this.arrivals = await this.busService.getArrivalsByBusAndDirection(this.bus.id, this.bus.direction);
+  }
 
-  ngOnInit() {
+  async ngOnInit() {
     console.log("ON INIT BUS: ", this.bus);
     this.getStopsAndDestination();
+    await this.getArrivals();
+    console.log("arrivals= ", this.arrivals);
     console.log("stops= ", this.stops);
 
-    this.busService.getBusFromRealtimeDatabase(this.bus.id).subscribe((bus) => {
+    this.busService.getBusFromRealtimeDatabase(this.bus.id).subscribe(async (bus) => {
       //console.log("Bus updated: ", bus);
       if(this.bus.direction !== bus.direction){
         this.bus.direction = bus.direction;
         this.getStopsAndDestination();
+        await this.getArrivals();
         console.log("Bus updated: ", this.bus);
       }
       if(this.bus.lastStop !== bus.lastStop){
