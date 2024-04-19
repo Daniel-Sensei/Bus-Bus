@@ -142,6 +142,13 @@ public class StopService {
                         // Ottenere l'oggetto Data per la data odierna
                         String today = getCurrentDate();
                         Schedule todayData = history.get(today);
+
+                        Schedule schedule = route.getDelays();
+                        if(!checkDelaysIntegrity(schedule)) {
+                            System.out.println("Delays are NOT ok");
+                            schedule = route.getTimetable();
+                        }
+
                         if (todayData != null) {
                             // Ottenere la lista di orari per la fermata
                             List<String> forwardDay = todayData.getForward().get(String.valueOf(indexForward));
@@ -163,11 +170,6 @@ public class StopService {
                                 }
                             }
 
-                            Schedule schedule = route.getDelays();
-                            if(!checkDelaysIntegrity(schedule)) {
-                                System.out.println("Delays are NOT ok");
-                                schedule = route.getTimetable();
-                            }
                             //schedule = route.getTimetable();
 
                             List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
@@ -179,12 +181,12 @@ public class StopService {
                                 //esempio: "A-B" diventa "B-A"
                                 //la destinazione potrebbe avere più di un "-"
                                 //quindi prendi la''ray splittato e ordina al contrario tutto
-                                String[] destinationArray = destination.split("-");
+                                String[] destinationArray = destination.split(" - ");
                                 String invertedDestination = "";
                                 for (int i = destinationArray.length - 1; i >= 0; i--) {
-                                    invertedDestination += destinationArray[i] + "-";
+                                    invertedDestination += destinationArray[i] + " - ";
                                 }
-                                invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 1);
+                                invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 3);
 
                                 nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward.subList(startIndexForward, forward.size()));
                                 nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back.subList(startIndexBack, back.size()));
@@ -193,7 +195,36 @@ public class StopService {
                             }
 
                         }
+                        else{
+                            //se la giornata attuale nella history è vuota allora prendi tutti gli orari di forward e back
+                            //dalla timetable senza considerare gli indici
+
+                            //schedule = route.getTimetable();
+
+                            List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
+                            List<String> back =schedule.getBack().get(String.valueOf(indexBack));
+
+                            //riempie la mappa nextBuses con gli orari di forward e back
+                            //inverti la destinazione se la lista di back non è vuota
+
+                            if(back != null) {
+                                String destination = route.getCode().split("_")[1];
+                                String[] destinationArray = destination.split(" - ");
+                                String invertedDestination = "";
+                                for (int i = destinationArray.length - 1; i >= 0; i--) {
+                                    invertedDestination += destinationArray[i] + " - ";
+                                }
+                                invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 3);
+
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward);
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back);
+                            } else {
+                                nextBuses.put(route.getCode(), forward);
+                            }
+
+                        }
                     }
+
 
                 }
 

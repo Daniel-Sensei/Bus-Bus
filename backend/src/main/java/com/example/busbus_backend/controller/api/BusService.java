@@ -151,6 +151,97 @@ public class BusService {
         }
     }
 
+    @GetMapping("/next-arrivals-by-bus-direction")
+    public ResponseEntity<Map<String, List<String>>> getNextArrivalsByBus(@RequestParam String busId, @RequestParam String direction){
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference buses = db.collection(BUSES_COLLECTION);
+
+        try {
+            DocumentSnapshot document = getDocumentById(buses, busId);
+            if (document.exists()) {
+                DocumentReference routeRef = (DocumentReference) document.get("route");
+                //get document of route
+                DocumentSnapshot routeDocument = routeRef.get().get();
+                Route route = routeDocument.toObject(Route.class);
+                // get forward and back stops of route
+                ForwardBackStops stops = route.buildStopOutboundReturn(routeDocument);
+                //route.setStops(stops);
+
+                Map<String, List<String>> nextArrivals = new HashMap<>();
+
+                Map<String, Schedule> history = route.getHistory();
+                if (history != null) {
+                    String today = getCurrentDate();
+                    Schedule todayData = history.get(today);
+
+                    Schedule schedule = route.getDelays();
+                    if(!checkDelaysIntegrity(schedule)) {
+                        System.out.println("Delays are NOT ok");
+                        schedule = route.getTimetable();
+                    }
+
+                    Map<String, List<String>> timetable = direction.equals("forward") ? schedule.getForward() : schedule.getBack();
+
+                    if (todayData != null) {
+                        for (Map.Entry<String, List<String>> entry : timetable.entrySet()) {
+                            List<String> entryHistory = direction.equals("forward") ? todayData.getForward().get(entry.getKey()) : todayData.getBack().get(entry.getKey());
+
+                            int startIndex = 0;
+                            for(String time : entryHistory) {
+                                if(time == null || !time.equals("-")) {
+                                    startIndex += 1;
+                                }
+                            }
+
+                            List<String> times = entry.getValue();
+                            String stopName = direction.equals("forward") ? stops.getForwardStops().get(Integer.parseInt(entry.getKey())).getName() : stops.getBackStops().get(Integer.parseInt(entry.getKey())).getName();
+
+                            nextArrivals.put(stopName, times.subList(startIndex, times.size()));
+                        }
+                    }
+                    else{
+                        //for each stop, get the next arrival time in schedule
+
+                        for (Map.Entry<String, List<String>> entry : timetable.entrySet()) {
+                            List<String> times = entry.getValue();
+                            String stopName = direction.equals("forward") ? stops.getForwardStops().get(Integer.parseInt(entry.getKey())).getName() : stops.getBackStops().get(Integer.parseInt(entry.getKey())).getName();
+
+                            nextArrivals.put(stopName, times);
+                        }
+                    }
+                }
+
+                return new ResponseEntity<>(nextArrivals, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean checkDelaysIntegrity(Schedule delays) {
+        //check if there are null values in the delays
+        for (Map.Entry<String, List<String>> entry : delays.getForward().entrySet()) {
+            for (String time : entry.getValue()) {
+                if (time == null) {
+                    return false;
+                }
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry : delays.getBack().entrySet()) {
+            for (String time : entry.getValue()) {
+                if (time == null) {
+                    return false;
+                }
+            }
+        }
+
+        System.out.println("Delays are ok");
+        return true;
+    }
+
     @PostMapping("/stopReached")
     public ResponseEntity<Boolean> updateStopReached(@RequestParam String routeId, @RequestParam String stopIndex, @RequestParam String direction) {
         Firestore db = FirestoreClient.getFirestore();
