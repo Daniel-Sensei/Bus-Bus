@@ -36,7 +36,7 @@ export class Tab1Page {
   }
 
   getPreferences() {
-    this.preferencesService.getFavorites('favouriteRoutes').then(routes => { this.favouriteRoutes = routes; console.log("routes=", routes) });
+    this.preferencesService.getFavorites('favouriteRoutes').then(routes => { this.favouriteRoutes = routes; console.log("fav routes=", routes) });
     this.preferencesService.getFavorites('favouriteStops').then(stops => { this.favouriteStops = stops; console.log("stops=", stops) });
     this.preferencesService.getFavorites('recentSearches').then(searches => this.recentSearches = searches);
   }

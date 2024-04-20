@@ -4,6 +4,8 @@ import { IonModal } from '@ionic/angular';
 import { Coordinates } from '../model/Coordinates';
 import { BusService } from '../service/bus.service';
 
+import { PreferencesService } from '../service/preferences.service';
+
 @Component({
   selector: 'app-bus-details',
   templateUrl: './bus-details.page.html',
@@ -16,7 +18,7 @@ export class BusDetailsPage implements OnInit {
   destination: string = "";
   arrivals: any;
 
-  constructor(private busService: BusService) { }
+  constructor(private busService: BusService, private preferencesService: PreferencesService) { }
 
   getDestination(back = false): string {
     let destination = "";
@@ -88,6 +90,8 @@ export class BusDetailsPage implements OnInit {
   }
 
   async ngOnInit() {
+    this.checkFavourite();
+    
     console.log("ON INIT BUS: ", this.bus);
     this.getStopsAndDestination();
     await this.getArrivals();
@@ -126,8 +130,20 @@ export class BusDetailsPage implements OnInit {
     this.modal.setCurrentBreakpoint(breakpoint);
   }
 
+  checkFavourite() {
+    this.preferencesService.getFavorites('favouriteRoutes').then(routes => {
+      this.favourite = routes.includes((this.bus.route.id || '') + '_' + (this.bus.route.code.split("_")[0] || '') + " " + (this.bus.route.company || ''));
+    });
+  }
+
   addFavourite(add: boolean) {
     this.favourite = add;
+    if(add){
+    this.preferencesService.addToFavorites('favouriteRoutes', (this.bus.route.id || '') + '_' + (this.bus.route.code.split("_")[0] || '') + " " + (this.bus.route.company || ''));
+    }
+    else{
+      this.preferencesService.removeFromFavorites('favouriteRoutes', (this.bus.route.id || '') + '_' + (this.bus.route.code.split("_")[0] || '') + " " + (this.bus.route.company || ''));
+    }
   }
 
 }

@@ -43,22 +43,10 @@
       </ion-item-divider>
 
       <div>
-        <ion-item slot="header">
-          <ion-badge slot="start" class="bus-badge" style="margin-top: 10px; margin-bottom: 10px;">
+        <ion-item slot="header" *ngFor="let route of favouriteRoutes">
+          <ion-badge slot="start" class="bus-badge" style="font-size: 15px; margin-bottom: 12px; margin-top: 12px;">
             <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-            136 Consorzio Autolinee Conseza
-          </ion-badge>
-        </ion-item>
-        <ion-item slot="header">
-          <ion-badge slot="start" class="bus-badge" style="margin-top: 10px; margin-bottom: 10px;">
-            <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-            136 Consorzio Autolinee Conseza
-          </ion-badge>
-        </ion-item>
-        <ion-item slot="header">
-          <ion-badge slot="start" class="bus-badge" style="margin-top: 10px; margin-bottom: 10px;">
-            <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-            136 Consorzio Autolinee Conseza
+            {{route.split('_')[1]}}
           </ion-badge>
         </ion-item>
       </div>
