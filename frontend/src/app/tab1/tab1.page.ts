@@ -61,9 +61,7 @@ export class Tab1Page {
   changeCurrentPosition(name: string, lat: number | string, lng: number | string) {
     console.log("name=", name, "lat=", lat, "lng=", lng);
 
-    if (name != '') {
-      this.preferencesService.addToFavorites('recentSearches', lat + ',' + lng + '_' + name);
-    }
+    this.preferencesService.addToFavorites('recentSearches', lat + ',' + lng + '_' + name);
 
     lat = typeof lat === 'string' ? parseFloat(lat) : lat;
     lng = typeof lng === 'string' ? parseFloat(lng) : lng;

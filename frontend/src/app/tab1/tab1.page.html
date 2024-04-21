@@ -69,7 +69,7 @@
       </ion-item-divider>
 
       <div>
-        <ion-item slot="header" *ngFor="let place of recentSearches" (click)="changeCurrentPosition('', place.split('_')[0].split(',')[0], place.split('_')[0].split(',')[1])">
+        <ion-item slot="header" *ngFor="let place of recentSearches" (click)="changeCurrentPosition(place.split('_')[1], place.split('_')[0].split(',')[0], place.split('_')[0].split(',')[1])">
           <ion-avatar slot="start">
             <ion-img src="../../assets/marker-round.png"></ion-img>
           </ion-avatar>

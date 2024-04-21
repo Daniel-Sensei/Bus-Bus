@@ -36,6 +36,9 @@ export class Tab2Page implements OnInit {
 
   // Array di fermate filtrate in base al raggio selezionato
   filteredStops: Stop[] = [];
+  loadedStops: boolean = false;
+  loadedBuses: boolean = false;
+
   nextBuses: any;
   filteredBuses: Bus[] = [];
 
@@ -393,10 +396,12 @@ export class Tab2Page implements OnInit {
 
   addStopsMarkers() {
     this.clearStopsMarkers();
+    this.loadedStops = false;
 
     this.stopService.getStopsWithinRadius({ latitude: this.currentPosition.coords.latitude, longitude: this.currentPosition.coords.longitude }, this.selectedRadius).subscribe(stops => {
       //stops are order by the server
       this.filteredStops = stops;
+      this.loadedStops = true;
 
       this.filteredStops.forEach(stop => {
         const customIcon = L.icon({
@@ -495,6 +500,8 @@ export class Tab2Page implements OnInit {
     //UPDATE BUSES (REMOVE OLD MARKERS AND ADD NEW ONES)
     this.clearBusMarkers();
     this.buses = [];
+    this.busesDetailsLoaded = false;
+    this.loadedBuses = false;
     //REMOVE ROUTE IF EXISTS
     if (this.firstRoute || this.secondRoute) {
       this.eraseRoute();
@@ -508,7 +515,9 @@ export class Tab2Page implements OnInit {
 
     this.busService.getBusesWithinRadius(this.currentPosition, this.selectedRadius).subscribe(buses => {
       this.filteredBuses = buses;
-      console.log(this.filteredBuses);
+      this.loadedBuses = true;
+      console.log("filtered: ", this.filteredBuses);
+      console.log("buses: ", this.buses);
       if (this.filteredBuses.length != this.buses.length) {
         console.log("GETTING ROUTES");
         this.buses = this.filteredBuses;

@@ -39,3 +39,16 @@ ion-button[slot='fixed'] {
 ion-segment{
     border-radius: 10px;
 }
+
+.loading-segment {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .loading-segment ion-spinner {
+    color: var(--ion-color-primary); /* Colore dell'icona di caricamento */
+    width: 40px;
+    height: 40px;
+  }
