@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Bus } from '../model/Bus';
 import { collection } from '@firebase/firestore';
 import { Firestore, collectionData } from '@angular/fire/firestore';
-import { map } from 'rxjs/operators';
+import { map, takeUntil  } from 'rxjs/operators';
 
 import { getDatabase, ref, get } from 'firebase/database';
 import { Subject } from 'rxjs';
@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
 export class BusService {
 
   firebaseDB: any;
+  private unsubscribeSubject: Subject<void> = new Subject();
 
   constructor(
     private http: HttpClient,
@@ -28,7 +29,11 @@ export class BusService {
   }
 
   getBusesWithinRadius(position: Position, radius: number): Observable<Bus[]> {
+    // Annulla la sottoscrizione precedente
+    this.unsubscribeSubject.next();
+
     return this.getBusesFromRealtimeDatabase().pipe(
+      takeUntil(this.unsubscribeSubject), // Annulla l'osservabile quando unsubscribeSubject emette
       map(buses => {
         return buses.filter(bus => this.isInsideRadius(
           [bus.coords.latitude, bus.coords.longitude],
