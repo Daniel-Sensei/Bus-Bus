@@ -27,45 +27,53 @@
 
           <!-- Fermate -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default' && filteredStops.length > 0">
-            <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)" (click)="centerStopBus(stop)" class="bus-item">
+            <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)"
+              (click)="centerStopBus(stop)" class="bus-item">
               <img [src]="getIconDirectory() + 'bus-stop.png'" class="img-icon">
               <ion-label
                 style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.name}}</ion-label>
-              <ion-label style="font-size: 22px;" slot="end">{{ this.getDistance(this.currentPosition, stop.coords) }}Km</ion-label>
+              <ion-label style="font-size: 22px;" slot="end">{{ this.getDistance(this.currentPosition, stop.coords)
+                }}Km</ion-label>
             </ion-item>
           </ion-list>
 
-          <div *ngIf="selectedSegment === 'default' && filteredStops.length === 0 && loadedStops" style="text-align: center;">
-            <ion-img src="../../assets/no-results-detective.png" style="width: 100%;"></ion-img><br>
-            <ion-label style="display: block;">Sembra che la zona che stai cercando non sia ancora registrata nei nostri sistemi. Controlla più tardi o prova un'altra area!</ion-label>
+          <div *ngIf="selectedSegment === 'default' && filteredStops.length === 0 && loadedStops"
+            style="text-align: center;">
+            <ion-img src="../../assets/no-results-detective.png" style="width: 70%; display: block; margin: auto; margin-top: 5px;"></ion-img><br>
+            <ion-label style="display: block;">Sembra che la zona che stai cercando non sia ancora registrata nei nostri
+              sistemi. Controlla più tardi o prova un'altra area!</ion-label>
           </div>
-          
+
           <div *ngIf="selectedSegment === 'default' && !loadedStops" class="loading-segment">
             <ion-spinner></ion-spinner>
           </div>
 
           <!-- Bus -->
-          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment' && busesDetailsLoaded && buses.length > 0">
-            <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)" (click)="centerStopBus(bus)">
+          <ion-list class="list" lines="full"
+            *ngIf="selectedSegment === 'segment' && busesDetailsLoaded && buses.length > 0">
+            <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)"
+              (click)="centerStopBus(bus)">
               <ion-badge class="bus-badge" style="font-size: 16px;">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
                 &nbsp;{{ bus.route.code.split('_')[0] }} - {{ bus.route.company }}
               </ion-badge>
               <ion-label style="font-size: 17px; padding-top: 12px; padding-bottom: 12px;"></ion-label>
-              <ion-label style="font-size: 22px; padding-top: 12px; padding-bottom: 12px;" slot="end">{{ bus.delay }}</ion-label>
+              <ion-label style="font-size: 22px; padding-top: 12px; padding-bottom: 12px;" slot="end">{{ bus.delay
+                }}</ion-label>
             </ion-item>
           </ion-list>
 
           <!-- Se non ci sono autobus nelle vicinanze -->
           <div *ngIf="selectedSegment === 'segment' && buses.length === 0 && loadedBuses" style="text-align: center;">
-            <ion-img src="../../assets/no-results-people.png" style="width: 100%;"></ion-img><br>
-            <ion-label style="display: block;">Attualmente non troviamo pullman in movimento nell'area. Riprova più tardi o verifica un'altra zona!</ion-label>
-          </div>  
-          
+            <ion-img src="../../assets/no-results-people.png" style="width: 70%; display: block; margin: auto; margin-top: 5px;"></ion-img><br>
+            <ion-label style="display: block;">Attualmente non troviamo pullman in movimento nell'area. Riprova più
+              tardi o verifica un'altra zona!</ion-label>
+          </div>
+
           <div *ngIf="selectedSegment === 'segment' && !loadedBuses" class="loading-segment">
             <ion-spinner></ion-spinner>
           </div>
-  
+
         </div>
 
         <div *ngIf="!showStops">
@@ -91,7 +99,8 @@
       <div class="card-modal-header">
         <ion-buttons slot="end">
           <ion-icon aria-hidden="true" (click)="cardModal.dismiss()" name="chevron-back-outline"></ion-icon>
-          <ion-input placeholder="Cerca sulla mappa" (ionChange)="searchPlaces($event)" style="width: 100%;"></ion-input>
+          <ion-input placeholder="Cerca sulla mappa" (ionChange)="searchPlaces($event)"
+            style="width: 100%;"></ion-input>
         </ion-buttons>
       </div>
       <ion-content>
@@ -106,7 +115,7 @@
               <!--<p>via della Resistenza, 132, Rende</p>-->
             </ion-label>
           </ion-item>
-      
+
         </ion-list>
       </ion-content>
     </ng-template>

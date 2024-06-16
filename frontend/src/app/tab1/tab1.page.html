@@ -38,44 +38,73 @@
 
     <ion-item-group>
 
-      <ion-item-divider>
-        <ion-label>Linee Preferite</ion-label>
-      </ion-item-divider>
+      <div *ngIf="favouriteRoutes.length > 0 || favouriteStops.length || recentSearches.length > 0; else noFavourites">
 
-      <div>
-        <ion-item slot="header" *ngFor="let route of favouriteRoutes">
-          <ion-badge slot="start" class="bus-badge" style="font-size: 15px; margin-bottom: 12px; margin-top: 12px;">
-            <ion-icon name="bus-outline" class="icon-center"></ion-icon>
-            {{route.split('_')[1]}}
-          </ion-badge>
-        </ion-item>
+        <div *ngIf="favouriteRoutes.length > 0">
+          <ion-item-divider>
+            <ion-label>Linee Preferite</ion-label>
+          </ion-item-divider>
+
+          <div>
+            <ion-item slot="header" *ngFor="let route of favouriteRoutes">
+              <ion-badge slot="start" class="bus-badge" style="font-size: 15px; margin-bottom: 12px; margin-top: 12px;">
+                <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+                {{route.split('_')[1]}}
+              </ion-badge>
+            </ion-item>
+          </div>
+        </div>
+
+        <div *ngIf="favouriteStops.length > 0">
+          <ion-item-divider>
+            <ion-label>Fermate Preferite</ion-label>
+          </ion-item-divider>
+
+
+          <ion-item slot="header" *ngFor="let stop of favouriteStops" (click)="setStopPosition(stop.split('_')[0])">
+            <ion-avatar slot="start">
+              <ion-img src="../../assets/bus-stop-round.png"></ion-img>
+            </ion-avatar>
+            <ion-label class="label-small"
+              style="padding-top: 10px; padding-bottom: 10px;">{{stop.split('_')[1]}}</ion-label>
+          </ion-item>
+        </div>
+
+        <div *ngIf="recentSearches.length > 0">
+          <ion-item-divider>
+            <ion-label>Ricerche Recenti</ion-label>
+          </ion-item-divider>
+
+          <div>
+            <ion-item slot="header" *ngFor="let place of recentSearches"
+              (click)="changeCurrentPosition(place.split('_')[1], place.split('_')[0].split(',')[0], place.split('_')[0].split(',')[1])">
+              <ion-avatar slot="start">
+                <ion-img src="../../assets/marker-round.png"></ion-img>
+              </ion-avatar>
+              <ion-label class="label-small"
+                style="padding-top: 10px; padding-bottom: 10px;">{{place.split('_')[1]}}</ion-label>
+            </ion-item>
+          </div>
+        </div>
+
+        <div class="no-favourites-container">
+          <ion-img src="../../assets/favourites.png" style="width: 90%; margin-top: 50px;"></ion-img>
+        </div>
+
+
       </div>
 
-      <ion-item-divider>
-        <ion-label>Fermate Preferite</ion-label>
-      </ion-item-divider>
-
-      <div>
-        <ion-item slot="header" *ngFor="let stop of favouriteStops" (click)="setStopPosition(stop.split('_')[0])">
-          <ion-avatar slot="start">
-            <ion-img src="../../assets/bus-stop-round.png"></ion-img>
-          </ion-avatar>
-          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">{{stop.split('_')[1]}}</ion-label>
-        </ion-item>
-      </div>
-
-      <ion-item-divider>
-        <ion-label>Ricerche Recenti</ion-label>
-      </ion-item-divider>
-
-      <div>
-        <ion-item slot="header" *ngFor="let place of recentSearches" (click)="changeCurrentPosition(place.split('_')[1], place.split('_')[0].split(',')[0], place.split('_')[0].split(',')[1])">
-          <ion-avatar slot="start">
-            <ion-img src="../../assets/marker-round.png"></ion-img>
-          </ion-avatar>
-          <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">{{place.split('_')[1]}}</ion-label>
-        </ion-item>
-      </div>
+      <ng-template #noFavourites>
+        <div class="no-favourites-container">
+          <ion-img src="../../assets/favourites.png" style="width: 90%; margin-top: 100px;"></ion-img>
+          <p style="text-align: center; padding-left: 20px; padding-right: 20px;">
+            <strong>Benvenuto nella tua Home!</strong><br><br>
+            Aggiungi le tue linee e fermate preferite per avere sempre a portata di mano le informazioni che ti servono.
+            <br>
+            Effettua ricerche sulla mappa per controllare lo stato dei bus in tempo reale.<br>
+          </p>
+        </div>
+      </ng-template>
 
     </ion-item-group>
   </ion-list>
