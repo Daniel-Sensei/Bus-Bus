@@ -513,9 +513,10 @@ export class Tab2Page implements OnInit {
       }
     }
 
+    this.loadedBuses = true;
     this.busService.getBusesWithinRadius(this.currentPosition, this.selectedRadius).subscribe(buses => {
       this.filteredBuses = buses;
-      this.loadedBuses = true;
+      //this.loadedBuses = true;
       console.log("filtered: ", this.filteredBuses);
       console.log("buses: ", this.buses);
       if (this.filteredBuses.length != this.buses.length) {
