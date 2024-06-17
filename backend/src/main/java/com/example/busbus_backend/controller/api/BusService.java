@@ -776,6 +776,8 @@ public class BusService {
                             }
                         }
                     }
+
+                    return new ResponseEntity<>(0, HttpStatus.OK);
                 }
             }
 
