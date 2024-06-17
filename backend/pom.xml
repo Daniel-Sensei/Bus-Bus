@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>BusBus_Backend</artifactId>
+	<artifactId>BusBuddy_Backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>BusBus_Backend</name>
-	<description>BusBus_Backend</description>
+	<name>BusBuddy_Backend</name>
+	<description>BusBuddy_Backend</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -51,7 +51,7 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
-		<!-- Dipendenza per JSON Web Token (JWT) -->
+		<!-- JSON Web Token (JWT) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
