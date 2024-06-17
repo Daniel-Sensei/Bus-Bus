@@ -137,7 +137,7 @@ public class StopService {
     }
 
     /**
-     * Get the next buses for a given stop within a specified radius.
+     * Get the next buses for a given stop.
      *
      * @param stopId The ID of the stop.
      * @return A response entity containing a map of route codes to lists of next bus times, or a not found response if the stop does not exist.
@@ -148,16 +148,16 @@ public class StopService {
         CollectionReference stops = db.collection(STOPS_COLLECTION);
 
         try {
-            //salva la reference del documento del tipo DocumentReference
+            // Save the reference of the document as DocumentReference
             DocumentSnapshot document = getDocumentById(stops, stopId);
             if (document.exists()) {
                 DocumentReference stopRef = document.getReference();
                 List<DocumentReference> routesRefs = (List<DocumentReference>) document.get("routes");
                 System.out.println(routesRefs);
-                System.out.println("numero di route: " + routesRefs.size());
+                System.out.println("Number of routes: " + routesRefs.size());
 
 
-                //crea una mappa vuota
+                // Create an empty map
                 Map<String, List<String>> nextBuses = new HashMap<>();
                 List<DocumentReference> stopsReferenceForward = null;
                 List<DocumentReference> stopsReferenceBack = null;
@@ -165,13 +165,13 @@ public class StopService {
                     DocumentSnapshot routeDocument = routeRef.get().get();
                     Route route = routeDocument.toObject(Route.class);
                     System.out.println(route.getCode());
-                    //FORWARD
+                    // FORWARD
                     stopsReferenceForward = (List<DocumentReference>) routeDocument.get("stops.forward");
                     Integer indexForward = null;
                     if(stopsReferenceForward.contains(stopRef)) {
                         indexForward = stopsReferenceForward.indexOf(stopRef);
                     }
-                    //BACK
+                    // BACK
                     stopsReferenceBack = (List<DocumentReference>) routeDocument.get("stops.back");
                     Integer indexBack = null;
                     if(stopsReferenceBack.contains(stopRef)) {
@@ -179,13 +179,13 @@ public class StopService {
                     }
 
 
-                    //controlla in nella mappa route.history con chiave "giorantaOdierna" nel formato "dd-MM-yyyy"
-                    //successivamnete muoviti in sunday se il giorno della settimana è domenica altrimenti in week
-                    //se la mappa non è vuota allora prendi la lista di orari di forward con chiave indexForward
-                    // prendi anche la lista di orari di back con chiave indexBack
+                    // Check in the route.history map with key "currentDate" in the format "dd-MM-yyyy"
+                    // Then move to "sunday" if the day of the week is Sunday, otherwise move to "week"
+                    // If the map is not empty, then get the list of forward times with key indexForward
+                    // Also get the list of back times with key indexBack
                     Map<String, Schedule> history = route.getHistory();
                     if (history != null) {
-                        // Ottenere l'oggetto Data per la data odierna
+                        // Get the Date object for the current date
                         String today = getCurrentDate();
                         Schedule todayData = history.get(today);
 
@@ -196,7 +196,7 @@ public class StopService {
                         }
 
                         if (todayData != null) {
-                            // Ottenere la lista di orari per la fermata
+                            // Get the list of times for the stop
                             List<String> forwardDay = todayData.getForward().get(String.valueOf(indexForward));
                             List<String> backDay = todayData.getBack().get(String.valueOf(indexBack));
 
@@ -223,10 +223,10 @@ public class StopService {
 
                             if(backDay != null) {
                                 String destination = route.getCode().split("_")[1];
-                                //ordina al contrario la destinazione splittando per "-"
-                                //esempio: "A-B" diventa "B-A"
-                                //la destinazione potrebbe avere più di un "-"
-                                //quindi prendi la''ray splittato e ordina al contrario tutto
+                                // Reverse the destination by splitting it with "-"
+                                // Example: "A-B" becomes "B-A"
+                                // The destination may have multiple "-"
+                                // So split the array and reverse everything
                                 String[] destinationArray = destination.split(" - ");
                                 String invertedDestination = "";
                                 for (int i = destinationArray.length - 1; i >= 0; i--) {
@@ -242,16 +242,16 @@ public class StopService {
 
                         }
                         else{
-                            //se la giornata attuale nella history è vuota allora prendi tutti gli orari di forward e back
-                            //dalla timetable senza considerare gli indici
+                            // If the current day in the history is empty, then get all the forward and back times
+                            // from the timetable without considering the indices
 
                             //schedule = route.getTimetable();
 
                             List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
                             List<String> back =schedule.getBack().get(String.valueOf(indexBack));
 
-                            //riempie la mappa nextBuses con gli orari di forward e back
-                            //inverti la destinazione se la lista di back non è vuota
+                            // Fill the nextBuses map with forward and back times
+                            // Reverse the destination if the back list is not empty
 
                             if(back != null) {
                                 String destination = route.getCode().split("_")[1];
@@ -281,33 +281,6 @@ public class StopService {
 
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Add the next bus times to the map.
-     *
-     * @param nextBuses The map to add the next bus times to.
-     * @param route The route object.
-     * @param forward The list of forward bus times.
-     * @param back The list of backward bus times.
-     * @param startIndexForward The start index for the forward times.
-     * @param startIndexBack The start index for the backward times.
-     */
-    private void addNextBusTimes(Map<String, List<String>> nextBuses, Route route, List<String> forward, List<String> back, int startIndexForward, int startIndexBack) {
-        if (back != null) {
-            String destination = route.getCode().split("_")[1];
-            String[] destinationArray = destination.split(" - ");
-            String invertedDestination = "";
-            for (int i = destinationArray.length - 1; i >= 0; i--) {
-                invertedDestination += destinationArray[i] + " - ";
-            }
-            invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 3);
-
-            nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward.subList(startIndexForward, forward.size()));
-            nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back.subList(startIndexBack, back.size()));
-        } else {
-            nextBuses.put(route.getCode(), forward.subList(startIndexForward, forward.size()));
         }
     }
 
