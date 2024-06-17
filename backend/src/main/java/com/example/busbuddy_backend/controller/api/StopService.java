@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static com.example.busbuddy_backend.controller.api.Time.getCurrentDate;
 import static java.awt.geom.Point2D.distance;
 
 @RestController
@@ -147,92 +148,140 @@ public class StopService {
         CollectionReference stops = db.collection(STOPS_COLLECTION);
 
         try {
-            // Get the document reference for the stop
+            //salva la reference del documento del tipo DocumentReference
             DocumentSnapshot document = getDocumentById(stops, stopId);
             if (document.exists()) {
                 DocumentReference stopRef = document.getReference();
                 List<DocumentReference> routesRefs = (List<DocumentReference>) document.get("routes");
+                System.out.println(routesRefs);
+                System.out.println("numero di route: " + routesRefs.size());
 
-                // Create an empty map to store the next bus times
+
+                //crea una mappa vuota
                 Map<String, List<String>> nextBuses = new HashMap<>();
-
-                // Iterate over the routes and get the next bus times
-                for (DocumentReference routeRef : routesRefs) {
+                List<DocumentReference> stopsReferenceForward = null;
+                List<DocumentReference> stopsReferenceBack = null;
+                for( DocumentReference routeRef : routesRefs) {
                     DocumentSnapshot routeDocument = routeRef.get().get();
                     Route route = routeDocument.toObject(Route.class);
+                    System.out.println(route.getCode());
+                    //FORWARD
+                    stopsReferenceForward = (List<DocumentReference>) routeDocument.get("stops.forward");
+                    Integer indexForward = null;
+                    if(stopsReferenceForward.contains(stopRef)) {
+                        indexForward = stopsReferenceForward.indexOf(stopRef);
+                    }
+                    //BACK
+                    stopsReferenceBack = (List<DocumentReference>) routeDocument.get("stops.back");
+                    Integer indexBack = null;
+                    if(stopsReferenceBack.contains(stopRef)) {
+                        indexBack = stopsReferenceBack.indexOf(stopRef);
+                    }
 
-                    // Get the stops references for forward and backward routes
-                    List<DocumentReference> stopsReferenceForward = (List<DocumentReference>) routeDocument.get("stops.forward");
-                    List<DocumentReference> stopsReferenceBack = (List<DocumentReference>) routeDocument.get("stops.back");
 
-                    // Get the index of the stop in the stops references
-                    Integer indexForward = stopsReferenceForward.indexOf(stopRef);
-                    Integer indexBack = stopsReferenceBack.indexOf(stopRef);
-
-                    // Get the delays and schedule for the route
+                    //controlla in nella mappa route.history con chiave "giorantaOdierna" nel formato "dd-MM-yyyy"
+                    //successivamnete muoviti in sunday se il giorno della settimana è domenica altrimenti in week
+                    //se la mappa non è vuota allora prendi la lista di orari di forward con chiave indexForward
+                    // prendi anche la lista di orari di back con chiave indexBack
                     Map<String, Schedule> history = route.getHistory();
-                    Schedule schedule = route.getDelays();
+                    if (history != null) {
+                        // Ottenere l'oggetto Data per la data odierna
+                        String today = getCurrentDate();
+                        Schedule todayData = history.get(today);
 
-                    // Check if the delays are valid, if not use the timetable
-                    if (!checkDelaysIntegrity(schedule)) {
-                        schedule = route.getTimetable();
+                        Schedule schedule = route.getDelays();
+                        if(!checkDelaysIntegrity(schedule)) {
+                            System.out.println("Delays are NOT ok");
+                            schedule = route.getTimetable();
+                        }
+
+                        if (todayData != null) {
+                            // Ottenere la lista di orari per la fermata
+                            List<String> forwardDay = todayData.getForward().get(String.valueOf(indexForward));
+                            List<String> backDay = todayData.getBack().get(String.valueOf(indexBack));
+
+                            int startIndexForward = 0;
+                            for(String time : forwardDay) {
+                                if(time == null || !time.equals("-")) {
+                                    startIndexForward += 1;
+                                }
+                            }
+
+                            int startIndexBack = 0;
+                            if(backDay != null) {
+                                for (String time : backDay) {
+                                    if (time == null || !time.equals("-")) {
+                                        startIndexBack += 1;
+                                    }
+                                }
+                            }
+
+                            //schedule = route.getTimetable();
+
+                            List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
+                            List<String> back =schedule.getBack().get(String.valueOf(indexBack));
+
+                            if(backDay != null) {
+                                String destination = route.getCode().split("_")[1];
+                                //ordina al contrario la destinazione splittando per "-"
+                                //esempio: "A-B" diventa "B-A"
+                                //la destinazione potrebbe avere più di un "-"
+                                //quindi prendi la''ray splittato e ordina al contrario tutto
+                                String[] destinationArray = destination.split(" - ");
+                                String invertedDestination = "";
+                                for (int i = destinationArray.length - 1; i >= 0; i--) {
+                                    invertedDestination += destinationArray[i] + " - ";
+                                }
+                                invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 3);
+
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward.subList(startIndexForward, forward.size()));
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back.subList(startIndexBack, back.size()));
+                            } else {
+                                nextBuses.put(route.getCode(), forward.subList(startIndexForward, forward.size()));
+                            }
+
+                        }
+                        else{
+                            //se la giornata attuale nella history è vuota allora prendi tutti gli orari di forward e back
+                            //dalla timetable senza considerare gli indici
+
+                            //schedule = route.getTimetable();
+
+                            List<String> forward =schedule.getForward().get(String.valueOf(indexForward));
+                            List<String> back =schedule.getBack().get(String.valueOf(indexBack));
+
+                            //riempie la mappa nextBuses con gli orari di forward e back
+                            //inverti la destinazione se la lista di back non è vuota
+
+                            if(back != null) {
+                                String destination = route.getCode().split("_")[1];
+                                String[] destinationArray = destination.split(" - ");
+                                String invertedDestination = "";
+                                for (int i = destinationArray.length - 1; i >= 0; i--) {
+                                    invertedDestination += destinationArray[i] + " - ";
+                                }
+                                invertedDestination = invertedDestination.substring(0, invertedDestination.length() - 3);
+
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + destination, forward);
+                                nextBuses.put(route.getCode().split("_")[0] + "_" + invertedDestination, back);
+                            } else {
+                                nextBuses.put(route.getCode(), forward);
+                            }
+
+                        }
                     }
 
-                    // Get the schedule for the current day
-                    String today = Time.getCurrentDate();
-                    Schedule todayData = history.get(today);
 
-                    if (todayData != null) {
-                        // Get the lists of forward and backward times for the stop
-                        List<String> forwardDay = todayData.getForward().get(String.valueOf(indexForward));
-                        List<String> backDay = todayData.getBack().get(String.valueOf(indexBack));
-
-                        // Get the start index for forward and backward times
-                        int startIndexForward = getStartIndex(forwardDay);
-                        int startIndexBack = getStartIndex(backDay);
-
-                        // Get the lists of forward and backward times from the schedule
-                        List<String> forward = schedule.getForward().get(String.valueOf(indexForward));
-                        List<String> back = schedule.getBack().get(String.valueOf(indexBack));
-
-                        // Add the next bus times to the map
-                        addNextBusTimes(nextBuses, route, forward, back, startIndexForward, startIndexBack);
-                    } else {
-                        // If there are no times for the current day, use all the times from the timetable
-                        List<String> forward = schedule.getForward().get(String.valueOf(indexForward));
-                        List<String> back = schedule.getBack().get(String.valueOf(indexBack));
-
-                        // Add the next bus times to the map
-                        addNextBusTimes(nextBuses, route, forward, back, 0, 0);
-                    }
                 }
 
-                // Return the map of next bus times with a success response
                 return new ResponseEntity<>(nextBuses, HttpStatus.OK);
             } else {
-                // Return a not found response if the stop does not exist
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Get the start index for the forward and backward times.
-     *
-     * @param times The list of times.
-     * @return The start index.
-     */
-    private int getStartIndex(List<String> times) {
-        int startIndex = 0;
-        for (String time : times) {
-            if (time != null && !time.equals("-")) {
-                startIndex += 1;
-            }
-        }
-        return startIndex;
     }
 
     /**
