@@ -24,6 +24,8 @@ public class Time {
      */
     public static String getCurrentTime() {
         // Calculates the current time and formats it in the "HH:mm" format
-        return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        // Return the formatted time plus the timezone offset in the format "HH:mm"
+        // The offset is +2 hours
+        return LocalTime.now().plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }
