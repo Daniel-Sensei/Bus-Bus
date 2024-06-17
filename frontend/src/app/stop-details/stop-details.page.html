@@ -22,9 +22,9 @@
   </ion-label>
 
   <ion-icon *ngIf="!this.favourite" (click)="addFavourite(true)" slot="end" aria-hidden="true" name="star-outline"
-    class="icon"></ion-icon>
+    class="icon" color="primary"></ion-icon>
   <ion-icon *ngIf="this.favourite" (click)="addFavourite(false)" slot="end" aria-hidden="true" name="star"
-    class="icon"></ion-icon>
+    class="icon" color="primary"></ion-icon>
 
 </ion-item>
 

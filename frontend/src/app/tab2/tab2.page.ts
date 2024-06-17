@@ -544,6 +544,8 @@ export class Tab2Page implements OnInit {
               else{
                 bus.delay = response + " min";
               }
+            }, (error) => {
+              bus.delay = "N/A";
             });
           }
         });
