@@ -23,6 +23,8 @@ import java.util.concurrent.ExecutionException;
 
 import static com.example.busbuddy_backend.controller.api.Time.getCurrentDate;
 import static com.example.busbuddy_backend.controller.api.Time.getCurrentTime;
+import static com.example.busbuddy_backend.controller.api.Utility.checkDelaysIntegrity;
+import static com.example.busbuddy_backend.controller.api.Utility.getDocumentById;
 
 @RestController
 @CrossOrigin("*")
@@ -330,37 +332,6 @@ public class BusService {
     }
 
     /**
-     * Checks the integrity of the delays by verifying that there are no null values.
-     *
-     * @param delays the delays to check
-     * @return true if the delays are valid, false otherwise
-     */
-    private boolean checkDelaysIntegrity(Schedule delays) {
-        // Check forward delays
-        for (Map.Entry<String, List<String>> entry : delays.getForward().entrySet()) {
-            for (String time : entry.getValue()) {
-                // If a time is null, return false
-                if (time == null) {
-                    return false;
-                }
-            }
-        }
-
-        // Check backward delays
-        for (Map.Entry<String, List<String>> entry : delays.getBack().entrySet()) {
-            for (String time : entry.getValue()) {
-                // If a time is null, return false
-                if (time == null) {
-                    return false;
-                }
-            }
-        }
-
-        // Return true indicating that the delays are valid
-        return true;
-    }
-
-    /**
      * Endpoint for updating the stop reached information.
      *
      * @param routeId   the ID of the route
@@ -403,6 +374,7 @@ public class BusService {
                         if (timetable != null) {
                             // Update the value for the specified stop index in the timetable with the current time
                             List<String> stopTimes = timetable.get(stopIndex);
+                            System.out.println("Stop times: " + stopTimes);
                             if (stopTimes != null) {
                                 for (int i = 0; i < stopTimes.size(); i++) {
                                     if (stopTimes.get(i) != null && stopTimes.get(i).equals("-")) {
@@ -422,6 +394,10 @@ public class BusService {
                                     DocumentSnapshot routeSnapshotAgain = transaction.get(routeRef).get();
                                     Route route = routeSnapshotAgain.toObject(Route.class);
                                     if (route != null) {
+                                        System.out.println("Updating stop reached for route " + routeId);
+                                        System.out.println("Today: " + today);
+                                        System.out.println("Today data: " + todayData);
+
                                         route.getHistory().put(today, todayData);
                                         transaction.update(routeRef, "history", route.getHistory());
                                     }
@@ -1018,22 +994,6 @@ public class BusService {
 
         // Calculate and return the delay in minutes
         return delayMinutes - timetableMinutes;
-    }
-
-    /**
-     * Returns the document snapshot for the document with the given id in the specified collection reference.
-     * This method throws an ExecutionException if there is an error retrieving the document.
-     * An InterruptedException is thrown if the retrieval is interrupted.
-     *
-     * @param collectionReference The collection reference to query
-     * @param id                  The id of the document to retrieve
-     * @return The document snapshot for the specified document
-     * @throws InterruptedException If the retrieval is interrupted
-     * @throws ExecutionException    If there is an error retrieving the document
-     */
-    private DocumentSnapshot getDocumentById(CollectionReference collectionReference, String id)
-            throws InterruptedException, ExecutionException {
-        return collectionReference.document(id).get().get();
     }
 
 

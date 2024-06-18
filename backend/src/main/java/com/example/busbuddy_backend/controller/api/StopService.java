@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +19,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.example.busbuddy_backend.controller.api.Time.getCurrentDate;
+import static com.example.busbuddy_backend.controller.api.Utility.checkDelaysIntegrity;
 import static java.awt.geom.Point2D.distance;
+
+import static com.example.busbuddy_backend.controller.api.Utility.getDocumentById;
+
 
 @RestController
 @CrossOrigin("*")
@@ -282,41 +284,5 @@ public class StopService {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private boolean checkDelaysIntegrity(Schedule delays) {
-        //check if there are null values in the delays
-        for (Map.Entry<String, List<String>> entry : delays.getForward().entrySet()) {
-            for (String time : entry.getValue()) {
-                if (time == null) {
-                    return false;
-                }
-            }
-        }
-
-        for (Map.Entry<String, List<String>> entry : delays.getBack().entrySet()) {
-            for (String time : entry.getValue()) {
-                if (time == null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Returns the document snapshot for the document with the given id in the specified collection reference.
-     * This method throws an ExecutionException if there is an error retrieving the document.
-     * An InterruptedException is thrown if the retrieval is interrupted.
-     *
-     * @param collectionReference The collection reference to query
-     * @param id                  The id of the document to retrieve
-     * @return The document snapshot for the specified document
-     * @throws InterruptedException If the retrieval is interrupted
-     * @throws ExecutionException    If there is an error retrieving the document
-     */
-    private DocumentSnapshot getDocumentById(CollectionReference collectionReference, String id) throws InterruptedException, ExecutionException {
-        return collectionReference.document(id).get().get();
     }
 }

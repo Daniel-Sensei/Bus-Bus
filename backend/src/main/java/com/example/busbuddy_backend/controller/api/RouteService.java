@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import static com.example.busbuddy_backend.controller.api.Utility.getDocumentById;
+
 @RestController
 @CrossOrigin("*")
 public class RouteService {
@@ -452,20 +454,5 @@ public class RouteService {
                 }
             }
         }
-    }
-
-    /**
-     * Returns the document snapshot for the document with the given id in the specified collection reference.
-     * This method throws an ExecutionException if there is an error retrieving the document.
-     * An InterruptedException is thrown if the retrieval is interrupted.
-     *
-     * @param collectionReference The collection reference to query
-     * @param id                  The id of the document to retrieve
-     * @return The document snapshot for the specified document
-     * @throws InterruptedException If the retrieval is interrupted
-     * @throws ExecutionException    If there is an error retrieving the document
-     */
-    private DocumentSnapshot getDocumentById(CollectionReference collectionReference, String id) throws InterruptedException, ExecutionException {
-        return collectionReference.document(id).get().get();
     }
 }
