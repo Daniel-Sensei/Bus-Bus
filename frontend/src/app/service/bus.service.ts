@@ -123,7 +123,6 @@ export class BusService {
       const response = await this.http.get(environment.API_URL + 'next-arrivals-by-bus-direction?busId=' + busId + '&direction=' + direction).toPromise();
       return response;
     } catch (error) {
-      console.error("Errore durante la chiamata HTTP:", error);
       throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
     }
   }
@@ -132,7 +131,6 @@ export class BusService {
     try {
       return this.http.get(environment.API_URL + 'avg-bus-delay?busId=' + busId + '&direction=' + direction).toPromise();
     } catch (error) {
-      console.error("Errore durante la chiamata HTTP:", error);
       throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
     }
   }
@@ -141,7 +139,6 @@ export class BusService {
     try {
       return this.http.get(environment.API_URL + 'current-bus-delay?busId=' + busId + '&direction=' + direction).toPromise();
     } catch (error) {
-      console.error("Errore durante la chiamata HTTP:", error);
       throw error; // Rilancia l'errore per gestirlo nel componente chiamante, se necessario
     }
   }
@@ -152,7 +149,6 @@ export class BusService {
     const busesRef = collection(this.firestore, 'buses');
     return collectionData(busesRef).pipe(
       map((buses: any[]) => {
-        //console.log(buses);
         return buses;
       })
     );

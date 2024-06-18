@@ -30,10 +30,8 @@ export class BusDetailsPage implements OnInit {
       destination = code.split("-").join(" - ");
     }
     else{
-      console.log("code: ", code);
       for(let i = code.split("-").length - 1; i >= 0; i--){
         destination += code.split("-")[i];
-        console.log("destination: ", destination);
         if(i !== 0){
           destination += " - ";
         }
@@ -92,23 +90,17 @@ export class BusDetailsPage implements OnInit {
   async ngOnInit() {
     this.checkFavourite();
     
-    console.log("ON INIT BUS: ", this.bus);
     this.getStopsAndDestination();
     await this.getArrivals();
-    console.log("arrivals= ", this.arrivals);
-    console.log("stops= ", this.stops);
 
     this.busService.getBusFromRealtimeDatabase(this.bus.id).subscribe(async (bus) => {
-      //console.log("Bus updated: ", bus);
       if(this.bus.direction !== bus.direction){
         this.bus.direction = bus.direction;
         this.getStopsAndDestination();
         await this.getArrivals();
-        console.log("Bus updated: ", this.bus);
       }
       if(this.bus.lastStop !== bus.lastStop){
         this.bus.lastStop = bus.lastStop;
-        console.log("Bus updated: ", this.bus);
       }
     });
   }

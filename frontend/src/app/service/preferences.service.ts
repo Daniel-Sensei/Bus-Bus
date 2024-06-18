@@ -13,9 +13,7 @@ export class PreferencesService {
   private async updatePreferences(key: string, value: string[]): Promise<void> {
     try {
       if (key=="recentSearches" && value.length > 5) {
-        console.log('Rimuovo ultimo elemento dalla lista dei preferiti', value);
         value.pop(); // Rimuove ultimo elemento se la lunghezza supera 5
-        console.log('Nuova lista dei preferiti', value);
       }
       await Preferences.set({
         key: key,

@@ -23,14 +23,11 @@ export class LinesPage {
 
   ngOnInit() {
     this.routeService.getAllRoutes().subscribe((routes: any) => {
-      console.log(routes);  
       for (let route of Object.keys(routes)) {
         this.routes.set(route, Object.values(routes[route as unknown as number]));
       }
       this.filteredRoutes = routes;
       this.loading = false; // Imposta il caricamento su false una volta scaricati i dati
-      console.log("routes: ", this.routes);
-      console.log("filteredRoutes: ", this.filteredRoutes);
     });
   }
 

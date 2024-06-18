@@ -30,7 +30,6 @@ export class PositionService {
 
   getCurrentPosition() {
     const position = this.currentPosition;
-    console.log('Current position:', position);
     this.clearCurrentPosition();
     return position;
   }
@@ -53,7 +52,6 @@ export class PositionService {
   async setCurrentPositionFromStopId(stopId: string) {
     try {
       const stop: Stop = await this.stopService.getStop(stopId).toPromise();
-      console.log('Setting current position to', stop.coords.latitude, stop.coords.longitude);
       this.setCurrentPosition(stop.coords.latitude, stop.coords.longitude);
     } catch (error) {
       console.error('Error while setting current position from stop id:', error);

@@ -82,7 +82,6 @@ export class MapPage implements OnInit {
   presentingElement: Element | null = null;
 
   async ngOnInit() {
-    console.log("INITIALIZING TAB2");
     this.presentingElement = document.querySelector('.ion-page');
 
     await this.initializeDefaultMap();
@@ -104,13 +103,10 @@ export class MapPage implements OnInit {
       this.map = await this.initializeMap();
 
       let position = this.positionService.getCurrentPosition();
-      console.log("POSITION: ", position);
       if (position.coords.latitude == 0 && position.coords.longitude == 0) {
-        console.log("POSITION NOT SET");
         await this.getCurrentPosition();
       }
       else {
-        console.log("POSITION SET");
         this.currentPosition = position;
         this.drawMarker = false;
       }
@@ -120,7 +116,6 @@ export class MapPage implements OnInit {
       this.updateMap();
     } catch (error) {
       console.error('Error initializing map', error);
-      // Handle error if needed
     }
   }
 
@@ -151,11 +146,9 @@ export class MapPage implements OnInit {
   async getCurrentPosition() {
     try {
       const permissionStatus = await Geolocation.checkPermissions();
-      console.log("Permission status: ", permissionStatus.location);
 
       if (permissionStatus.location !== 'granted') {
         const requestStatus = await Geolocation.requestPermissions();
-        console.log("Permission request: ", requestStatus.location);
         if (requestStatus.location !== 'granted') {
           throw new Error('Permission not granted');
         }
@@ -170,8 +163,7 @@ export class MapPage implements OnInit {
       this.currentPosition = await Geolocation.getCurrentPosition(options);
     } catch (error) {
       console.error('Error getting current position', error);
-      console.log("DEFAULT POSITION");
-      //imposta una posizione di default
+      // Set default position
       this.currentPosition = {
         coords: {
           latitude: 39.3620,
@@ -491,18 +483,12 @@ export class MapPage implements OnInit {
         this.nextBuses.sort((a: any, b: any) => {
           return a.time.localeCompare(b.time);
         });
-
-        // Stampa la lista risultante
-        this.nextBuses.forEach((item: string) => {
-          console.log(item);
-        });
       });
     }
   }
 
   getAvgBusDelay(busId: string, direction: string){
     this.busService.getAvgDelayByBusAndDirection(busId, direction).then((response) => {
-      console.log(response);
       if(response > 0){
         return ("+" + response + " min");
       }
@@ -510,7 +496,7 @@ export class MapPage implements OnInit {
         return ("-" + response + " min");
       }
     }, (error) => {
-      console.error("Error getting average delay: ", error);
+      // Not Available
       return "N/A";
     });
   }
@@ -535,28 +521,21 @@ export class MapPage implements OnInit {
     this.loadedBuses = true;
     this.busService.getBusesWithinRadius(this.currentPosition, this.selectedRadius).subscribe(buses => {
       this.filteredBuses = buses;
-      //this.loadedBuses = true;
-      console.log("filtered: ", this.filteredBuses);
-      console.log("buses: ", this.buses);
       if (this.filteredBuses.length != this.buses.length) {
-        console.log("GETTING ROUTES");
         this.buses = this.filteredBuses;
         let cont = 0;
         this.buses.forEach(bus => {
           if (bus.route == undefined) {
             this.routeService.getRouteById(bus.routeId).subscribe((route: any) => {
-              console.log(route);
               bus.route = route;
               cont++;
               if (cont == this.buses.length) {
                 this.busesDetailsLoaded = true;
-                console.log("ROUTES LOADED");
               }
             });
           }
           if (bus.delay == undefined) {
             this.busService.getCurrentDelayByBusAndDirection(bus.id, bus.direction).then((response) => {
-              console.log("Delay di " + bus.id + ": " + response)
               if(response >= 0){
                 bus.delay = "+" + response + " min";
               }
@@ -614,7 +593,6 @@ export class MapPage implements OnInit {
     this.buses.forEach(bus => {
       if (bus.routeId === busRouteId) {
         this.selectedBus = bus;
-        console.log(this.selectedBus);
         this.showBuses = false;
         this.showStops = true;
         return;
@@ -644,7 +622,6 @@ export class MapPage implements OnInit {
     const busPosition = position.coords;
     //find bus in this.buses
     bus = this.buses.find(b => b.id === bus.id) as Bus;
-    console.log("DRAW ROUTE: ", bus);
 
     let stops: any[] = [];
     if (bus.direction === "forward") {
@@ -791,7 +768,6 @@ export class MapPage implements OnInit {
 
   search(event: CustomEvent) {
     const query = event.detail.value;
-    console.log(query);
   }
 
   segmentChanged(event: any) {
@@ -799,12 +775,10 @@ export class MapPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    console.log("ION WILL ENTER");
     this.modal.present();
   }
 
   ionViewDidEnter() {
-    console.log("ION DID ENTER");
     if (this.onInit) {
       let position = this.positionService.getCurrentPosition();
       if (position.coords.latitude != 0 && position.coords.longitude != 0) {
@@ -824,14 +798,12 @@ export class MapPage implements OnInit {
 
   searchPlaces(event: Event) {
     const query = (event.target as HTMLInputElement).value;
-    console.log(query);
     this.searchAddress(query);
   }
 
   async searchAddress(query: string) {
     if (query && query.length > 0) {
       const results = await provider.search({ query: query });
-      //console.log(results);
       this.places = results.map(result => {
         return {
           name: result.label,
@@ -839,7 +811,6 @@ export class MapPage implements OnInit {
           lng: result.x
         };
       });
-      console.log(this.places);
     }
   }
 

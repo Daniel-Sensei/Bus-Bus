@@ -28,16 +28,21 @@ export class HomePage {
 
   constructor(private positionService: PositionService, private router: Router, private preferencesService: PreferencesService) { }
 
+  /**
+   * Initializes the component and sets the presenting element.
+   * Also calls the getPreferences function to retrieve user preferences.
+   */
   ngOnInit() {
+    // Get the presenting element that will be used to present the modal
     this.presentingElement = document.querySelector('.ion-page');
 
-    // Recupera le preferenze dell'utente
+    // Retrieve user preferences
     this.getPreferences();
   }
 
   getPreferences() {
-    this.preferencesService.getFavorites('favouriteRoutes').then(routes => { this.favouriteRoutes = routes; console.log("fav routes=", routes) });
-    this.preferencesService.getFavorites('favouriteStops').then(stops => { this.favouriteStops = stops; console.log("stops=", stops) });
+    this.preferencesService.getFavorites('favouriteRoutes').then(routes => this.favouriteRoutes = routes);
+    this.preferencesService.getFavorites('favouriteStops').then(stops => this.favouriteStops = stops);
     this.preferencesService.getFavorites('recentSearches').then(searches => this.recentSearches = searches);
   }
 
@@ -49,18 +54,15 @@ export class HomePage {
     setTimeout(() => {
       const input = document.querySelector('ion-input') as HTMLIonInputElement;
       input.setFocus();
-    }, 0); // 500 milliseconds di ritardo per garantire che il modal sia completamente aperto
+    }, 0);
   }
 
   searchPlaces(event: Event) {
     const query = (event.target as HTMLInputElement).value;
-    console.log(query);
     this.searchAddress(query);
   }
 
   changeCurrentPosition(name: string, lat: number | string, lng: number | string) {
-    console.log("name=", name, "lat=", lat, "lng=", lng);
-
     this.preferencesService.addToFavorites('recentSearches', lat + ',' + lng + '_' + name);
 
     lat = typeof lat === 'string' ? parseFloat(lat) : lat;
@@ -74,7 +76,6 @@ export class HomePage {
   async searchAddress(query: string) {
     if (query && query.length > 0) {
       const results = await provider.search({ query: query });
-      //console.log(results);
       this.places = results.map(result => {
         return {
           name: result.label,
@@ -82,7 +83,6 @@ export class HomePage {
           lng: result.x
         };
       });
-      console.log(this.places);
     }
   }
 
@@ -96,7 +96,6 @@ export class HomePage {
 
   async setStopPosition(stopId: string) {
     await this.positionService.setCurrentPositionFromStopId(stopId);
-    console.log("FATOO");
     this.cardModal.dismiss();
     this.router.navigate(['/tabs/tab2']);
   }

@@ -24,7 +24,6 @@ export class StopDetailsPage implements OnInit {
   constructor(private stopService: StopService, private preferencesService: PreferencesService) { }
 
   ngOnInit() {
-    console.log('ngOnInit of the stop details page', this.stop?.name);
     this.checkFavourite();
   }
 
@@ -35,7 +34,6 @@ export class StopDetailsPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    console.log('ionViewWillEnter');
   }
 
   backToStops() {
