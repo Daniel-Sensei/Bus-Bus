@@ -25,31 +25,26 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/* Importa i fogli di stile Leaflet */
+/* Leaflet */
 @import "~leaflet/dist/leaflet.css";
 @import '~leaflet-geosearch/dist/geosearch.css';
 
-/* Importa i fogli di stile di Compass */
-//@import "~compass.scss";
-
 /* SHEET MODAL */
-/* Stile per il segmento */
+/* Segment style */
 .top-segment {
   position: sticky;
   top: 0;
   z-index: 1100;
 
-  /* Assicura che il segmento sia sopra all'header */
   --background: var(--ion-item-background);
 
-  //imposta il colore di sfondo bianco per il tema chiaro
+  // White background for light theme
   @media (prefers-color-scheme: light) {
     --background: #fff;
   }
 
+  /* Segment on top of the white background */
   margin-top: -30px;
-  /* Sposta il segmento sopra lo spazio bianco */
-  //padding-top: 10px;
 }
 
 .blank-space {
@@ -61,12 +56,13 @@
 
   background: var(--ion-item-background);
 
-  //imposta il colore di sfondo bianco per il tema chiaro
+  // White background for light theme
   @media (prefers-color-scheme: light) {
     background: #fff;
   }
 }
 
+// Center elements
 .div-center {
   display: flex;
   align-items: center;
@@ -74,17 +70,16 @@
 }
 
 .div-center ion-button {
-
-  //imposta margine personalizzato se la lunghezza è maggiore di 1000px in verticale
   @media (min-height: 890px) {
-    //for long phone
+    //For long phone screens
     margin-top: 14px;
   }
 }
 
 .bus-badge {
+  // Used for white and black theme
   color: var(--ion-color-contrast);
-  /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
+
   background-color: transparent;
   padding: 6px 8px;
   margin-right: 8px;
@@ -109,7 +104,6 @@
   background-color: var(--ion-color-primary);
 }
 
-
 .big-hour {
   font-size: 22px;
   font-weight: bold;
@@ -118,18 +112,14 @@
 .header {
   text-align: center;
   padding-left: 0;
-
 }
-
 
 .icon {
   margin-right: 10px;
-  /* Aggiungi un margine a destra all'icona */
 }
 
 .bold {
   font-weight: bold;
-  /* Rendi il testo in grassetto */
   font-size: 18px;
 }
 
@@ -139,11 +129,8 @@
   justify-content: center;
 }
 
-//search Modal
+/* SEARCH MODAL */
 .card-modal-header{
-  //display: flex;
-  //justify-content: space-between;
-  //align-items: center;
   padding: 30px 30px 5px 20px;
 }
 
@@ -152,22 +139,13 @@
   margin-right: 5px
 }
 
-/* LISTA */
 .icon-center {
   margin-right: 4px;
-  /* Aggiunge un po' di spazio tra l'icona e il testo */
 }
 
 .label-small {
   font-size: 17px;
-  /* Imposta la dimensione del testo desiderata */
 }
-
-/*
-ion-list {
-  padding-top: 0;
-}
-*/
 
 ion-item-divider {
   font-size: 22px;

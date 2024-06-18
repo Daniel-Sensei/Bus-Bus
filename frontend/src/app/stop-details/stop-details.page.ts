@@ -21,7 +21,7 @@ export class StopDetailsPage implements OnInit {
   accordionOpen: boolean = false;
   favourite = false;
 
-  constructor(private stopService: StopService, private preferencesService: PreferencesService) { }
+  constructor(private preferencesService: PreferencesService) { }
 
   ngOnInit() {
     this.checkFavourite();
@@ -31,6 +31,16 @@ export class StopDetailsPage implements OnInit {
     this.preferencesService.getFavorites('favouriteStops').then(stops => {
       this.favourite = stops.includes((this.stop?.id || '') + '_' + (this.stop?.name || ''));
     });
+  }
+
+  addFavourite(add: boolean) {
+    this.favourite = add;
+    if(add){
+    this.preferencesService.addToFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    }
+    else{
+      this.preferencesService.removeFromFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    }
   }
 
   ionViewWillEnter() {
@@ -44,15 +54,5 @@ export class StopDetailsPage implements OnInit {
     this.accordionOpen = !this.accordionOpen;
     const breakpoint = this.accordionOpen ? 1 : 0.30;
     this.modal.setCurrentBreakpoint(breakpoint);
-  }
-
-  addFavourite(add: boolean) {
-    this.favourite = add;
-    if(add){
-    this.preferencesService.addToFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
-    }
-    else{
-      this.preferencesService.removeFromFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
-    }
   }
 }

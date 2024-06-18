@@ -86,11 +86,19 @@ export class HomePage {
     }
   }
 
+  /**
+   * Returns the directory path for the icon based on the user's preferred theme.
+   * @returns {string} The directory path for the icon.
+   */
   getIconDirectory(): string {
-    // Controlla se il tema preferito dall'utente è scuro o chiaro
+    // Check if the user's preferred theme is dark or light
     const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    // Restituisci il percorso dell'immagine in base al tema
+    // Return the directory path for the icon based on the theme
+    /**
+     * The directory path for the icon.
+     * @type {string}
+     */
     return isDarkTheme ? 'assets/dark/' : 'assets/light/';
   }
 

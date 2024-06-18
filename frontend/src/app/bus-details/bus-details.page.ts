@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Bus } from '../model/Bus';
 import { IonModal } from '@ionic/angular';
-import { Coordinates } from '../model/Coordinates';
 import { BusService } from '../service/bus.service';
 
 import { PreferencesService } from '../service/preferences.service';
@@ -18,14 +17,37 @@ export class BusDetailsPage implements OnInit {
   destination: string = "";
   arrivals: any;
 
+  @Input() modal!: IonModal;
+
+  @Input() bus!: Bus;
+  @Output() back: EventEmitter<void> = new EventEmitter<void>();
+
+  stops: any;
+
   constructor(private busService: BusService, private preferencesService: PreferencesService) { }
+
+  async ngOnInit() {
+    this.checkFavourite();
+    
+    this.getStopsAndDestination();
+    await this.getArrivals();
+
+    this.busService.getBusFromRealtimeDatabase(this.bus.id).subscribe(async (bus) => {
+      if(this.bus.direction !== bus.direction){
+        this.bus.direction = bus.direction;
+        this.getStopsAndDestination();
+        await this.getArrivals();
+      }
+      if(this.bus.lastStop !== bus.lastStop){
+        this.bus.lastStop = bus.lastStop;
+      }
+    });
+  }
 
   getDestination(back = false): string {
     let destination = "";
     let code = this.bus.route.code.split("_")[1];
-    // in questo momento code continete qaulcosa del tipo "Nicastro-Fronti-Sambiase"
-    // se !back allora la destinazione dovrà seprarae il trattino e prendere "Nicastro - Fronti - Sambiase"
-    // altrimenti dovra invertire l'rdine e prendere "Sambiase -Fronti - Nicastro"
+
     if(!back){
       destination = code.split("-").join(" - ");
     }
@@ -64,7 +86,7 @@ export class BusDetailsPage implements OnInit {
     //find the stopId as a key in the arrivals map
     //the value of the key is an array of arrival times
     //return all the element joined by a " - ", excluding the first element
-    //dont use shift() because it modifies the original array
+    //don't use shift() because it modifies the original array
     let arrival = this.arrivals[stopId];
     if(arrival){
       let newArrival = arrival.slice(1);
@@ -87,30 +109,6 @@ export class BusDetailsPage implements OnInit {
     this.arrivals = await this.busService.getArrivalsByBusAndDirection(this.bus.id, this.bus.direction);
   }
 
-  async ngOnInit() {
-    this.checkFavourite();
-    
-    this.getStopsAndDestination();
-    await this.getArrivals();
-
-    this.busService.getBusFromRealtimeDatabase(this.bus.id).subscribe(async (bus) => {
-      if(this.bus.direction !== bus.direction){
-        this.bus.direction = bus.direction;
-        this.getStopsAndDestination();
-        await this.getArrivals();
-      }
-      if(this.bus.lastStop !== bus.lastStop){
-        this.bus.lastStop = bus.lastStop;
-      }
-    });
-  }
-
-  @Input() modal!: IonModal;
-
-  @Input() bus!: Bus;
-  @Output() back: EventEmitter<void> = new EventEmitter<void>();
-
-  stops: any;
 
   backToBuses(){
     this.back.emit();

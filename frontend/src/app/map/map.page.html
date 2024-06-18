@@ -10,8 +10,7 @@
     <ng-template>
       <ion-content class="ion-padding">
 
-        <!-- Contenuto del modal -->
-        <!-- Assicurati che il contenuto abbia un'altezza fissa -->
+        <!-- MODAL CONTENT -->
         <div *ngIf="showStops && showBuses">
 
           <div class="blank-space"></div>
@@ -25,7 +24,7 @@
             </ion-segment-button>
           </ion-segment>
 
-          <!-- Fermate -->
+          <!-- STOPS -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default' && filteredStops.length > 0">
             <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)"
               (click)="centerStopBus(stop.coords.latitude, stop.coords.longitude)" class="bus-item">
@@ -48,7 +47,7 @@
             <ion-spinner></ion-spinner>
           </div>
 
-          <!-- Bus -->
+          <!-- BUSES -->
           <ion-list class="list" lines="full"
             *ngIf="selectedSegment === 'segment' && busesDetailsLoaded && buses.length > 0">
             <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)"
@@ -63,7 +62,7 @@
             </ion-item>
           </ion-list>
 
-          <!-- Se non ci sono autobus nelle vicinanze -->
+          <!-- If no buses -->
           <div *ngIf="selectedSegment === 'segment' && buses.length === 0 && loadedBuses" style="text-align: center;">
             <ion-img src="../../assets/no-results-people.png" style="width: 70%; display: block; margin: auto; margin-top: 5px;"></ion-img><br>
             <ion-label style="display: block;">Attualmente non troviamo pullman in movimento nell'area. Riprova più

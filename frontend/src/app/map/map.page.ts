@@ -32,9 +32,9 @@ export class MapPage implements OnInit {
   map!: L.Map;
   currentPosition!: Position;
   selectedRadius: number = 1000;
-  selectedSegment: string = 'default'; //stops and buses
+  selectedSegment: string = 'default'; // "default" for stops and "segment" for buses
 
-  // Array di fermate filtrate in base al raggio selezionato
+  // Filtered Stops and Buses based on specified radius
   filteredStops: Stop[] = [];
   loadedStops: boolean = false;
   loadedBuses: boolean = false;
@@ -42,9 +42,9 @@ export class MapPage implements OnInit {
   nextBuses: any;
   filteredBuses: Bus[] = [];
 
-  @ViewChild('modal', { static: true }) modal!: IonModal; // Ottieni il riferimento al modal
-  @ViewChild('cardModal', { static: true }) cardModal!: IonModal; // Ottieni il riferimento al modal
-  @ViewChild('map', { static: true }) mapContainer!: ElementRef; // Ottieni il riferimento al contenitore della mappa
+  @ViewChild('modal', { static: true }) modal!: IonModal; // Content MODAL
+  @ViewChild('cardModal', { static: true }) cardModal!: IonModal; // Search MODAL
+  @ViewChild('map', { static: true }) mapContainer!: ElementRef; // MAP
 
   showStops: boolean = true;
   showBuses: boolean = true;
@@ -60,12 +60,10 @@ export class MapPage implements OnInit {
   isModalOpen = true;
   busesDetailsLoaded: boolean = false;
 
-  //
   places: any[] = [];
   isComponentLoaded: boolean = false;
   drawMarker: boolean = true;
   onInit: boolean = false;
-
 
   constructor(
     private busService: BusService,
@@ -122,18 +120,18 @@ export class MapPage implements OnInit {
   initializeMap(): Promise<L.Map> {
     return new Promise((resolve, reject) => {
       const map = L.map('map', {
-        center: [39.229, 12.810], // Posizione iniziale della mappa (Italy)
+        center: [39.229, 12.810], // Italy
         zoom: 5,
         renderer: L.canvas(),
-        zoomControl: false // Rimuovi il controllo di zoom predefinito
+        zoomControl: false // Remove zoom control
       });
 
-      L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', { //transport
+      L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=f24f001e33674c629c27b0332728171c', {
         attribution: 'Open Street Map',
         className: 'map-tiles'
       }).addTo(map);
 
-      //used to fix the map not showing correctly when moving
+      // Used to fix the map not showing correctly while moving
       map.whenReady(() => {
         setTimeout(() => {
           map.invalidateSize();
@@ -163,7 +161,7 @@ export class MapPage implements OnInit {
       this.currentPosition = await Geolocation.getCurrentPosition(options);
     } catch (error) {
       console.error('Error getting current position', error);
-      // Set default position
+      // Set default position, UNICAL
       this.currentPosition = {
         coords: {
           latitude: 39.3620,
@@ -176,26 +174,40 @@ export class MapPage implements OnInit {
         },
         timestamp: 0
       };
-      //throw error;
     }
   }
 
+  /**
+   * Updates the map to the current position and adds markers and a circle.
+   *
+   * This function retrieves the current position, calculates the latitude and longitude,
+   * and then uses the Leaflet library to fly the map to the current position with a zoom level of 14.
+   * After the map has finished zooming, it adds a marker and a circle to the map.
+   * It also sets the visibility of stops and buses to true.
+   * Finally, it adds markers for stops and buses to the map.
+   */
   updateMap() {
+    // Retrieve the current position
     const currentPosition = this.currentPosition.coords;
+    // Calculate the latitude and longitude
     const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
 
+    // Fly the map to the current position with a zoom level of 14
     this.map.flyTo(currentLatLng, 14, {
       duration: 1.5,
       easeLinearity: 0.5
     });
 
+    // Add a marker and a circle to the map after the map has finished zooming
     this.map.once('zoomend', () => {
       this.addMarkerAndCircle(currentLatLng);
     });
 
+    // Set the visibility of stops and buses to true
     this.showStops = true;
     this.showBuses = true;
 
+    // Add markers for stops and buses to the map
     this.addStopsMarkers();
     this.addBusesMarkers();
   }
@@ -204,10 +216,9 @@ export class MapPage implements OnInit {
     const TopBarControl = L.Control.extend({
       onAdd: () => {
         const topBarDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-        topBarDiv.style.width = '100%'; // Imposta la larghezza al 100%
-        topBarDiv.style.display = 'flex'; // Usa flexbox per allineare il contenuto al centro
-        //topBarDiv.style.marginLeft = "50%"; // Sposta il controllo a sinistra di 100px per centrarlo correttamente
-        topBarDiv.style.border = '0px'; // Aggiungi un bordo al controllo
+        topBarDiv.style.width = '100%';
+        topBarDiv.style.display = 'flex'; // Used to center the control
+        topBarDiv.style.border = '0px'; // Remove the border
         topBarDiv.innerHTML = `
                 <div style="display: flex; height: 40px; justify-content: center; align-items: center; border-radius: 10px; width: 100%; background-color: var(--background); margin-top: 10px;">
                     <div style="height: 100%; display: flex; align-items: center; border-right: solid 1px; border-color: var(--ion-color-step-600, #999999);">
@@ -229,15 +240,12 @@ export class MapPage implements OnInit {
                 </div>
             `;
 
-        // Modifica lo stile del genitore di topBarDiv
         const parentDiv = document.querySelector('.leaflet-top.leaflet-right') as HTMLElement;
         if (parentDiv) {
-          parentDiv.style.left = '0'; // Allinea il controllo a sinistra
-          parentDiv.style.paddingLeft = '6.5%'; // Aggiungi un padding a sinistra
-          parentDiv.style.paddingRight = '2%'; // Aggiungi un padding a destra
+          parentDiv.style.left = '0';
+          parentDiv.style.paddingLeft = '6.5%';
+          parentDiv.style.paddingRight = '2%';
         }
-
-
         return topBarDiv;
       },
       onRemove: () => { }
@@ -249,25 +257,12 @@ export class MapPage implements OnInit {
 
 
   addMarkerAndCircle(currentLatLng: L.LatLng) {
-
-    /*
-    const myMarker = L.icon({
-      iconUrl: 'assets/my-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-      iconSize: [20, 20], // Dimensioni del marker
-      iconAnchor: [10, 20], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-    });
-    */
-
-    //L.marker(currentLatLng, { icon: myMarker }).addTo(this.map);
-
-
-    //clear marker and circle if exists
+    // Clear marker and circle if exists
     this.map.eachLayer((layer: any) => {
       if (layer instanceof L.CircleMarker) {
         this.map.removeLayer(layer);
       }
     });
-
 
     if (this.drawMarker) {
       const marker = L.circleMarker(currentLatLng, {
@@ -288,7 +283,6 @@ export class MapPage implements OnInit {
   }
 
   addCustomControls() {
-    // Aggiungi un nuovo controllo personalizzato per il ricentramento sulla propria posizione
     //GPS BUTTON
     const recenterButton = L.Control.extend({
       options: {
@@ -345,25 +339,18 @@ export class MapPage implements OnInit {
 
       const currentPosition = this.currentPosition.coords;
       const currentLatLng = L.latLng(currentPosition.latitude, currentPosition.longitude);
-      /*
-      this.map.flyTo(currentLatLng, this.calculateZoomLevel(radius), {
-        duration: 1,
-        easeLinearity: 0.5
-      });
-      */
 
-      // Rimuovi i marker delle fermate attualmente presenti sulla mappa
+      // Remove existing markers and circles
       this.map.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
           this.map.removeLayer(layer);
         }
       });
 
-      // Aggiorna e aggiungi i marker delle fermate filtrate con il nuovo raggio
       this.addStopsMarkers();
       this.addBusesMarkers();
 
-      // Rimuovi il cerchio esistente e aggiungi un nuovo cerchio con il raggio specificato
+      // Remove existing circles and add new ones
       this.map.eachLayer((layer) => {
         if (layer instanceof L.Circle) {
           this.map.removeLayer(layer);
@@ -391,24 +378,22 @@ export class MapPage implements OnInit {
     this.loadedStops = false;
 
     this.stopService.getStopsWithinRadius({ latitude: this.currentPosition.coords.latitude, longitude: this.currentPosition.coords.longitude }, this.selectedRadius).subscribe(stops => {
-      //stops are order by the server
+      // Stops are already sorted by distance from the the server
       this.filteredStops = stops;
       this.loadedStops = true;
 
       this.filteredStops.forEach(stop => {
         const customIcon = L.icon({
-          iconUrl: this.getIconDirectory() + 'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-          iconSize: [16, 16], // Dimensioni del marker
-          iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-          popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+          iconUrl: this.getIconDirectory() + 'bus-stop-marker.png',
+          iconSize: [16, 16], // Marker size
+          iconAnchor: [8, 16], // Anchor position of the marker relative to its position
+          popupAnchor: [0, -16] // Anchor position of the popup relative to its anchor
         });
 
-        const stopMarker = L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
-          //.bindPopup(stop.name)
+        const stopMarker = L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon })
           .on('click', () => {
-            this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
-
-            this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
+            this.eraseRoute(); // Remove existing route if exists
+            this.navigateToStopDetails(stop);
             this.centerStopBus(stop.coords.latitude, stop.coords.longitude);
           })
           .addTo(this.map);
@@ -419,7 +404,7 @@ export class MapPage implements OnInit {
   }
 
   centerStopBus = async (lat: number, long: number) => {
-    //se il breakpoint del modal è 1, allora imposta il breakpoint a 0.30
+    // Set modal breakpoint to 0.30 if it's 1
     if (await this.modal.getCurrentBreakpoint() === 1) {
       this.modal.setCurrentBreakpoint(0.30);
     }
@@ -432,22 +417,21 @@ export class MapPage implements OnInit {
   }
 
   centerBus = async (bus: Bus) => {
-    //se il breakpoint del modal è 1, allora imposta il breakpoint a 0.30
+    // Set modal breakpoint to 0.30 if it's 1
     if (await this.modal.getCurrentBreakpoint() === 1) {
       this.modal.setCurrentBreakpoint(0.30);
     }
 
-    //find the bus in filteredBuses and take the coords
+    // Find the bus in filteredBuses and take the coords
     const busIndex = this.filteredBuses.findIndex(busFound => busFound.id === bus.id);
     const busCoords = this.filteredBuses[busIndex].coords;
-    
-    
+
+
     const stopLatLng = L.latLng(busCoords.latitude, busCoords.longitude);
     this.map.flyTo(stopLatLng, 15, {
       duration: 1,
       easeLinearity: 0.5
     });
-    
   }
 
   navigateToStopDetails(stop: Stop) {
@@ -457,29 +441,29 @@ export class MapPage implements OnInit {
         this.showBuses = true;
 
         this.selectedStop = this.filteredStops.find(stopFound => stopFound.id === stop.id);
-        // Inizializza un array per contenere tutte le coppie di linee e orari
+        // Array used to store the next buses
         this.nextBuses = [];
 
-        // Itera su tutte le chiavi dell'oggetto (che rappresentano i nomi delle linee)
+        // Keys rapresent the line names
         Object.keys(buses).forEach(line => {
           buses[line].forEach((time: any) => {
             this.nextBuses.push(`${line}?${time}`);
           });
         });
 
-        //splitta la stringa in due parti
+        // Split the string in two parts: line and time
         this.nextBuses = this.nextBuses.map((item: string) => {
           const [line, time] = item.split('?');
           return { line, time };
         });
 
-        //splitta ulteriormente line.code e line.name per "_"
+        // Split again line.code and line.name
         this.nextBuses = this.nextBuses.map((item: any) => {
           const [code, name] = item.line.split('_');
           return { code, name, time: item.time };
         });
 
-        // Ordina la lista risultante per orario
+        // Reorder the buses by time
         this.nextBuses.sort((a: any, b: any) => {
           return a.time.localeCompare(b.time);
         });
@@ -487,12 +471,13 @@ export class MapPage implements OnInit {
     }
   }
 
-  getAvgBusDelay(busId: string, direction: string){
+  /* NOT USED, takes the average delay from the server from the "delays" */
+  getAvgBusDelay(busId: string, direction: string) {
     this.busService.getAvgDelayByBusAndDirection(busId, direction).then((response) => {
-      if(response > 0){
+      if (response > 0) {
         return ("+" + response + " min");
       }
-      else{
+      else {
         return ("-" + response + " min");
       }
     }, (error) => {
@@ -510,7 +495,6 @@ export class MapPage implements OnInit {
     //REMOVE ROUTE IF EXISTS
     if (this.firstRoute || this.secondRoute) {
       this.eraseRoute();
-      //filtra nell'array buses il this.selectedBus
       this.selectedBus = this.filteredBuses.find(bus => bus.id === this.selectedBus?.id);
       //Redraw route if selectedBus is not null
       if (this.selectedBus) {
@@ -518,28 +502,43 @@ export class MapPage implements OnInit {
       }
     }
 
+    // Stop the loading animation
     this.loadedBuses = true;
+
+    // Get the buses within the selected radius
     this.busService.getBusesWithinRadius(this.currentPosition, this.selectedRadius).subscribe(buses => {
       this.filteredBuses = buses;
+
+      // If the filtered buses are different from the current buses, update the buses
       if (this.filteredBuses.length != this.buses.length) {
         this.buses = this.filteredBuses;
+
+        // Initialize a counter to keep track of the number of buses with missing data
         let cont = 0;
+
+        // Iterate over each bus
         this.buses.forEach(bus => {
+
+          // If the bus route is not defined, get it from the server
           if (bus.route == undefined) {
             this.routeService.getRouteById(bus.routeId).subscribe((route: any) => {
               bus.route = route;
               cont++;
+
+              // If all the buses have their route, mark the bus details as loaded
               if (cont == this.buses.length) {
                 this.busesDetailsLoaded = true;
               }
             });
           }
+
+          // If the bus delay is not defined, get it from the server
           if (bus.delay == undefined) {
             this.busService.getCurrentDelayByBusAndDirection(bus.id, bus.direction).then((response) => {
-              if(response >= 0){
+              if (response >= 0) {
                 bus.delay = "+" + response + " min";
               }
-              else{
+              else {
                 bus.delay = response + " min";
               }
             }, (error) => {
@@ -549,52 +548,56 @@ export class MapPage implements OnInit {
         });
       }
 
-      /*
-      this.filteredBuses = this.buses.filter(BUSES =>
-        this.isInsideRadius([BUSES.coords.latitude, BUSES.coords.longitude], this.currentPosition.coords, this.selectedRadius)
-      );
-      */
-
+      // REDRAW THE MARKERS
       this.clearBusMarkers();
 
       this.filteredBuses.forEach(bus => {
         const customIcon = L.icon({
-          iconUrl: this.getIconDirectory() + 'bus-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-          iconSize: [22, 22], // Dimensioni del marker
-          iconAnchor: [11, 11], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-          popupAnchor: [0, -11] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+          iconUrl: this.getIconDirectory() + 'bus-marker.png',
+          iconSize: [22, 22],
+          iconAnchor: [11, 11],
+          popupAnchor: [0, -11]
         });
 
         const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
           .on('click', () => {
-            this.navigateToBusDetails(bus.routeId); // Aggiunta dell'azione quando clicchi sulla fermata
+            this.navigateToBusDetails(bus.routeId);
             this.centerStopBus(bus.coords.latitude, bus.coords.longitude);
             this.eraseRoute();
-            //this.drawRoute(bus);
+            //this.drawRoute(bus); //NOT USED
           })
           .addTo(this.map);
         this.busesMarkers.push(busMarker);
       });
-
     });
-
   }
 
+  /**
+   * Returns the directory for the icons based on the user's preferred theme.
+   * @returns {string} The path to the icon directory.
+   */
   getIconDirectory(): string {
-    // Controlla se il tema preferito dall'utente è scuro o chiaro
     const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    // Restituisci il percorso dell'immagine in base al tema
     return isDarkTheme ? 'assets/dark/' : 'assets/light/';
   }
 
-
+  /**
+   * Navigates to the bus details page for the specified bus route ID.
+   * 
+   * @param {string} busRouteId - The ID of the bus route.
+   */
   navigateToBusDetails(busRouteId: string) {
+    // Iterate through the buses and find the bus with the specified route ID.
     this.buses.forEach(bus => {
+      // Check if the current bus's route ID matches the specified route ID.
       if (bus.routeId === busRouteId) {
+        // Set the selected bus to the found bus.
         this.selectedBus = bus;
+        // Set the flags to display the bus details and hide the stops.
         this.showBuses = false;
         this.showStops = true;
+        // Exit the loop after finding the bus.
         return;
       }
     });
@@ -606,7 +609,13 @@ export class MapPage implements OnInit {
     });
   }
 
+  /**
+   * Draws a route on the map for the specified bus.
+   *
+   * @param {Bus} bus - The bus for which to draw the route.
+   */
   drawRoute(bus: Bus) {
+    // Create a mock position object for the bus
     var position = {
       coords: {
         latitude: bus.coords.latitude,
@@ -619,43 +628,42 @@ export class MapPage implements OnInit {
       },
       timestamp: 0
     };
-    const busPosition = position.coords;
-    //find bus in this.buses
+
+    // Find the bus object in the buses array
     bus = this.buses.find(b => b.id === bus.id) as Bus;
 
+    // Get the stops for the bus's current direction
     let stops: any[] = [];
     if (bus.direction === "forward") {
       stops = bus.route.stops.forwardStops;
-    }
-    else {
+    } else {
       stops = bus.route.stops.backStops;
     }
 
+    // Draw markers for each stop on the map
     stops.forEach(stop => {
       const customIcon = L.icon({
-        iconUrl: this.getIconDirectory() + 'bus-stop-marker.png', // Assicurati di specificare il percorso corretto del tuo marker personalizzato
-        iconSize: [16, 16], // Dimensioni del marker
-        iconAnchor: [8, 16], // Posizione del punto di ancoraggio del marker rispetto alla sua posizione
-        popupAnchor: [0, -16] // Posizione della finestra di popup rispetto al punto di ancoraggio del marker
+        iconUrl: this.getIconDirectory() + 'bus-stop-marker.png',
+        iconSize: [16, 16],
+        iconAnchor: [8, 16],
+        popupAnchor: [0, -16]
       });
 
-      L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
-        //.bindPopup(stop.name)
+      L.marker([stop.coords.latitude, stop.coords.longitude], { icon: customIcon })
         .on('click', () => {
-          this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
-
-          this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
+          this.eraseRoute();
+          this.navigateToStopDetails(stop);
           this.centerStopBus(stop.coords.latitude, stop.coords.longitude);
         })
         .addTo(this.map);
     });
 
-    // Creare un array di coordinate dal primo stop all'attuale posizione del bus
+    // Create waypoints for the first and last legs of the route
     if (bus.lastStop >= 0) {
       const firstLegStops = stops.slice(0, bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
+      const firstLegWaypoints = [...firstLegStops, L.latLng(position.coords.latitude, position.coords.longitude)];
 
-      const firstLegWaypoints = [...firstLegStops, L.latLng(busPosition.latitude, busPosition.longitude)];
-      // Aggiungere il controllo di routing alla mappa per il primo percorso (primo stop all'attuale posizione del bus)
+      // Add routing control for the first leg of the route
       this.firstRoute = L.Routing.control({
         waypoints: firstLegWaypoints,
         lineOptions: {
@@ -665,20 +673,18 @@ export class MapPage implements OnInit {
         },
         routeWhileDragging: true,
         show: false,
-        fitSelectedRoutes: false, // Non adattare la mappa al percorso
-        //lineOptions: { styles: [{ color: 'yellow', weight: 5 }] } // Imposta il colore del percorso in giallo
+        fitSelectedRoutes: false // Don't adjust the map to fit the route
       }).addTo(this.map);
     }
 
     const lastLegStops = stops.slice(bus.lastStop + 1).map((stop: any) => L.latLng(stop.coords.latitude, stop.coords.longitude));
-    const lastLegWaypoints = [L.latLng(busPosition.latitude, busPosition.longitude), ...lastLegStops];
+    const lastLegWaypoints = [L.latLng(position.coords.latitude, position.coords.longitude), ...lastLegStops];
 
-    // Aggiungere il controllo di routing alla mappa per il secondo percorso (attuale posizione del bus all'ultimo stop)
+    // Add routing control for the second leg of the route
     this.secondRoute = L.Routing.control({
       waypoints: lastLegWaypoints,
       routeWhileDragging: true,
-      show: true,
-      //lineOptions: { styles: [{ color: 'red', weight: 5 }] } // Imposta il colore del percorso in rosso
+      show: true
     }).addTo(this.map);
 
     // Remove waypoints (of the route) from the map
@@ -688,37 +694,55 @@ export class MapPage implements OnInit {
       }
     });
 
-    // Effettuare una query nel DOM per trovare il div che contiene il controllo di routing
-    // Nascondere tutti i div che contengono il controllo di routing
+    // Hide routing control divs in the DOM
     const routingControlDivs = document.querySelectorAll('.leaflet-routing-container');
     routingControlDivs.forEach(div => {
       (div as HTMLElement).style.display = 'none';
     });
   }
 
+  /**
+   * Removes the intermediate points (waypoints) and the routes themselves from the map.
+   */
   eraseRoute() {
-    // Rimuovere i punti intermedi (waypoints) dei percorsi
+    // Remove intermediate points (waypoints) from the map
+    // This is done by iterating over all the layers on the map and checking if they have waypoints
+    // If a layer has waypoints, it is removed from the map
     this.map.eachLayer((layer: any) => {
       if (layer.options.waypoints && layer.options.waypoints.length) {
         this.map.removeLayer(layer);
       }
     });
 
-    // Rimuovere i layer dei percorsi stessi
+    // Remove the routes themselves from the map
+    // This is done by checking if the firstRoute and secondRoute properties exist
+    // If they do, they are removed from the map
     if (this.firstRoute) {
       this.map.removeControl(this.firstRoute);
-      this.firstRoute = undefined;
+      this.firstRoute = undefined; // Reset the firstRoute property
     }
     if (this.secondRoute) {
       this.map.removeControl(this.secondRoute);
-      this.secondRoute = undefined;
+      this.secondRoute = undefined; // Reset the secondRoute property
     }
   }
 
+  /**
+   * Checks if a given object is within a certain radius of the current position.
+   * @param objectCoords - The coordinates of the object to check.
+   * @param currentCoords - The current position coordinates.
+   * @param radius - The radius in meters.
+   * @returns True if the object is within the radius, false otherwise.
+   */
   isInsideRadius(objectCoords: [number, number], currentCoords: { latitude: number, longitude: number }, radius: number): boolean {
+    // Create L.LatLng objects for the object and current position
     const stopLatLng = L.latLng(objectCoords[0], objectCoords[1]);
     const currentLatLng = L.latLng(currentCoords.latitude, currentCoords.longitude);
+
+    // Calculate the distance between the object and current position
     const distance = stopLatLng.distanceTo(currentLatLng);
+
+    // Check if the distance is less than or equal to the radius
     return distance <= radius;
   }
 
@@ -734,35 +758,54 @@ export class MapPage implements OnInit {
     });
   }
 
+  /**
+   * Calculates the zoom level based on the given radius.
+   *
+   * @param {number} radius - The radius in meters.
+   * @return {number} The calculated zoom level.
+   */
   calculateZoomLevel(radius: number): number {
+    // The zoom level is calculated using the formula:
+    // zoom level = 15 - log2(radius / 500)
+    // The logarithm base is 2 (Math.LN2).
+
+    // The zoom level determines the level of detail displayed on the map.
+    // A higher zoom level shows more detail, while a lower zoom level shows less detail.
+
+    // The radius is divided by 500 to normalize the calculation.
+    // This ensures that the zoom level is consistent regardless of the radius value.
+
     return Math.round(15 - Math.log(radius / 500) / Math.LN2);
   }
 
-  getDistance(pos1: GeoPoint | Position, pos2: GeoPoint) {
-    //using leaflet-routing-machine calculate distance between two points
-    // return distance in meters without calculating the route, just the distance in air
-
-    //if the first position is a Position object, convert it to a Geopoint object
+  /**
+   * Calculates the distance between two points using Leaflet Routing Machine.
+   *
+   * @param {GeoPoint | Position} pos1 - The first position (GeoPoint or Position object).
+   * @param {GeoPoint} pos2 - The second position (GeoPoint object).
+   * @return {number} The calculated distance in meters, rounded to one decimal place.
+   */
+  getDistance(pos1: GeoPoint | Position, pos2: GeoPoint): number {
+    // Convert Position object to GeoPoint if necessary
     if ((pos1 as Position).coords) {
       const positionCoords = (pos1 as Position).coords;
       pos1 = new GeoPoint(positionCoords.latitude, positionCoords.longitude);
     }
 
-    //use leaflet measure
-    // Creare due punti Leaflet LatLng
+    // Create two Leaflet LatLng points
     const point1 = L.latLng((pos1 as GeoPoint).latitude, (pos1 as GeoPoint).longitude);
     const point2 = L.latLng(pos2.latitude, pos2.longitude);
 
-    // Utilizzare il modulo Leaflet Measure per calcolare la distanza tra i due punti
+    // Use Leaflet Measure to calculate the distance between the two points
     const distance = L.GeometryUtil.length([point1, point2]);
 
-    // Calcola la distanza in chilometri
+    // Calculate the distance in kilometers
     const distanceInKilometers = distance / 1000;
 
-    // Arrotonda la distanza a una cifra decimale
+    // Round the distance to one decimal place
     const roundedDistance = distanceInKilometers.toFixed(1);
 
-    // Ritorna la distanza arrotondata
+    // Return the rounded distance
     return Number(roundedDistance);
   }
 
@@ -772,28 +815,6 @@ export class MapPage implements OnInit {
 
   segmentChanged(event: any) {
     this.selectedSegment = event.detail.value;
-  }
-
-  ionViewWillEnter() {
-    this.modal.present();
-  }
-
-  ionViewDidEnter() {
-    if (this.onInit) {
-      let position = this.positionService.getCurrentPosition();
-      if (position.coords.latitude != 0 && position.coords.longitude != 0) {
-        //aspetta che il componente sia caricato al 100%
-        setTimeout(() => {
-          this.currentPosition = position;
-          this.drawMarker = false;
-          this.updateMap();
-        }, 1000);
-      }
-    }
-  }
-
-  ionViewWillLeave() {
-    this.modal.dismiss();
   }
 
   searchPlaces(event: Event) {
@@ -830,8 +851,40 @@ export class MapPage implements OnInit {
     setTimeout(() => {
       const input = document.querySelector('ion-input') as HTMLIonInputElement;
       input.setFocus();
-    }, 0); // 500 milliseconds di ritardo per garantire che il modal sia completamente aperto
+    }, 0);
   }
 
+  ionViewWillEnter() {
+    this.modal.present();
+  }
 
+  /**
+   * This function is called when the view is fully entered.
+   * It checks if it is the first time the view is entered and if so, it retrieves the current position
+   * and updates the map accordingly.
+   */
+  ionViewDidEnter() {
+    // Check if it is the first time the view is entered
+    if (this.onInit) {
+      // Get the current position
+      let position = this.positionService.getCurrentPosition();
+      
+      // Check if the position is not (0, 0)
+      if (position.coords.latitude != 0 && position.coords.longitude != 0) {
+        // Delay the update of the map by 1 second
+        setTimeout(() => {
+          // Update the current position
+          this.currentPosition = position;
+          // Hide the marker on the map
+          this.drawMarker = false;
+          // Update the map with the new position
+          this.updateMap();
+        }, 1000);
+      }
+    }
+  }
+
+  ionViewWillLeave() {
+    this.modal.dismiss();
+  }
 }

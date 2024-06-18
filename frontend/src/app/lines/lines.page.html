@@ -6,7 +6,7 @@
   </ion-toolbar>
 
   <div *ngIf="loading" class="loading-overlay">
-    <!-- Aggiungi qui l'effetto di caricamento, ad esempio uno spinner -->
+    <!-- Loading Spinner -->
     <ion-spinner></ion-spinner>
   </div>
 
@@ -43,7 +43,7 @@
                 </ion-segment-button>
               </ion-segment>
 
-              <!-- Andata -->
+              <!-- Forward -->
               <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default'" style="padding-top: 0px;">
                 <ion-accordion-group>
                   <div *ngFor="let stop of route.stops.forwardStops; let i = index">
@@ -64,7 +64,7 @@
                 </ion-accordion-group>
               </ion-list>
 
-              <!-- Ritorno -->
+              <!-- Back -->
               <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'" style="padding-top: 0px;">
                 <ion-accordion-group>
                   <div *ngFor="let stop of route.stops.backStops; let i = index">

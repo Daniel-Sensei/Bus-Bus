@@ -1,11 +1,6 @@
 ion-button[slot='fixed'] {
   position: fixed;
-  bottom: 16px; // Regola l'altezza dal basso della pagina
-  left: 50%; // Posiziona il bottone a metà della larghezza della pagina
-  transform: translateX(-50%); // Sposta il bottone a sinistra del 50% della propria larghezza
-}
-
-ion-list > ion-item.bus-item{
-  //padding-top: 10px;
-  //padding-bottom: 10px;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
 }
