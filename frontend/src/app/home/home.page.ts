@@ -12,10 +12,10 @@ import { PreferencesService } from '../service/preferences.service';
 
 @Component({
   selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+  templateUrl: 'home.page.html',
+  styleUrls: ['home.page.scss']
 })
-export class Tab1Page {
+export class HomePage {
 
   @ViewChild('cardModal', { static: true }) cardModal!: IonModal; // Ottieni il riferimento al modal
   presentingElement: Element | null = null;

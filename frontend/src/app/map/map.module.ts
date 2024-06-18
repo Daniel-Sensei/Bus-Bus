@@ -2,10 +2,9 @@ import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Tab2Page } from './tab2.page';
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
+import { MapPage } from './map.page';
 
-import { Tab2PageRoutingModule } from './tab2-routing.module';
+import { MapPageRoutingModule } from './map-routing.module';
 
 import { StopDetailsPageModule } from '../stop-details/stop-details.module';
 import { BusDetailsPageModule } from '../bus-details/bus-details.module';
@@ -14,13 +13,11 @@ import { BusDetailsPageModule } from '../bus-details/bus-details.module';
   imports: [
     IonicModule,
     CommonModule,
-    FormsModule,
-    ExploreContainerComponentModule,
-    
-    Tab2PageRoutingModule,
+    FormsModule,    
+    MapPageRoutingModule,
     StopDetailsPageModule,
     BusDetailsPageModule
   ],
-  declarations: [Tab2Page]
+  declarations: [MapPage]
 })
-export class Tab2PageModule {}
+export class MapPageModule {}

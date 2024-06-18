@@ -25,10 +25,10 @@ import { PreferencesService } from '../service/preferences.service';
 
 @Component({
   selector: 'app-tab2',
-  templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss']
+  templateUrl: 'map.page.html',
+  styleUrls: ['map.page.scss']
 })
-export class Tab2Page implements OnInit {
+export class MapPage implements OnInit {
   map!: L.Map;
   currentPosition!: Position;
   selectedRadius: number = 1000;

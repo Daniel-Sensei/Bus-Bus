@@ -8,10 +8,10 @@ interface Company {
 
 @Component({
   selector: 'app-tab3',
-  templateUrl: 'tab3.page.html',
-  styleUrls: ['tab3.page.scss']
+  templateUrl: 'lines.page.html',
+  styleUrls: ['lines.page.scss']
 })
-export class Tab3Page {
+export class LinesPage {
 
   selectedCompany: Company | null = null;
   routes: Map<string,any[]> = new Map();
