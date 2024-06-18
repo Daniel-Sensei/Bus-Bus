@@ -67,3 +67,7 @@ npm install
 
 ## Author
 - [Curcio Daniel](https://github.com/Daniel-Sensei)
+
+---
+
+Feel free to use and modify this application to suit your transportation needs. For any issues or contributions, please visit the repository and submit your queries or pull requests.
