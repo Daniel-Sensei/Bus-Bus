@@ -511,6 +511,7 @@ export class MapPage implements OnInit {
 
       // If the filtered buses are different from the current buses, update the buses
       if (this.filteredBuses.length != this.buses.length) {
+        console.log("READ FROM FIRESTORE");
         this.buses = this.filteredBuses;
 
         // Initialize a counter to keep track of the number of buses with missing data

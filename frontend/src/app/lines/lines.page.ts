@@ -15,9 +15,9 @@ export class LinesPage {
 
   selectedCompany: Company | null = null;
   routes: Map<string, any[]> = new Map();
-  filteredRoutes: Map<string, any[]> = new Map(); // Aggiungi un array per i dati filtrati
-  loading: boolean = true; // Aggiungi una variabile per il caricamento
-  selectedSegment: string = 'default'; //stops and buses
+  filteredRoutes: Map<string, any[]> = new Map();
+  loading: boolean = true; 
+  selectedSegment: string = 'default'; // "default" for stops and "segment" for buses
 
   constructor(private routeService: RouteService) { }
 
