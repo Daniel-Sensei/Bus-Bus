@@ -937,7 +937,10 @@ public class BusService {
             Route route = routeDocument.toObject(Route.class);
 
             // Calculate the current delay
-            Schedule timetable = route.getTimetable();
+            Schedule timetable = route.getDelays();
+            if(!checkDelaysIntegrity(timetable)) {
+                timetable = route.getTimetable();
+            }
             Map<String, List<String>> timetableDirection = direction.equals("forward") ? timetable.getForward()
                     : timetable.getBack();
 
