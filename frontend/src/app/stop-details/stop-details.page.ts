@@ -2,6 +2,9 @@ import { Component, OnInit, Input, Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import { Stop } from '../model/Stop';
 import { IonModal } from '@ionic/angular';
+import { StopService } from '../service/stop.service';
+
+import { PreferencesService } from '../service/preferences.service';
 
 @Component({
   selector: 'app-stop-details',
@@ -12,20 +15,35 @@ export class StopDetailsPage implements OnInit {
   @Input() modal!: IonModal;
 
   @Input() stop?: Stop;
+  @Input() nextBuses?: any;
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
 
   accordionOpen: boolean = false;
-
   favourite = false;
 
-  constructor() {}
+  constructor(private preferencesService: PreferencesService) { }
 
   ngOnInit() {
-    console.log('ngOnInit');
+    this.checkFavourite();
+  }
+
+  checkFavourite() {
+    this.preferencesService.getFavorites('favouriteStops').then(stops => {
+      this.favourite = stops.includes((this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    });
+  }
+
+  addFavourite(add: boolean) {
+    this.favourite = add;
+    if(add){
+    this.preferencesService.addToFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    }
+    else{
+      this.preferencesService.removeFromFavorites('favouriteStops', (this.stop?.id || '') + '_' + (this.stop?.name || ''));
+    }
   }
 
   ionViewWillEnter() {
-    console.log('ionViewWillEnter');
   }
 
   backToStops() {
@@ -36,9 +54,5 @@ export class StopDetailsPage implements OnInit {
     this.accordionOpen = !this.accordionOpen;
     const breakpoint = this.accordionOpen ? 1 : 0.30;
     this.modal.setCurrentBreakpoint(breakpoint);
-  }
-
-  addFavourite(add: boolean) {
-    this.favourite = add;
   }
 }

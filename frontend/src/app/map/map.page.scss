@@ -1,0 +1,52 @@
+#map {
+    height: 100%;
+}
+
+.modal-above-tabs {
+    bottom: 56px;
+}
+
+.modal-above-tabs::part(handle) {
+    background-color: var(--ion-color-primary);
+    
+    height: 4px;
+    width: 72px;
+    margin-top: 10px;
+}
+
+.modal-above-tabs::part(content) {
+    border-radius: 20px 20px 0 0px; // Border radius
+    box-shadow: 0px 0px 20px 5px rgb(0 0 0 / 15%);
+    padding-top: 10px;
+}
+
+ion-button[slot='fixed'] {
+    position: fixed;
+    bottom: 16px; // Must be fixed bottom
+    left: 50%; // Horizontally center
+    transform: translateX(-50%);
+}
+
+.img-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+ion-segment {
+    border-radius: 10px;
+}
+
+.loading-segment {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-segment ion-spinner {
+    color: var(--ion-color-primary);
+
+    width: 40px;
+    height: 40px;
+}

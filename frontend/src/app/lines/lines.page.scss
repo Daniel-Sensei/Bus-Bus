@@ -1,0 +1,33 @@
+
+
+
+
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.search-bar {
+  padding-left: 10px;
+  padding-right: 10px;
+  --border-radius: 20px;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Sfondo grigio trasparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-overlay ion-spinner {
+  color: var(--ion-color-primary); /* Colore dell'icona di caricamento */
+  width: 40px;
+  height: 40px;
+}

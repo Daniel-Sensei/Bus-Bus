@@ -25,113 +25,129 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/* Importa i fogli di stile Leaflet */
+/* Leaflet */
 @import "~leaflet/dist/leaflet.css";
-
-/* Importa i fogli di stile di Compass */
-//@import "~compass.scss";
+@import '~leaflet-geosearch/dist/geosearch.css';
 
 /* SHEET MODAL */
-/* Stile per il segmento */
+/* Segment style */
 .top-segment {
-    position: sticky;
-    top: 0;
-    z-index: 1100;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
 
-    /* Assicura che il segmento sia sopra all'header */
-    --background: var(--ion-item-background);
+  --background: var(--ion-item-background);
 
-    //imposta il colore di sfondo bianco per il tema chiaro
-    @media (prefers-color-scheme: light) {
-        --background: #fff;
-    }
+  // White background for light theme
+  @media (prefers-color-scheme: light) {
+    --background: #fff;
+  }
 
-    margin-top: -30px;
-    /* Sposta il segmento sopra lo spazio bianco */
-    //padding-top: 10px;
+  /* Segment on top of the white background */
+  margin-top: -30px;
 }
 
 .blank-space {
-    position: sticky;
-    top: -20px;
-    z-index: 1000;
-    height: 22px;
+  position: sticky;
+  top: -20px;
+  z-index: 1000;
+  height: 22px;
 
 
-    background: var(--ion-item-background);
+  background: var(--ion-item-background);
 
-    //imposta il colore di sfondo bianco per il tema chiaro
-    @media (prefers-color-scheme: light) {
-        background: #fff;
-    }
+  // White background for light theme
+  @media (prefers-color-scheme: light) {
+    background: #fff;
+  }
 }
 
-.div-center{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+// Center elements
+.div-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.div-center ion-button {
+  @media (min-height: 890px) {
+    //For long phone screens
+    margin-top: 14px;
+  }
 }
 
 .bus-badge {
-    background-color: transparent;
-    padding-right: 4px;
-    position: relative;
-    margin-right: 8px;
-    border: 3px solid #ccc;
-    /* Aggiunge un bordo grigio */
-  
-    display: flex;
-    align-items: center;
-  
-    font-size: 18px;
-    /* Imposta la dimensione del badge desiderata (13px DEFAULT) */
-    color: var(--ion-color-contrast);
-    /* Imposta il colore del testo del badge (TEMA CHIARO/SCURO) */
+  // Used for white and black theme
+  color: var(--ion-color-contrast);
 
-    //rounded
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-right: 8px;
-    padding-left: 8px;
-    border-radius: 10px;
-  }
-  
-  .bus-badge::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background-color: blue;
-  }
+  background-color: transparent;
+  padding: 6px 8px;
+  margin-right: 8px;
+  border: 3px solid #ccc;
+  border-radius: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .big-hour{
-    font-size: 22px;
-    font-weight: bold;
-  }
+.bus-badge ion-icon {
+  vertical-align: middle;
+}
 
-  .header {
-    text-align: center;
-    padding-left: 0;
-  
-  }
-  
-  
-  .icon {
-    margin-right: 10px;
-    /* Aggiungi un margine a destra all'icona */
-  }
-  
-  .bold {
-    font-weight: bold;
-    /* Rendi il testo in grassetto */
-    font-size: 18px;
-  }
-  
-  .label {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
+.bus-badge::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--ion-color-primary);
+}
+
+.big-hour {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.header {
+  text-align: center;
+  padding-left: 0;
+}
+
+.icon {
+  margin-right: 10px;
+}
+
+.bold {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* SEARCH MODAL */
+.card-modal-header{
+  padding: 30px 30px 5px 20px;
+}
+
+.card-modal-header ion-icon{
+  font-size: 20px;
+  margin-right: 5px
+}
+
+.icon-center {
+  margin-right: 4px;
+}
+
+.label-small {
+  font-size: 17px;
+}
+
+ion-item-divider {
+  font-size: 22px;
+  background: var(--ion-border-color);
+}

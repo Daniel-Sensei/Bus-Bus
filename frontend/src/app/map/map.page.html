@@ -1,0 +1,123 @@
+<ion-content>
+  <div #map id="map"></div>
+
+  <ion-button shape="round" *ngIf="isModalOpen == false" (click)="setOpen(true)" slot="fixed">Visualizza nei
+    dintorni</ion-button>
+
+  <ion-modal #modal [isOpen]="isModalOpen" [initialBreakpoint]="0.30" [breakpoints]="[0.00, 0.30, 1]"
+    [backdropDismiss]="false" [backdropBreakpoint]="0.95" [handle]="true" [cssClass]="'modal-above-tabs'"
+    handle-behavior="cycle">
+    <ng-template>
+      <ion-content class="ion-padding">
+
+        <!-- MODAL CONTENT -->
+        <div *ngIf="showStops && showBuses">
+
+          <div class="blank-space"></div>
+
+          <ion-segment value="{{this.selectedSegment}}" (ionChange)="segmentChanged($event)" class="top-segment">
+            <ion-segment-button value="default">
+              <ion-label>Fermate</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="segment">
+              <ion-label>Bus</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+
+          <!-- STOPS -->
+          <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default' && filteredStops.length > 0">
+            <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)"
+              (click)="centerStopBus(stop.coords.latitude, stop.coords.longitude)" class="bus-item">
+              <img [src]="getIconDirectory() + 'bus-stop.png'" class="img-icon">
+              <ion-label
+                style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.name}}</ion-label>
+              <ion-label style="font-size: 22px;" slot="end">{{ this.getDistance(this.currentPosition, stop.coords)
+                }}Km</ion-label>
+            </ion-item>
+          </ion-list>
+
+          <div *ngIf="selectedSegment === 'default' && filteredStops.length === 0 && loadedStops"
+            style="text-align: center;">
+            <ion-img src="../../assets/no-results-detective.png" style="width: 70%; display: block; margin: auto; margin-top: 5px;"></ion-img><br>
+            <ion-label style="display: block;">Sembra che la zona che stai cercando non sia ancora registrata nei nostri
+              sistemi. Controlla più tardi o prova un'altra area!</ion-label>
+          </div>
+
+          <div *ngIf="selectedSegment === 'default' && !loadedStops" class="loading-segment">
+            <ion-spinner></ion-spinner>
+          </div>
+
+          <!-- BUSES -->
+          <ion-list class="list" lines="full"
+            *ngIf="selectedSegment === 'segment' && busesDetailsLoaded && buses.length > 0">
+            <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)"
+              (click)="centerBus(bus)">
+              <ion-badge class="bus-badge" style="font-size: 16px;">
+                <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+                &nbsp;{{ bus.route.code.split('_')[0] }} - {{ bus.route.company }}
+              </ion-badge>
+              <ion-label style="font-size: 17px; padding-top: 12px; padding-bottom: 12px;"></ion-label>
+              <ion-label style="font-size: 22px; padding-top: 12px; padding-bottom: 12px;" slot="end">{{ bus.delay
+                }}</ion-label>
+            </ion-item>
+          </ion-list>
+
+          <!-- If no buses -->
+          <div *ngIf="selectedSegment === 'segment' && buses.length === 0 && loadedBuses" style="text-align: center;">
+            <ion-img src="../../assets/no-results-people.png" style="width: 70%; display: block; margin: auto; margin-top: 5px;"></ion-img><br>
+            <ion-label style="display: block;">Attualmente non troviamo pullman in movimento nell'area. Riprova più
+              tardi o verifica un'altra zona!</ion-label>
+          </div>
+
+          <div *ngIf="selectedSegment === 'segment' && !loadedBuses" class="loading-segment">
+            <ion-spinner></ion-spinner>
+          </div>
+
+        </div>
+
+        <div *ngIf="!showStops">
+          <app-stop-details [stop]="this.selectedStop" [nextBuses]="this.nextBuses" [modal]="this.modal"
+            (back)="this.showStops = true"></app-stop-details>
+        </div>
+
+
+        <div *ngIf="!showBuses">
+          <app-bus-details *ngIf="selectedBus" [bus]="this.selectedBus" [modal]="this.modal"
+            (back)="this.showBuses = true"></app-bus-details>
+        </div>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Search Modal -->
+  <ion-modal #cardModal trigger="open-modal" [presentingElement]="presentingElement"
+    style="margin-top: 10px; border-radius: 20px 20px 0 0px; box-shadow: 0px 0px 20px 5px rgb(0 0 0 / 15%);"
+    (ionModalDidPresent)="focusInput()">
+    <ng-template>
+      <div class="card-modal-header">
+        <ion-buttons slot="end">
+          <ion-icon aria-hidden="true" (click)="cardModal.dismiss()" name="chevron-back-outline"></ion-icon>
+          <ion-input placeholder="Cerca sulla mappa" (ionChange)="searchPlaces($event)"
+            style="width: 100%;"></ion-input>
+        </ion-buttons>
+      </div>
+      <ion-content>
+        <ion-list>
+
+          <ion-item *ngFor="let place of places" (click)="changeCurrentPosition(place.name, place.lat, place.lng)">
+            <ion-avatar slot="start">
+              <ion-img src="../../assets/marker-round.png"></ion-img>
+            </ion-avatar>
+            <ion-label>
+              <h2>{{place.name}}</h2>
+              <!--<p>via della Resistenza, 132, Rende</p>-->
+            </ion-label>
+          </ion-item>
+
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

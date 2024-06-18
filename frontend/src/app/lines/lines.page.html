@@ -1,0 +1,97 @@
+<ion-content [fullscreen]="true">
+  <ion-toolbar>
+    <ion-searchbar class="search-bar" slot="start" (input)="search($event)" (ionClear)="clearSearch()"
+      placeholder="Cerca una linea">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <div *ngIf="loading" class="loading-overlay">
+    <!-- Loading Spinner -->
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <ion-list lines="full" *ngIf="!loading">
+    <ion-accordion-group>
+
+      <ion-item-group *ngFor="let company of filteredRoutes | keyvalue">
+
+        <ion-item-divider>
+          <ion-label>{{company.key}}</ion-label>
+        </ion-item-divider>
+
+
+        <div *ngFor="let route of company.value">
+          <ion-accordion>
+            <ion-item slot="header">
+              <ion-badge slot="start" class="bus-badge">
+                <ion-icon name="bus-outline" class="icon-center"></ion-icon>
+                {{ route.code.split('_')[0] }}
+              </ion-badge>
+              <ion-label class="label-small" style="padding-top: 10px; padding-bottom: 10px;">{{
+                route.code.split('_')[1] }}</ion-label>
+            </ion-item>
+
+            <div slot="content">
+
+              <ion-segment value="{{this.selectedSegment}}" (ionChange)="segmentChanged($event)"
+                style="--background: var(--ion-color-light-tint);">
+                <ion-segment-button value="default">
+                  <ion-label>Andata</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="segment" *ngIf="route.stops.backStops.length > 0">
+                  <ion-label>Ritorno</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+
+              <!-- Forward -->
+              <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default'" style="padding-top: 0px;">
+                <ion-accordion-group>
+                  <div *ngFor="let stop of route.stops.forwardStops; let i = index">
+                    <ion-accordion>
+                      <ion-item slot="header" style="--background: var(--ion-color-light-tint);">
+                        <ion-icon aria-hidden="true" name="pin-outline"></ion-icon>
+                        <ion-label
+                          style="margin-left: 10px; padding-top: 10px; padding-bottom: 10px;">{{stop.address}}</ion-label>
+                      </ion-item>
+
+                      <div slot="content">
+                        <ion-label
+                          style="font-size: 22px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px;">{{
+                          this.getStopTimetable(company.key, route, "forward", i ) }}</ion-label>
+                      </div>
+                    </ion-accordion>
+                  </div>
+                </ion-accordion-group>
+              </ion-list>
+
+              <!-- Back -->
+              <ion-list class="list" lines="full" *ngIf="selectedSegment === 'segment'" style="padding-top: 0px;">
+                <ion-accordion-group>
+                  <div *ngFor="let stop of route.stops.backStops; let i = index">
+                    <ion-accordion>
+                      <ion-item slot="header" style="--background: var(--ion-color-light-tint);">
+                        <ion-icon aria-hidden="true" name="pin-outline"></ion-icon>
+                        <ion-label
+                          style="margin-left: 10px; padding-top: 10px; padding-bottom: 10px;">{{stop.address}}</ion-label>
+                      </ion-item>
+
+                      <div slot="content">
+                        <ion-label
+                          style="font-size: 22px; padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px;">{{
+                          this.getStopTimetable(company.key, route, "back", i ) }}</ion-label>
+                      </div>
+                    </ion-accordion>
+                  </div>
+                </ion-accordion-group>
+              </ion-list>
+            </div>
+
+          </ion-accordion>
+        </div>
+
+
+
+      </ion-item-group>
+    </ion-accordion-group>
+  </ion-list>
+</ion-content>

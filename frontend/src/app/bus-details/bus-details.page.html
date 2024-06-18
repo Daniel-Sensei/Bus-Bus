@@ -1,53 +1,86 @@
 <div class="blank-space"></div>
 
-  <ion-toolbar class="top-segment">
-    <ion-icon aria-hidden="true" name="arrow-back" slot="start" (click)="backToBuses()"></ion-icon>
-    <ion-title class="header">Dettagli Bus</ion-title>
-  </ion-toolbar>
+<ion-toolbar class="top-segment">
+  <ion-icon aria-hidden="true" name="arrow-back" slot="start" (click)="backToBuses()"></ion-icon>
+  <ion-title class="header">Dettagli Bus</ion-title>
+</ion-toolbar>
 
 
 
-  <ion-item lines="none" style="margin-top: 10px;">
-    <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon" size="large"></ion-icon>
-    <ion-label class="label">
-      <div class="bold">{{bus.route.code}} - {{bus.route.company}}</div>
-      <div>1 di 3</div>
-    </ion-label>
+<ion-item lines="none" style="margin-top: 10px;">
+  <ion-icon slot="start" aria-hidden="true" name="bus-outline" class="icon" size="large"></ion-icon>
+  <ion-label class="label">
+    <div class="bold">{{ bus.route.code.split('_')[0] }} - {{ destination }}</div>
+    <div>{{bus.route.company}}</div>
+  </ion-label>
 
-    <ion-icon *ngIf="!this.favourite" (click)="addFavourite(true)" slot="end" aria-hidden="true" name="star-outline" class="icon"></ion-icon>
-    <ion-icon *ngIf="this.favourite" (click)="addFavourite(false)" slot="end" aria-hidden="true" name="star" class="icon"></ion-icon>
+  <ion-icon *ngIf="!this.favourite" (click)="addFavourite(true)" slot="end" aria-hidden="true" name="star-outline"
+    class="icon" color="primary"></ion-icon>
+  <ion-icon *ngIf="this.favourite" (click)="addFavourite(false)" slot="end" aria-hidden="true" name="star"
+    class="icon" color="primary"></ion-icon>
 
-  </ion-item>
+</ion-item>
 
-  <ion-accordion-group>
-    <ion-accordion value="first" (click)="resizeModal()">
-      <ion-item slot="header" style="margin-right: 10px;">
-        <ion-icon slot="start" aria-hidden="true" name="time-outline" class="icon" size="large"></ion-icon>
-        <ion-label class="label">
-          <div class="bold">Prossime fermate</div>
-          <div>Visualizza elenco delle fermate</div>
-        </ion-label>
-      </ion-item>
+<ion-accordion-group>
+  <ion-accordion value="first" (click)="resizeModal()">
+    <ion-item slot="header" style="margin-right: 10px;">
+      <ion-icon slot="start" aria-hidden="true" name="time-outline" class="icon" size="large"></ion-icon>
+      <ion-label class="label">
+        <div class="bold">Prossime fermate</div>
+        <div>Visualizza elenco delle fermate</div>
+      </ion-label>
+    </ion-item>
 
-      <div slot="content" style="margin-bottom: -2.5em;">
-        
-        <!--
-        <ul>
-          <li *ngFor="let stop of bus?.route?.stops" [attr.data-content]="stop" [ngClass]="{ 'active': stop === 'via degli innocenti e della Speranzaa, 3' }"></li>
+    <div slot="content">
 
-        
-        </ul>
-      -->
 
-        
+      <ion-list class="list" lines="full">
+        <ion-accordion-group>
 
-      </div>
-    </ion-accordion>
-  </ion-accordion-group>  
+          <div *ngFor="let stop of stops; let i = index" style="margin-left: 8px; margin-right: 10px;">
+            <ion-accordion (click)="$event.stopPropagation()">
+              <ion-item slot="header">
 
-  <div class="div-center" style="margin-top: 5px;">
-    <ion-button shape="round">
-      Portami qui
-    </ion-button>
-  </div>
+
+                <ion-icon *ngIf="bus.lastStop >= i" style="font-size: 18px; margin-right: 15px;" color="primary"
+                  name="ellipse" slot="start"></ion-icon>
+                <ion-icon *ngIf="bus.lastStop < i" style="font-size: 18px; margin-right: 15px;" color="primary"
+                  name="ellipse-outline" slot="start"></ion-icon>
+
+                <div style="margin-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+                  <div *ngIf="stop?.address != stop?.name; else elseBlock">
+                    <div class="bold">{{ stop?.name }}</div>
+                    <div>{{ stop?.address }}</div>
+                  </div>
+                  <ng-template #elseBlock>
+                    <div class="bold">{{ stop?.address }}</div>
+                  </ng-template>
+                </div>
+              </ion-item>
+
+              <div slot="content" class="accordation-details" *ngIf="arrivals != null">
+
+                <div *ngIf="bus.lastStop < i; else nextArrival">
+                  <ion-label style="font-size: 18px;">Arrivo Previsto:</ion-label><ion-label style="font-size: 22px;"
+                    class="bold"> {{getNextArrivalByStop(stop.id)}}</ion-label><br>
+                  <!--<ion-label style="font-size: 18px;">Ritardo:</ion-label><ion-label style="font-size: 22px;"
+                    class="bold"> +5 min</ion-label>--><br>
+                  <ion-label style="font-size: 16px;">Prossimi Arrivi Previsti:</ion-label><br>
+                  <ion-label style="font-size: 20px;" class="bold"> {{getNextArrivalsByStopMinusFirst(stop.id)}}</ion-label>
+                </div>
+                <ng-template #nextArrival>
+                  <ion-label style="font-size: 18px;">Prossimi Arrivi Previsti:</ion-label><br>
+                  <ion-label style="font-size: 20px;" class="bold"> {{getNextArrivalsByStop(stop.id)}}</ion-label>
+                </ng-template>
+
+              </div>
+            </ion-accordion>
+          </div>
+        </ion-accordion-group>
+      </ion-list>
+
+
+    </div>
+  </ion-accordion>
+</ion-accordion-group>
 
