@@ -38,7 +38,7 @@
       </ion-label>
     </ion-item>
 
-    <div slot="content">
+    <div slot="content" *ngIf="nextBuses.length > 0">
 
       <ion-list class="list" lines="full">
 
@@ -54,6 +54,12 @@
       </ion-list>
 
     </div>
+
+    <div slot="content" *ngIf="nextBuses.length === 0" style="text-align: center;">
+      <ion-img src="../../assets/no-results-people.png" style="width: 70%; display: block; margin: auto; margin-top: 70px;"></ion-img><br>
+      <ion-label style="display: block;">Attualmente non troviamo pullman diretti in questa fermata. Riprova più tardi o verifica un'altra fermata!</ion-label>
+    </div>
+
   </ion-accordion>
 </ion-accordion-group>
 
