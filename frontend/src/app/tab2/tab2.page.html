@@ -28,7 +28,7 @@
           <!-- Fermate -->
           <ion-list class="list" lines="full" *ngIf="selectedSegment === 'default' && filteredStops.length > 0">
             <ion-item *ngFor="let stop of filteredStops" (click)="navigateToStopDetails(stop)"
-              (click)="centerStopBus(stop)" class="bus-item">
+              (click)="centerStopBus(stop.coords.latitude, stop.coords.longitude)" class="bus-item">
               <img [src]="getIconDirectory() + 'bus-stop.png'" class="img-icon">
               <ion-label
                 style="margin-left: 5px; font-size: 17px; font-weight: bold; padding-top: 15px; padding-bottom: 15px;">{{stop.name}}</ion-label>
@@ -52,7 +52,7 @@
           <ion-list class="list" lines="full"
             *ngIf="selectedSegment === 'segment' && busesDetailsLoaded && buses.length > 0">
             <ion-item *ngFor="let bus of buses" (click)="navigateToBusDetails(bus.routeId)"
-              (click)="centerStopBus(bus)">
+              (click)="centerBus(bus)">
               <ion-badge class="bus-badge" style="font-size: 16px;">
                 <ion-icon name="bus-outline" class="icon-center"></ion-icon>
                 &nbsp;{{ bus.route.code.split('_')[0] }} - {{ bus.route.company }}

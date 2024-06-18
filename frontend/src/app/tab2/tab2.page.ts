@@ -417,7 +417,7 @@ export class Tab2Page implements OnInit {
             this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
 
             this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
-            this.centerStopBus(stop);
+            this.centerStopBus(stop.coords.latitude, stop.coords.longitude);
           })
           .addTo(this.map);
         this.stopsMarkers.push(stopMarker);
@@ -426,17 +426,36 @@ export class Tab2Page implements OnInit {
     });
   }
 
-  centerStopBus = async (pos: Stop | Bus) => {
+  centerStopBus = async (lat: number, long: number) => {
     //se il breakpoint del modal è 1, allora imposta il breakpoint a 0.30
     if (await this.modal.getCurrentBreakpoint() === 1) {
       this.modal.setCurrentBreakpoint(0.30);
     }
 
-    const stopLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+    const stopLatLng = L.latLng(lat, long);
     this.map.flyTo(stopLatLng, 15, {
       duration: 1,
       easeLinearity: 0.5
     });
+  }
+
+  centerBus = async (bus: Bus) => {
+    //se il breakpoint del modal è 1, allora imposta il breakpoint a 0.30
+    if (await this.modal.getCurrentBreakpoint() === 1) {
+      this.modal.setCurrentBreakpoint(0.30);
+    }
+
+    //find the bus in filteredBuses and take the coords
+    const busIndex = this.filteredBuses.findIndex(busFound => busFound.id === bus.id);
+    const busCoords = this.filteredBuses[busIndex].coords;
+    
+    
+    const stopLatLng = L.latLng(busCoords.latitude, busCoords.longitude);
+    this.map.flyTo(stopLatLng, 15, {
+      duration: 1,
+      easeLinearity: 0.5
+    });
+    
   }
 
   navigateToStopDetails(stop: Stop) {
@@ -570,7 +589,7 @@ export class Tab2Page implements OnInit {
         const busMarker = L.marker([bus.coords.latitude, bus.coords.longitude], { icon: customIcon }) // Usa il marker personalizzato
           .on('click', () => {
             this.navigateToBusDetails(bus.routeId); // Aggiunta dell'azione quando clicchi sulla fermata
-            this.centerStopBus(bus);
+            this.centerStopBus(bus.coords.latitude, bus.coords.longitude);
             this.eraseRoute();
             //this.drawRoute(bus);
           })
@@ -649,7 +668,7 @@ export class Tab2Page implements OnInit {
           this.eraseRoute(); // Rimuovi i percorsi esistenti dalla mappa
 
           this.navigateToStopDetails(stop); // Aggiunta dell'azione quando clicchi sulla fermata
-          this.centerStopBus(stop);
+          this.centerStopBus(stop.coords.latitude, stop.coords.longitude);
         })
         .addTo(this.map);
     });
