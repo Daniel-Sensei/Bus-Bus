@@ -9,14 +9,14 @@ The project consists of two main components:
 
 ## Screenshots
 ### White Theme
-<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/59ecf100-cd45-4af5-b8f5-b442a5063e92" width="300">
-<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/4ec8bbad-879d-44eb-8c79-93307e165e6c" width="300">
-<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/bad86770-622d-4150-b942-b0101bb3d8cb" width="300">
+<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/59ecf100-cd45-4af5-b8f5-b442a5063e92" width="250">
+<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/4ec8bbad-879d-44eb-8c79-93307e165e6c" width="250">
+<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/bad86770-622d-4150-b942-b0101bb3d8cb" width="250">
 
 ### Dark Theme
-<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/ec5f66ba-2796-4e22-a213-8ec29bad4910" width="300">
-<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/1b0433d2-dc14-4983-88e9-697d29b4fbb8" width="300">
-<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/9625baee-5e9b-4208-9acf-022babe5043a" width="300">
+<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/ec5f66ba-2796-4e22-a213-8ec29bad4910" width="250">
+<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/1b0433d2-dc14-4983-88e9-697d29b4fbb8" width="250">
+<img src="https://github.com/Daniel-Sensei/BusBuddy/assets/132211678/9625baee-5e9b-4208-9acf-022babe5043a" width="250">
 
 
 ## Features
