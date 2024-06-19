@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -18,7 +19,7 @@ public class FirestoreInitializer {
     public void initialize() {
         try {
             // Load environment variables from .env file
-            Dotenv dotenv = Dotenv.configure().load();
+            Dotenv dotenv = loadDotenv();
 
             // Get the Firebase service account key from environment variables
             String serviceAccountJson = dotenv.get("FIREBASE_SERVICE_ACCOUNT_KEY");
@@ -37,5 +38,25 @@ public class FirestoreInitializer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Dotenv loadDotenv() throws Exception {
+        Dotenv dotenv = null;
+        try {
+            // Try loading .env file from /etc/secrets/
+            dotenv = Dotenv.configure()
+                    .directory("/etc/secrets/")
+                    .load();
+            System.out.println("Loaded .env file from /etc/secrets/");
+        } catch (Exception e) {
+            // Handle DotenvException for classpath loading
+            System.out.println("Could not find /etc/secrets/.env on the classpath");
+            dotenv = Dotenv.configure()
+                    .directory(new File("").getAbsolutePath())
+                    .load();
+        }
+
+
+        return dotenv;
     }
 }
