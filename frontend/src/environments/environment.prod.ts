@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  API_URL: 'https://bus-bus.onrender.com/'
+  API_URL: 'https://busbuddy-f96y.onrender.com/'
 };

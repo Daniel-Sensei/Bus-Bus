@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  API_URL: 'https://bus-bus.onrender.com/'
+  API_URL: 'https://busbuddy-f96y.onrender.com/'
   /*
   firebase: {
     apiKey: "AIzaSyAXBzmUtfz_xcBTMmhcEvQdWO1GEArn5wA",
